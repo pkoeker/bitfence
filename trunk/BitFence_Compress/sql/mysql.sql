@@ -13,6 +13,7 @@ create table ITEM (
 create table OBJEKT
 (
     OID                             INTEGER                not null,
+    content			    varchar(255),
     primary key (OID)
 ); 
 
