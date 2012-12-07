@@ -1,10 +1,7 @@
 package de.pk86.bf.client;
 
-import java.util.Iterator;
-
 import javax.servlet.http.HttpServletRequest;
 
-import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.pk86.bf.ExpressionResult;
 import de.pk86.bf.ObjectItemServiceIF;
