@@ -23,6 +23,8 @@
 	<classpathentry kind="lib" path="lib/tomcat-juli.jar"/>
 	<classpathentry kind="lib" path="lib/servlet.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql-9.2-1000.jdbc4.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jxmlguibuilder"/>
+	<classpathentry kind="lib" path="lib/guibuilder.jar"/>
+	<classpathentry kind="lib" path="lib/jdataset.jar"/>
+	<classpathentry kind="lib" path="lib/pkjs_pl.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -3,7 +3,6 @@ package de.pk86.bf;
 import java.io.Serializable;
 import java.util.Iterator;
 
-import de.guibuilder.framework.event.GuiUserEvent;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 
