@@ -1,8 +1,3 @@
-# ============================================================
-#   Database name  :  SCHLAGWORT                              
-#   DBMS name      :  MySQL                                   
-#   Created on     :  24.12.2002  14:04                       
-# ============================================================
 
 # ============================================================
 #   Table : ITEM                                              
@@ -15,25 +10,19 @@ create table ITEM (
 # ============================================================
 #   Table : OBJECT                                            
 # ============================================================
-create table OBJECT
+create table OBJEKT
 (
     OID                             INTEGER                not null,
     primary key (OID)
 ); 
 
-# ============================================================
-#   Table : OBJECTITEM                                        
-# Der INDEX ist wichtig:
-# Alle Foreign Keys, die nicht das erste Feld in einem Key (hier der Primary Key) sind,
-# benötigen einen extra Index!
-# ============================================================
-create table OBJECTITEM
+create table OBJEKTITEM
 (
     OID                             INTEGER                not null,
     ITEMNAME                        VARCHAR(50)            not null,
     primary key (OID, ITEMNAME),
     foreign key (OID)
-       references OBJECT (OID) ON DELETE CASCADE,
+       references OBJEKT (OID) ON DELETE CASCADE,
 	INDEX FK_Itemname (Itemname),
     foreign key (ITEMNAME)
        references ITEM (ITEMNAME) ON DELETE CASCADE
