@@ -3,7 +3,6 @@ package de.pk86.bf.client;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -16,7 +15,6 @@ import de.guibuilder.framework.GuiUtil;
 import de.guibuilder.framework.GuiWindow;
 import de.guibuilder.framework.event.GuiChangeEvent;
 import de.guibuilder.framework.event.GuiUserEvent;
-import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.pk86.bf.ExpressionResult;
 import de.pk86.bf.ObjectItemServiceIF;
@@ -46,7 +44,6 @@ public class ObjectItemGui {
 		GuiUtil.setUiManager("Nimbus");
 		try {
 			GuiWindow win = fact.createWindow("gui/Expression.xml");
-			//GuiWindow win = fact.createWindow("gui/Selection.xml");
 			win.setController(this);
 			win.show();
 		} catch (Exception ex) {
