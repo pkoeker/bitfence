@@ -29,10 +29,9 @@ create table OBJEKTITEM
 create table SLOT
 (
     ITEMNAME                        VARCHAR(128)            not null,
-    SLOTNUMBER                      INTEGER                not null,
     BITS                            BLOB                   not null,
     BITCOUNT                        INTEGER                        ,
-    primary key (ITEMNAME, SLOTNUMBER),
+    primary key (ITEMNAME),
     foreign key (ITEMNAME)
        references ITEM (ITEMNAME)
 )
