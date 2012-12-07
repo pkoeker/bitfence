@@ -1,0 +1,1 @@
+java -Xmx28M -cp pk86_bf.jar:lib/log4j-1.2.16.jar:lib/GLUE.jar:../jxmlguibuilder/lib/spring/*:../jxmlguibuilder/guibuilder.jar:../jxmlguibuilder/lib/jdataset.jar:../jxmlguibuilder/lib/commons-logging-api-1.1.jar de.pk86.bf.client.ObjectItemGui

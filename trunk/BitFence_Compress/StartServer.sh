@@ -1,0 +1,1 @@
+java -Xmx64M -cp .:pk86_bf.jar:lib/*:lib/spring/* de.pk86.bf.Startup
