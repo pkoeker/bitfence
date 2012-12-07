@@ -3,20 +3,20 @@ create table ITEM (
     primary key (ITEMNAME)
 ); 
 
-create table OBJECT
+create table OBJEKT
 (
     OID                             INTEGER                not null,
     content			    			TEXT,    
     primary key (OID)
 ); 
 
-create table OBJECTITEM
+create table OBJEKTITEM
 (
     OID                             INTEGER                not null,
     ITEMNAME                        VARCHAR(128)            not null,
     primary key (OID, ITEMNAME),
     foreign key (OID)
-       references OBJECT (OID) ON DELETE CASCADE,
+       references OBJEKT (OID) ON DELETE CASCADE,
     foreign key (ITEMNAME)
        references ITEM (ITEMNAME) ON DELETE CASCADE
 );
