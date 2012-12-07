@@ -1,0 +1,48 @@
+<?xml version='1.0'  encoding='UTF-8'?>
+<!DOCTYPE GDL SYSTEM 'http://guibuilder.de/gdl.dtd'>
+<GDL>
+<Form label="Keyword Selection - Expression Editor" restore="SIZE_LOCATION" OnClose="doExit">
+<Menubar>
+	<Menu label="%Source">
+		<ItemOption label="local %native" cmd="native" OnChange="getService"/>
+		<ItemOption label="local %RMI"    cmd="rmi" />
+		<ItemOption label="local %SOAP"   cmd="soap" />
+		<ItemOption label="re%mote SOAP"  cmd="remoteSOAP"/>
+		<ItemOption label="r%emote RMI"   cmd="remoteRMI"/>
+		<Separator/>
+		<Item label="Exit" cmd="doExit"/>
+	</Menu>
+	<Menu label="Session">
+	</Menu>
+</Menubar>
+<!--
+<Toolbar>
+	<Tool label="Edit Objects..." cmd="editObjects"/>
+</Toolbar>
+-->
+<Split type="VERTICAL">
+<Panel label="oben" >
+	<Group label="Expression" >
+		<Memo name="memExpr" it="0" ir ="0" w="1"/>
+		<Button label="Execute" an="C" cmd="ee_execute" type="OK"/>
+	</Group>
+</Panel>
+<Panel label="unten">
+	<Group label="Result Set">
+		<Panel wy="0" ib="5">
+			<Number label="Number of Objects:" name="size" ir="0" fill="H" wx="1" do="y" eol="false" it="0"/>
+			<Text label="Execution Time:" name="exeTime" ir="0" fill="H" wx="1" do="y" it="0"/>
+		</Panel>
+		<Memo name="memResult"  it="0" ir="0" do="y" tabstop="y"/>
+		<Panel w="4" wy="0" layout="FLOW">
+			<Button label="Other Items" cmd="findOther" />
+			<Button label="< Back" cmd="goBack" />
+			<Button label="More >" cmd="goMore" />
+			<!--Button label="Show Objects" cmd="showObjects" /-->
+		</Panel>
+		<!--Memo name="memOther"  it="0" ir="0" do="y" tabstop="y"/-->
+	</Group>
+</Panel>
+</Split>
+</Form>
+</GDL>
