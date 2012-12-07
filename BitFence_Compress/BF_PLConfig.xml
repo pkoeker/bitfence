@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Server>
+	<Database name='bitfence' enabled='true'>
+    <!-- POSTGRES -->
+    <JDBC-Driver>org.postgresql.Driver</JDBC-Driver>
+    <URL>jdbc:postgresql://localhost/bitdemo?prepareThreshold=3</URL>
+	<Schema>public</Schema>
+    <Username>peter</Username>
+    <Password>peter</Password>
+    <!-- MAXDB -->
+	<!--JDBC-Driver>com.sap.dbtech.jdbc.DriverSapDB</JDBC-Driver>
+    <URL>jdbc:sapdb://localhost/MAXDB?cache=all</URL-->
+	<!--Schema>bitfence</Schema>
+    <Username>bitfence</Username>
+    <Password>bitfence</Password-->
+
+	<Schema>bitdemo</Schema>
+	<Username>bitdemo</Username>
+	<Password>bitdemo</Password>
+    
+	<MaxActiveConnections value="45"/>
+	<MaxIdleConnections value="45"/>
+	<MinIdleConnections value="5"/>
+	<!-- MaxWait 5 Minuten -->
+	<ConnectionTimeOut value="300000"/>
+	<ValidationQuery>SELECT 1</ValidationQuery>
+	<TransactionIsolationLevel value="TRANSACTION_READ_COMMITTED"/>
+    <DetectDatabaseSessionID value="false" />	
+    <Sequence>
+      <!--get>SELECT counter FROM counter WHERE oid = 1</get>
+      <set>UPDATE counter SET counter = ? WHERE oid = 1</set-->
+      <get>SELECT MAX(oid)+1 FROM OBJEKT</get>
+    </Sequence>
+  </Database>
+  <Format>
+    <DateFormat value='dd.MM.yyyy'/>
+    <TimeFormat value='HH:mm'/>
+    <TimestampFormat value='dd.MM.yyyy HH:mm:ss'/>
+    <DecimalFormat value='#0.00'/>
+  </Format>
+  <Options>
+    	<Debug value='true'/>
+		<MaxOid value="212992"/>
+		<MaxResultSet value="60000"/>
+		<ResultSetPage value="20"/>
+		<SlowQueryLogger loggerName="log_slow_queries" defaultMaxExecutionTime="50"></SlowQueryLogger>
+  </Options>
+	<Spider>
+		<Directory>/home/peter/workspace/GuiBuilder/src/de/guibuilder/framework</Directory>
+		<FileExtension>.txt</FileExtension>
+		<FileExtension>.html</FileExtension>
+		<FileExtension>.java</FileExtension>
+		<FileExtension>.sh</FileExtension>
+	</Spider>
+	<WebService>
+		<URL>http://pk86.de:8004</URL>
+		<Service>bitdemo</Service>
+	</WebService>
+</Server>
+  
