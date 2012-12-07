@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE GDL SYSTEM 'http://guibuilder.de/gdl.dtd'>
+<GDL>
+<Dialog label="Items" restore="SIZE_LOCATION">
+	<Text label="Item:" name="textItem" eol="false" w="1" OnChange="itemChanged"/>
+	<Button label="Find" eol="false" cmd="findItems"/>	
+	<Button label="Create" eol="false" cmd="createItem"/>
+	<Button label="Delete" cmd="deleteItem"/>
+	<Group label="Items" w="5">
+		<List name="listItems" it="0" ir="0"/>
+		<Panel label="Buttons" wy="0" layout="FLOW">
+			<Button label="OK" />
+			<Button label="Cancel" />
+		</Panel>
+	</Group>
+</Dialog>
+<!--Script language="BeanShell"-->
+<!--
+import de.pkjs.bf.*;
+import de.guibuilder.framework.*;
+import electric.registry.*;
+//ObjectItemService sv = new ObjectItemService();
+ObjectItemServiceIF sv = (ObjectItemServiceIF)Registry.bind("http://localhost:8004/bf.wsdl", ObjectItemServiceIF.class);
+String item = null;
+findItems(event) {
+	item = event.window.getValue("textItem");
+	String[] items = sv.findItems(item);
+	GuiMember mem = event.window.getGuiMember("listItems");
+	mem.setItems(items);
+}
+createItem(event) {
+	item = event.window.getValue("textItem");
+	sv.createItem(item);
+}
+deleteItem(event) {
+	item = event.window.getValue("textItem");
+	sv.deleteItem(item);
+}
+itemChanged(event) {
+	item = event.value;
+}
+-->
+<!--/Script-->
+</GDL>
