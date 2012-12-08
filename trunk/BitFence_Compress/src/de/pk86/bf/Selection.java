@@ -6,10 +6,13 @@ import java.util.Arrays;
 import de.jdataset.JDataSet;
 import de.pk86.bf.pl.BfPL;
 import de.pk86.bf.pl.Slot;
+
 /**
  * Hält den Zustand einer Schlagwortselektion
  */
 public class Selection {
+	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Selection.class);
+
 	public static final int NONE = 0;
 	public static final int AND = 1;
 	public static final int OR = 2;
@@ -23,6 +26,7 @@ public class Selection {
 	private long duration;
 	private int posi; // Pointer im Resultset
 	private ArrayList<String> items = new ArrayList<String>();
+	private String missingItems = ""; 
 	// Constructor
 	Selection (String name) {
 		this.name = name;
@@ -38,6 +42,11 @@ public class Selection {
 	 * @throws Exception
 	 */
 	int performOper(OperToken ot) {
+		if (ot.slot == null) {
+			logger.warn("Missing Slot: " + ot.token);
+			missingItems += ot.token + " ";
+			return 0;
+		}
 		items.add(ot.token);
 		if (ot.oper == NONE || calls == 0) {
 			this.slot = ot.slot;
@@ -223,6 +232,13 @@ public class Selection {
 	ArrayList<String> getItems() {
 		return items;
 	}
+	/**
+	 * Menge der nicht vorhandenen Suchbegriffe
+	 * @return
+	 */
+	String getMissingItems() {
+		return missingItems;
+	}
 	
 	long getDuration() {
 		return this.duration;
@@ -234,6 +250,7 @@ public class Selection {
 		this.duration = 0;
 		this.slot = null;
 		this.items = new ArrayList<String>();
+		this.missingItems = "";
 	}
 	public static int countBitsSet(int[] values) {
 		int count = 0;

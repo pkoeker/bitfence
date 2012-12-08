@@ -12,6 +12,7 @@ public class ExpressionResult implements Serializable {
    public String sessionName;
    
    public String expression;
+   public String missingItems;
    public long[] objekts; // nur die erste Page
    public int resultsetSize;
    public long duraDB1;
@@ -32,12 +33,16 @@ public class ExpressionResult implements Serializable {
    }
    
    public String getFirstPage() {
-   	return pageToString(firstPage);
+   	String s = pageToString(firstPage);
+   	if (missingItems != null && missingItems.length() > 0) {
+   		s += "\nUngültige Suchbegriffe: " + missingItems;
+   	}
+   	return s;
    }
    
    public static String pageToString(JDataSet ds) {
-   	if (ds == null) {
-   		return "";
+   	if (ds == null || ds.getRowCount() == 0) {
+   		return "<null>";
    	}
    	Iterator<JDataRow> it = ds.getChildRows();
    	StringBuilder sb = new StringBuilder();
