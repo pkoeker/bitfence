@@ -854,6 +854,7 @@ public class BfPL {
 	/**
 	 * Die Liste mit den Tokes wird mit den Slots ergänzt;
 	 * entweder aus dem Cache oder aus der Datenbank frisch eingelesen.
+	 * Achtung! Wird ein Item angegeben, welches nicht existiert, bleibt slot null!
 	 * @param al
 	 * @throws Exception
 	 */

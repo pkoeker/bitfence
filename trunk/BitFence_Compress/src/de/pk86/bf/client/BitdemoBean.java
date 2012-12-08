@@ -74,6 +74,9 @@ public class BitdemoBean {
 	
 	private void dispResult(JDataSet ds) {
 		String s = ExpressionResult.pageToString(ds);
+		if (res.missingItems != null && res.missingItems.length() > 0) {
+			s += "\nIgnorierte Suchbegriffe: " + res.missingItems;
+		}
 		page = s;
 	}
 	
