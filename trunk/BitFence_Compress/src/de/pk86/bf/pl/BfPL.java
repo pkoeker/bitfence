@@ -1,11 +1,14 @@
 package de.pk86.bf.pl;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
+import net.sf.ehcache.CacheManager;
 
 import org.apache.log4j.xml.DOMConfigurator;
 
@@ -70,8 +73,6 @@ public class BfPL {
 	
 	private PL pl;
 	
-	//private BfDatabase database;
-	//private BfConnectionPool pool;
 	// Private Constructor
 	private BfPL(String configFilename) {
 		this.init(configFilename);
@@ -95,6 +96,25 @@ public class BfPL {
 		}
 		return me;
 	}
+	// Cache ########################################
+	private static CacheManager cacheManager;
+	  
+	static CacheManager getCacheManager() {
+		synchronized (CacheManager.class) {
+			if (cacheManager == null) {
+				try {
+					URL url = PL.class.getResource("/ehcache.xml");
+					cacheManager = CacheManager.create(url);
+				} catch (Throwable ex) {
+					logger.error(ex.getMessage(), ex);
+				}
+			}
+		}
+		return cacheManager;
+	}
+	
+	private SlotCache sc;
+
 	// Objects ###################################
 	public void createObject(long oid) throws Exception {
 		try {
@@ -831,36 +851,59 @@ public class BfPL {
 		ipl.commitTransaction("repair");
 	}
 	
+	/**
+	 * Die Liste mit den Tokes wird mit den Slots ergänzt;
+	 * entweder aus dem Cache oder aus der Datenbank frisch eingelesen.
+	 * @param al
+	 * @throws Exception
+	 */
 	public void findSlots(ArrayList<OperToken> al) throws Exception {
+		/* Prüfen, ob Slot im Cache bereits vorhanden; 
+		 * ansonsten Slot aus der Datenbank einlesen und im Cache versenken. */
 		ArrayList<String> alToks = new ArrayList<String>(al.size());
 		for(OperToken ot:al) {
-			alToks.add(ot.token);
+			boolean cached = false;		
+			if (sc != null) {
+				Slot cs = sc.get(ot.token);
+				if (cs != null) {
+					ot.slot = cs;
+					cached = true;
+				}
+			}
+			if (!cached) {
+				alToks.add(ot.token);
+			}
 		}
-		/*
-		 * TODO: wenn itemname mit Wildcard, dann alle Slots dazu einlesen und mit AND verknüpfen
-		 */
-		String sql = "SELECT Itemname, Bits, BitCount FROM SLOT WHERE Itemname IN (?) ORDER BY Itemname";
-		ParameterList list = new ParameterList();
-		list.addParameter("Itemname", alToks);
-		try {
-	      JDataSet ds = pl.getDatasetSql("Slots", sql, list);
-	      if (ds == null || ds.getRowCount() == 0)
-	      	return;
-	      for(OperToken ot:al) {
-		      Iterator<JDataRow> it = ds.getChildRows();	      
-		      while(it.hasNext()) {
-		      	JDataRow row = it.next();
-		      	String itemname = row.getValue("itemname");
-		      	if (itemname.equals(ot.token)) {
-		      		Slot slot = new Slot(itemname, row);
-		      		ot.slot = slot;
-		      	}
+		if (alToks.size() > 0) { // Alles aus dem Cache?
+			/*
+			 * TODO: wenn itemname mit Wildcard, dann alle Slots dazu einlesen und mit AND verknüpfen
+			 */
+			String sql = "SELECT Itemname, Bits, BitCount FROM SLOT WHERE Itemname IN (?) ORDER BY Itemname";
+			ParameterList list = new ParameterList();
+			list.addParameter("Itemname", alToks);
+			try {
+		      JDataSet ds = pl.getDatasetSql("Slots", sql, list);
+		      if (ds == null || ds.getRowCount() == 0)
+		      	return;
+		      for(OperToken ot:al) {
+			      Iterator<JDataRow> it = ds.getChildRows();	      
+			      while(it.hasNext()) {
+			      	JDataRow row = it.next();
+			      	String itemname = row.getValue("itemname");
+			      	if (itemname.equals(ot.token)) {
+			      		Slot slot = new Slot(itemname, row);
+			      		ot.slot = slot;
+			      		if (sc != null) {
+			      			sc.put(slot);
+			      		}
+			      	}
+			      }
 		      }
+	      } catch (PLException e) {
+	      	logger.error(e.getMessage(), e);
+	      	throw e;
 	      }
-      } catch (PLException e) {
-      	logger.error(e.getMessage(), e);
-      	throw e;
-      }
+		}
 	}
 	
 	public String getObjekts(long[] oids) throws Exception {
@@ -998,15 +1041,19 @@ public class BfPL {
 				String sRsPage = rsPageEle.getAttribute("value");
 				resultSetPage = Integer.parseInt(sRsPage);
 			}
+			// Caches
+			Element scEle = optEle.getElement("SlotCache");
+			if (scEle != null) {
+				sc = new SlotCache(scEle);
+			}
+			Element ocEle = optEle.getElement("ObjektCache");
+			// TODO: ObjektCache
 			// GLUE
 			webServiceConfig = root.getElement("WebService");
 			// Spider
 			spiderConfig = root.getElement("Spider");
 			// PL
 			pl = new PL(configDoc); // neu
-			// ConnectionPool initialisieren // alt
-//			BfDatabase database = new BfDatabase(root, username, password);
-//		   pool = new BfConnectionPool(database);
 
 		} catch (Exception ex) {
 			System.err.println(
