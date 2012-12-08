@@ -1,0 +1,11 @@
+#summary Ehcache enabled!
+
+= Caching mit ehcache =
+
+Da es sich hier um eine vorwiegend lesende Anwendung handelt, bietet sich Caching an.
+
+  * Vorerst werden nur die Slots gecached.
+  * Max 10000 Einträge
+  * Max 10 Minuten
+
+ObjektCache
