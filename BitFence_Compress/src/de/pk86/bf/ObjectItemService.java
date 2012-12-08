@@ -370,6 +370,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		JDataSet ds = sel.getFirstPage();
 		ret.firstPage = ds;
 		ret.resultsetSize = sel.getResultSetSize();
+		ret.missingItems = sel.getMissingItems();
 		long end2 = System.currentTimeMillis();
 		ret.duraAlg = end1-start;
 		ret.duraDB2 = end2-end1;
