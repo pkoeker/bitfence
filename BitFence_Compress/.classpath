@@ -26,5 +26,8 @@
 	<classpathentry kind="lib" path="lib/guibuilder.jar"/>
 	<classpathentry kind="lib" path="lib/jdataset.jar"/>
 	<classpathentry kind="lib" path="lib/pkjs_pl.jar"/>
+	<classpathentry kind="lib" path="lib/ehcache-core-2.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
