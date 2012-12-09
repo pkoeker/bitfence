@@ -126,4 +126,16 @@ public class Slot implements Serializable {
 			throw new IllegalStateException("Slot #bits/bitCount mismatch: " + itemname);
 		}
 	}
+	
+	public Slot clone() {
+		Slot clone = new Slot(this.itemname);
+		clone.bitCount = this.bitCount;
+		clone.inserted = true;
+		clone.fence = new int[this.fence.length];
+		for (int i = 0; i < fence.length; i++) {
+			clone.fence[i] = fence[i];
+		}
+		
+		return clone;
+	}
 }
