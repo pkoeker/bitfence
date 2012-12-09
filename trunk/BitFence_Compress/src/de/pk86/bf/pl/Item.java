@@ -2,11 +2,9 @@ package de.pk86.bf.pl;
 
 import de.pkjs.pl.IPLContext;
 
-
-
 /**
+ * Eine Eigenschaft (eines Objekts)
  * @author peter
- *
  */
 class Item {
 	private static BfPL pl = BfPL.getInstance();
