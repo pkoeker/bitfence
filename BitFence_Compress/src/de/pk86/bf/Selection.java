@@ -48,25 +48,14 @@ public class Selection {
 			return 0;
 		}
 		items.add(ot.token);
-		if (ot.oper == NONE || calls == 0) {
-			this.slot = ot.slot;
+		if (ot.oper == NONE || calls == 0) { // Der Erste
+			this.slot = ot.slot.clone(); // Clone ist hier wichtig, sonst wird Cache vermüllt!
 		} else {
-				Slot slot2 = ot.slot;
-				int[] arr1 = null;
-				int[] arr2 = null;
-				if (slot != null) {
-					arr1 = slot.getBits();
-				} else {
-					arr1 = new int[Const.SLOT_INT]; 
-				}
-				if (slot2 != null) {
-					arr2 = slot2.getBits();
-				} else {
-					arr2 = new int[Const.SLOT_INT]; 
-				}
-				if (arr1 != null || arr2 != null) {
+				int[] arr1 = this.slot.getBits();
+				int[] arr2 = ot.slot.getBits();
+				if (arr1 != null || arr2 != null) { // TODO: Ist nie null?
 					switch (ot.oper) {
-						case NONE : {
+						case NONE : { // Wird das gebraucht?
 							if (arr2 != null) {
 								for (int j = 0 ; j < arr1.length; j++) {
 									arr1[j] = arr2[j];	
@@ -101,8 +90,7 @@ public class Selection {
 						case NOT : { 
 							if (arr1 != null && arr2 != null) {
 								for (int j = 0 ; j < arr1.length; j++) {
-									//arr2[j] =~arr2[j];
-									arr1[j] = arr1[j] & ~arr2[j];	
+									arr1[j] = arr1[j] & ~arr2[j];	// AND NOT
 								}
 							}
 						}
