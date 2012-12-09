@@ -512,13 +512,33 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		stoks.whitespaceChars('\t', ' ');
 		stoks.quoteChar('\"');
 		stoks.ordinaryChar('/');
+		stoks.ordinaryChar('(');
+		stoks.ordinaryChar(')');
 		stoks.slashSlashComments(true);
 		stoks.slashStarComments(true);
+		stoks.eolIsSignificant(true); // ??
 		ArrayList<OperToken> al = new ArrayList<OperToken>();
 		try {
+			int level = 0;
+			OperToken.Brace brace = OperToken.Brace.NONE;
+			OperToken prevOp = null;
 			while (stoks.nextToken() != StreamTokenizer.TT_EOF) {
 				String tok = stoks.sval;
-				if (tok != null) { // passiert das jemals?
+				// Klammern
+				switch (stoks.ttype) {
+					case '(':
+						level++;
+						brace = OperToken.Brace.OPEN;
+						break;
+					case ')':
+						level--;
+						brace = OperToken.Brace.NONE;
+						if (prevOp != null) {
+							prevOp.brace = OperToken.Brace.CLOSE;
+						}
+						break;
+				}
+				if (tok != null) { // passiert das jemals? Ja! Bei ordinary Chars
 					if (tok.equals("|")) {
 						oper = Selection.OR;
 					} else if (tok.equals("-")) {
@@ -528,16 +548,18 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 					} else if (tok.equals("+")) {
 						oper = Selection.AND;
 					} else {
-						//cnt = this.performOper(name, tok, oper);
 						OperToken op = new OperToken(tok, oper);
+						op.brace = brace;
+						op.level = level;
 						al.add(op);
-						//System.out.println(cnt);
 						oper = Selection.AND; // default, falls kein Operator angegeben
+						prevOp = op; // für close
+						brace = OperToken.Brace.NONE;
 					}				
 				}
 			}
 			
-			pl.findSlots(al); // Reichert mit Slots[] aus der Datenbank an.
+			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an.
 			long end1 = System.currentTimeMillis();
 			res = this.performOper(name, al);
 			res.duraDB1 = end1 - startTime;
