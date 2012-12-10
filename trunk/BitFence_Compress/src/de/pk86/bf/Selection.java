@@ -13,11 +13,7 @@ import de.pk86.bf.pl.Slot;
 public class Selection {
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Selection.class);
 
-	public static final int NONE = 0;
-	public static final int AND = 1;
-	public static final int OR = 2;
-	public static final int XOR = 3;
-	public static final int NOT = 4;
+	public static enum Oper {NONE, AND, OR, XOR, NOT}; 
 	private String name;
 	private BfPL pl = BfPL.getInstance();
 	private Slot slot;
@@ -34,8 +30,66 @@ public class Selection {
 	String getName() {
 		return this.name;
 	}
+	
+	int performOper(ArrayList<OperToken> al) {
+		
+		// Klammer
+		while (al.size() > 1) {
+			int maxLevel = 0;
+			int startIndex = 0;
+			for (int i = 0; i < al.size(); i++) {
+				OperToken ot = al.get(i);
+				if (ot.level > maxLevel) {
+					maxLevel = ot.level;
+					startIndex = i;
+				}
+			}			
+			this.performBrace(al, startIndex, maxLevel);
+		} 
+		
+		
+//		for (OperToken ot:al) {
+//			this.performOper(ot);
+//		}
+		this.slot = al.get(0).slot;
+		int[] arr = slot.getBits();
+		int ret = countBitsSet(arr);
+		this.bitCount = ret;
+
+		return ret;
+	}
+	
+	private void performBrace(ArrayList<OperToken> al, int startIndex, int level) {
+		int cnt = 0;
+		for (int i = startIndex; i < al.size(); i++) {
+			OperToken ot = al.get(i);
+			if (ot.level == level) {
+				cnt++;
+				if (ot.brace == OperToken.Brace.CLOSE) {
+					break;
+				}
+			}
+		}
+		if (cnt == 1) { // (a)
+			al.get(startIndex).level--;
+			return;
+		}
+		OperToken ot1 = al.get(startIndex);
+		ot1.slot = ot1.slot.clone(); // HACK
+		for (int i = startIndex+1; i < startIndex + cnt; i++) {
+			OperToken ot2 = al.get(i);
+			int[] erg = performOper(ot1.slot.getBits(), ot2.slot.getBits(), ot2.oper);
+			ot1.slot.setBits(erg);
+		}
+		for (int i = startIndex + cnt -1; i>startIndex; i--) {
+			al.remove(i);
+		}
+		ot1.level--; // keine Klammer mehr
+		ot1.brace = OperToken.Brace.NONE;
+	}
 	/**
-	 * 
+	 * Es wird ein Token mit einem Slot übergeben;
+	 * die Ergebnismenge landet wieder im internen Slot dieser Session
 	 * @param itemname
 	 * @param oper
 	 * @return Größe der Ergebnismenge
@@ -48,56 +102,13 @@ public class Selection {
 			return 0;
 		}
 		items.add(ot.token);
-		if (ot.oper == NONE || calls == 0) { // Der Erste
+		if (ot.oper == Oper.NONE || calls == 0) { // Der Erste
 			this.slot = ot.slot.clone(); // Clone ist hier wichtig, sonst wird Cache vermüllt!
 		} else {
 				int[] arr1 = this.slot.getBits();
 				int[] arr2 = ot.slot.getBits();
-				if (arr1 != null || arr2 != null) { // TODO: Ist nie null?
-					switch (ot.oper) {
-						case NONE : { // Wird das gebraucht?
-							if (arr2 != null) {
-								for (int j = 0 ; j < arr1.length; j++) {
-									arr1[j] = arr2[j];	
-								}
-							}						
-						}
-						break;
-						case AND : { 
-							if (arr1 != null && arr2 != null) {
-								for (int j = 0 ; j < arr1.length; j++) {
-									arr1[j] = arr1[j] & arr2[j];	
-								}
-							}
-						}
-						break;
-						case OR : { 
-							if (arr1 != null && arr2 != null) {
-								for (int j = 0 ; j < arr1.length; j++) {
-									arr1[j] = arr1[j] | arr2[j];	
-								}
-							}
-						}
-						break;
-						case XOR : { 
-							if (arr1 != null && arr2 != null) {
-								for (int j = 0 ; j < arr1.length; j++) {
-									arr1[j] = arr1[j] ^ arr2[j];	
-								}
-							}
-						}
-						break;
-						case NOT : { 
-							if (arr1 != null && arr2 != null) {
-								for (int j = 0 ; j < arr1.length; j++) {
-									arr1[j] = arr1[j] & ~arr2[j];	// AND NOT
-								}
-							}
-						}
-						break;
-					} // End Switch
-				} // End If != null
-		} // End If NONE
+				this.slot.setBits(performOper(arr1, arr2, ot.oper));
+		} 
 		this.calls++;
 		// Count bits
 		int[] arr = slot.getBits();
@@ -105,6 +116,62 @@ public class Selection {
 		this.bitCount = ret;
 		return ret;	
 	}
+	
+	/**
+	 * BitOperation ausführen
+	 * Wenn arr1 == null, wird arr2 in Returnvalue umkopiert.
+	 * @param arr1 Operand1
+	 * @param arr2 Operand2
+	 * @param oper Operator
+	 * @return Ergebnis der Operation
+	 */
+	private static int[] performOper(int[] arr1, int[] arr2, Oper oper) {
+		if (arr2 == null) {
+			throw new IllegalArgumentException("Argument null");
+		}
+		int[] arrErg = new int[arr2.length];
+		if (arr1 == null) {
+			oper = Oper.NONE; // Kopieren
+		} else {
+			if (arr1.length != arr2.length) {
+				throw new IllegalArgumentException("Array size mismatch: " + arr1.length + " != " + arr2.length);
+			}
+		}
+		switch (oper) {
+			case NONE: { 
+				for (int j = 0; j < arr2.length; j++) {
+					arrErg[j] = arr2[j];
+				}
+			}
+				break;
+			case AND: {
+				for (int j = 0; j < arr2.length; j++) {
+					arrErg[j] = arr1[j] & arr2[j];
+				}
+			}
+				break;
+			case OR: {
+				for (int j = 0; j < arr2.length; j++) {
+					arrErg[j] = arr1[j] | arr2[j];
+				}
+			}
+				break;
+			case XOR: {
+				for (int j = 0; j < arr2.length; j++) {
+					arrErg[j] = arr1[j] ^ arr2[j];
+				}
+			}
+				break;
+			case NOT: {
+				for (int j = 0; j < arr2.length; j++) {
+					arrErg[j] = arr1[j] & ~arr2[j]; // AND NOT
+				}
+			}
+				break;
+		} // End Switch
+		return arrErg;
+	}
+	
 	int getResultSetSize() {
 		return bitCount;
 	}
@@ -323,4 +390,22 @@ public class Selection {
       return result;
    } 
    */	
+	
+	public static Oper toOper(int i) {
+		switch(i) {
+		case 0:
+			return Oper.NONE;
+		case 1:
+			return Oper.AND;
+		case 2:
+			return Oper.OR;
+		case 3:
+			return Oper.XOR;
+		case 4:
+			return Oper.NOT;
+			
+			default:
+			return Oper.NONE;
+		}
+	}
 }

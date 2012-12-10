@@ -19,7 +19,7 @@ public class Test {
 		long start = System.currentTimeMillis();
 		//System.out.println(start);
 		sv.startSession("test");
-		int cntl = sv.performOper("test", "Beispiel", Selection.OR);
+		int cntl = sv.performOper("test", "Beispiel", Selection.Oper.OR);
 		while (sv.hasNext("test")) {
 			long[] erg = sv.getNext("test");
 			//System.out.println(erg.length);

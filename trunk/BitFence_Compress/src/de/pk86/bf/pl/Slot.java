@@ -52,6 +52,10 @@ public class Slot implements Serializable {
 	public int[] getBits() {
 		return fence;
 	}
+	
+	public void setBits(int[] fence) {
+		this.fence = fence;
+	}
 
 	boolean isInserted() {
 		return inserted;
