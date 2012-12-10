@@ -18,6 +18,7 @@ import de.guibuilder.framework.event.GuiUserEvent;
 import de.jdataset.JDataSet;
 import de.pk86.bf.ExpressionResult;
 import de.pk86.bf.ObjectItemServiceIF;
+import de.pk86.bf.Selection;
 import de.pkjs.util.Convert;
 
 /**
@@ -74,7 +75,11 @@ public class ObjectItemGui {
 	public void doExit(GuiUserEvent event) {
 		System.exit(1);
 	}
-
+	
+	/**
+	 * @deprecated schrittweise nicht mehr unterstützen
+	 * @param event
+	 */
 	public void execute(GuiUserEvent event) {
 		String itemname = (String) event.window.getValue("listItems");
 		String oper = (String) event.window.getValue("oper");
@@ -82,7 +87,7 @@ public class ObjectItemGui {
 			oper = "0";
 		int iOper = Integer.parseInt(oper);
 		long start = System.currentTimeMillis();
-		int cnt = sv.performOper("test", itemname, iOper);
+		int cnt = sv.performOper("test", itemname, Selection.toOper(iOper));
 		long end = System.currentTimeMillis();
 		event.window.setValue("exeTime",  end - start);
 		event.window.setValue("size", Integer.toString(cnt));

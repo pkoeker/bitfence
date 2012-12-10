@@ -325,6 +325,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	/**
+	 * @deprecated Dieses schrittweise Vorgehen ist nicht wirklich optimal: Klammern sind so nicht möglich.
 	 * Ausführen einer Operation. Diese Operation wird mit dem bisherigen
 	 * Zwischenergebnis der Transaktion ausgeführt; die Größe der
 	 * Ergebnismenge wird geliefert.<p>
@@ -336,7 +337,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * Transaktion darf auch der Operator NONE angegeben werden.
 	 * @return int Die Größe der Ergebnismenge.
 	 */
-	public int performOper(String name, String itemname, int operand) {
+	public int performOper(String name, String itemname, Selection.Oper operand) {
 		Selection sel = sessions.get(name);
 		if (sel == null) {
 			throw new IllegalArgumentException("ObjectItemService#performOper()\nMissing Session: "+name);
@@ -359,9 +360,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public ExpressionResult performOper(String name, ArrayList<OperToken> al) {
 		long start = System.currentTimeMillis();
 		Selection sel = sessions.get(name);
-		for (OperToken ot:al) {
-			int cnt = sel.performOper(ot);
-		}
+		int cnt = sel.performOper(al);
 		long end1 = System.currentTimeMillis();
 		ExpressionResult ret = new ExpressionResult(name);
 		int anz = pl.getResultSetPage();
@@ -503,7 +502,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		long startTime = System.currentTimeMillis(); // Zeit messen
 		ExpressionResult res = null;
 		this.startSession(name);
-		int oper = Selection.AND;
+		Selection.Oper oper = Selection.Oper.AND;
 		
 		StreamTokenizer stoks = new StreamTokenizer(new StringReader(expression));
 		stoks.resetSyntax();
@@ -540,19 +539,19 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				}
 				if (tok != null) { // passiert das jemals? Ja! Bei ordinary Chars
 					if (tok.equals("|")) {
-						oper = Selection.OR;
+						oper = Selection.Oper.OR;
 					} else if (tok.equals("-")) {
-						oper = Selection.NOT;
+						oper = Selection.Oper.NOT;
 					} else if (tok.equals("^")) {
-						oper = Selection.XOR;
+						oper = Selection.Oper.XOR;
 					} else if (tok.equals("+")) {
-						oper = Selection.AND;
+						oper = Selection.Oper.AND;
 					} else {
 						OperToken op = new OperToken(tok, oper);
 						op.brace = brace;
 						op.level = level;
 						al.add(op);
-						oper = Selection.AND; // default, falls kein Operator angegeben
+						oper = Selection.Oper.AND; // default, falls kein Operator angegeben
 						prevOp = op; // für close
 						brace = OperToken.Brace.NONE;
 					}				

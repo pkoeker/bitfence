@@ -20,7 +20,8 @@ public interface ObjectItemServiceIF {
 	public String[] findItems(String pattern);
 	public void startSession(String transname);
 	public void resetAllSessions();
-	public int performOper(String transname, String itemname, int operand);
+	/* @deprecated @see #performOper(List)*/
+	public int performOper(String transname, String itemname, Selection.Oper operand);
 	public ExpressionResult performOper(String name, ArrayList<OperToken> al);
 	public ExpressionResult getResultSet(String transname);
 	public String getObjekts(long[] oids);
