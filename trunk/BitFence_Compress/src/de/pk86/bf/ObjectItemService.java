@@ -513,6 +513,11 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		stoks.ordinaryChar('/');
 		stoks.ordinaryChar('(');
 		stoks.ordinaryChar(')');
+		//stoks.ordinaryChar('-');
+		stoks.ordinaryChar('!');
+		stoks.ordinaryChar('+');
+		stoks.ordinaryChar('^');
+		stoks.ordinaryChar('|');
 		stoks.slashSlashComments(true);
 		stoks.slashStarComments(true);
 		stoks.eolIsSignificant(true); // ??
@@ -536,17 +541,30 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 							prevOp.brace = OperToken.Brace.CLOSE;
 						}
 						break;
+					case '|':
+						oper = Selection.Oper.OR;
+						break;
+					case '-':
+					case '!':
+						oper = Selection.Oper.NOT;
+						break;
+					case '^':
+						oper = Selection.Oper.XOR;
+						break;
+					case '+':
+						oper = Selection.Oper.AND;
+						break;
 				}
 				if (tok != null) { // passiert das jemals? Ja! Bei ordinary Chars
-					if (tok.equals("|")) {
-						oper = Selection.Oper.OR;
-					} else if (tok.equals("-")) {
-						oper = Selection.Oper.NOT;
-					} else if (tok.equals("^")) {
-						oper = Selection.Oper.XOR;
-					} else if (tok.equals("+")) {
-						oper = Selection.Oper.AND;
-					} else {
+//					if (tok.equals("|")) {
+//						oper = Selection.Oper.OR;
+//					} else if (tok.equals("-")) {
+//						oper = Selection.Oper.NOT;
+//					} else if (tok.equals("^")) {
+//						oper = Selection.Oper.XOR;
+//					} else if (tok.equals("+")) {
+//						oper = Selection.Oper.AND;
+//					} else {
 						OperToken op = new OperToken(tok, oper);
 						op.brace = brace;
 						op.level = level;
@@ -555,7 +573,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 						prevOp = op; // für close
 						brace = OperToken.Brace.NONE;
 					}				
-				}
+//				}
 			}
 			
 			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an.
