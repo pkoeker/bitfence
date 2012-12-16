@@ -10,6 +10,10 @@ import de.jdataset.JDataSet;
 import de.pkjs.pl.PL;
 import de.pkjs.pl.PLException;
 
+/**
+ * @deprecated
+ * @author peter
+ */
 public class ImportItems extends TestCase {
 	public static void main(String[] args) {
 		

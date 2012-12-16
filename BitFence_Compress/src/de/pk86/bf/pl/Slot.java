@@ -1,13 +1,13 @@
 package de.pk86.bf.pl;
 
 import java.io.Serializable;
+import java.util.BitSet;
 
 import de.jdataset.JDataRow;
 import de.jdataset.JDataValue;
-import de.pk86.bf.Const;
-import de.pk86.bf.Selection;
 
 /**
+ * TODO: Die Klassen Item und Slot vereinen
  * Objekte diese Klassen halten den BitZaun für ein Item
  * @author peter
  */
@@ -16,23 +16,23 @@ public class Slot implements Serializable {
 
 	public String itemname;
 
-	private int bitCount; // geht schneller!
-	private int[] fence = new int[Const.SLOT_INT];
+	private BitSet bitset;
 	private boolean inserted = false;
 
 	// Constructor
 	public Slot(String itemname) {
 		this.itemname = itemname;
+		this.bitset = new BitSet();
 		this.inserted = true;
 	}
 
-	public Slot(String itemname, int[] bitFence, int count) {
+//	public Slot(String itemname, long[] bitFence) {
+//		this.itemname = itemname;
+//		this.bitset = BitSet.valueOf(bitFence);
+//	}
+	public Slot(String itemname, byte[] bitFence) {
 		this.itemname = itemname;
-		this.fence = bitFence;
-		if (fence.length != Const.SLOT_INT) {
-			throw new IllegalArgumentException("Illegal fence size: " + itemname + "/" + fence.length);
-		}
-		this.bitCount = count;
+		this.bitset = BitSet.valueOf(bitFence);
 	}
 
 	public Slot(String itemname, JDataRow row) {
@@ -42,19 +42,18 @@ public class Slot implements Serializable {
 		if (oval == null) {
 			throw new IllegalArgumentException("Slot bitfence null");
 		}
-		this.fence = BfPL.byteToInt((byte[]) oval);
-		if (fence.length != Const.SLOT_INT) {
-			throw new IllegalArgumentException("Illegal fence size: " + itemname + "/" + fence.length);
-		}
-		this.bitCount = row.getValueInt("bitcount");
-	}
-
-	public int[] getBits() {
-		return fence;
+		this.bitset = BitSet.valueOf((byte[]) oval);
 	}
 	
-	public void setBits(int[] fence) {
-		this.fence = fence;
+	public BitSet getBitset() {
+		return bitset;
+	}
+	public byte[] getBytes() {
+		return bitset.toByteArray();
+	}
+	
+	public void setBitset(BitSet bitset) {
+		this.bitset = bitset;
 	}
 
 	boolean isInserted() {
@@ -68,19 +67,8 @@ public class Slot implements Serializable {
 	 *           Eine Zahl zwischen 0 und 1024*8 -1
 	 * @return boolean Wenn true, dann wurde das Bit wirklich gesetzt
 	 */
-	boolean setBit(long l) {
-		int index = (int) l >>> 5; // Index für Array errechen (Division durch 32)
-		int bitNumber = (int) l % 32; // Position des Bits errechnen
-		int mask = 1 << bitNumber; // ein Bit wird an die richtige Stelle
-											// geschoben.
-		int oldValue = fence[index]; // Den vorigen Wert merken
-		fence[index] = fence[index] | mask; // Bit mit OR setzen.
-		if (fence[index] != oldValue) {
-			bitCount++;
-			return true;
-		} else {
-			return false;
-		}
+	void setBit(long l) {
+		bitset.set((int)l);
 	}
 
 	/**
@@ -90,14 +78,8 @@ public class Slot implements Serializable {
 	 * @return boolean
 	 */
 	boolean testBit(long l) {
-		int index = (int) l >>> 5; // Division durch 32
-		int bitNumber = (int) l % 32;
-		int erg = fence[index] >> bitNumber & 1;
-		if (erg == 0) {
-			return false;
-		} else {
-			return true;
-		}
+		boolean b = bitset.get((int)l);
+		return b;
 	}
 
 	/**
@@ -106,39 +88,26 @@ public class Slot implements Serializable {
 	 * @param l
 	 * @return boolean Wenn true, dann wurde das Bit wirklich gelöscht
 	 */
-	boolean removeBit(long l) {
-		int index = (int) l >>> 5; // Division durch 32
-		int bitNumber = (int) l % 32;
-		int mask = 1 << bitNumber;
-		int oldValue = fence[index];
-		fence[index] = fence[index] ^ mask;
-		if (fence[index] != oldValue) {
-			bitCount--;
-			return true;
-		} else {
-			return false;
-		}
+	void removeBit(long l) {
+		bitset.set((int)l, false);
 	}
 
 	public int countBits() {
-		return bitCount;
+		return bitset.cardinality();
+		//return bitCount;
 	}
 
-	public void validate() {
-		int cnt = Selection.countBitsSet(fence);
-		if (cnt != bitCount) {
-			throw new IllegalStateException("Slot #bits/bitCount mismatch: " + itemname);
-		}
-	}
+//	public void validate() {
+//		int cnt = Selection.countBitsSet(fence);
+//		if (cnt != bitCount) {
+//			throw new IllegalStateException("Slot #bits/bitCount mismatch: " + itemname);
+//		}
+//	}
 	
 	public Slot clone() {
 		Slot clone = new Slot(this.itemname);
-		clone.bitCount = this.bitCount;
 		clone.inserted = true;
-		clone.fence = new int[this.fence.length];
-		for (int i = 0; i < fence.length; i++) {
-			clone.fence[i] = fence[i];
-		}
+		clone.bitset = (BitSet)bitset.clone();
 		
 		return clone;
 	}

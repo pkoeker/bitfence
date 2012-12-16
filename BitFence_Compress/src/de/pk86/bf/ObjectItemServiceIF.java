@@ -11,8 +11,6 @@ public interface ObjectItemServiceIF {
 	public void deleteObject(long oid);
 	public void createItem(String name);
 	public void deleteItem(String name);
-	public void addObjectItem(long oid, String itemname);
-	public void removeObjectItem(long oid, String itemname);
 	public String[] getObjectItems(long oid);
 	public boolean hasItem(long oid, String itemname);
 	public boolean hasItem(String itemname);

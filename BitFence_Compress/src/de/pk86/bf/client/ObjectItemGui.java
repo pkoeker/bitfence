@@ -8,7 +8,6 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 
 import de.guibuilder.framework.GDLParseException;
-import de.guibuilder.framework.GuiDialog;
 import de.guibuilder.framework.GuiFactory;
 import de.guibuilder.framework.GuiList;
 import de.guibuilder.framework.GuiUtil;
@@ -205,33 +204,6 @@ public class ObjectItemGui {
    public void deleteObject(GuiUserEvent event) {
    	long oid = Convert.toLong(event.window.getValue("oid"));
    	sv.deleteObject(oid);
-   }
-   public void addItem(GuiUserEvent event) {
-   	long oid = Convert.toLong(event.window.getValue("oid"));
-   	GuiDialog winItem;
-      try {
-	      winItem = GuiFactory.getInstance().createDialog("gui/Item.xml", event.window);
-	      winItem.setController(this);
-	      if (winItem.showDialog()) {
-	      	String addItem = (String)winItem.getValue("listItems");
-	      	if (addItem != null) {
-	      		sv.addObjectItem(oid, addItem);
-	      		GuiList list = (GuiList)event.window.getGuiMember("listItems");
-	      		list.addItem(addItem);
-	      	}
-	      }
-      } catch (GDLParseException e) {
-	      e.printStackTrace();
-      }
-   }
-   public void removeItem(GuiUserEvent event) {
-   	long oid = Convert.toLong(event.window.getValue("oid"));
-   	String remItem = (String)event.window.getValue("listItems");
-   	if (remItem != null) {
-   		sv.removeObjectItem(oid, remItem);
-	   	GuiList list = (GuiList)event.window.getGuiMember("listItems");
-   		list.removeItem(remItem);
-   	}
    }
    public void setOid(GuiUserEvent event) {
    	long oid = Convert.toLong(event.window.getValue("oid"));
