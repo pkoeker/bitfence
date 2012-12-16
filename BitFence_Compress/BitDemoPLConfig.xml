@@ -4,10 +4,10 @@
 	<!-- Postgres -->
 	<Database name="adresse" enabled="true">
     	<JDBC-Driver>org.postgresql.Driver</JDBC-Driver>
-    	<URL>jdbc:postgresql://localhost:5432/bitdemo</URL>
+    	<URL>jdbc:postgresql://localhost:5432/bitset</URL>
     	<!-- Schema kann weggelassen werden: Dann werden die Metadaten aller Schemata eingelesen.
     	Auch mehrere Schemata angeben: Dann mit Komma getrennt. -->
-    	<!--Schema>public,test</Schema-->
+    	<Schema>public</Schema>
     	<Username>peter</Username>
     	<Password>peter</Password>
     
@@ -69,9 +69,9 @@
 			<Column name="*"/>
 		</RootTable>
 	</View>
-	<View name="objektitem">
+	<!--View name="objektitem">
 		<RootTable pk="oid,itemname" tablename="objektitem">
 			<Column name="*"/>
 		</RootTable>
-	</View>
+	</View-->
 </Server>
