@@ -134,9 +134,9 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @throws IllegalArgumentException wenn oid < 0 oder größer MAX_OID
 	 */
 	public void createObject(long oid) {
-		if (oid < 0 || oid > pl.getMaxOid()) {
-			throw new IllegalArgumentException("OID out of Range: 0 >= oid =< "+Long.toString(pl.getMaxOid()));
-		}
+//		if (oid < 0 || oid > pl.getMaxOid()) {
+//			throw new IllegalArgumentException("OID out of Range: 0 >= oid =< "+Long.toString(pl.getMaxOid()));
+//		}
 		try {
 			pl.createObject(oid);
 		} catch (Exception ex) {
@@ -167,13 +167,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 */
 	public void deleteObject(long oid) {
 		try {
-//			String[] items = this.getObjectItems(oid);
-			// Start Trans
 			pl.deleteObject(oid);
-//			for (int i = 0; i < items.length; i++) {
-//				String itemname = items[i];
-//				Item.removeBit(oid, itemname);
-//			}
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			ex.printStackTrace();
@@ -209,7 +203,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	}
 	/**
 	 * Versieht ein Objekt mit einer weiteren Eigenschaft.
-	 * TODO: Das muß eine Transaktion werden!
 	 * @param oid
 	 * @param itemname
 	 */
@@ -509,6 +502,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		stoks.wordChars('!', '~');
 		stoks.wordChars('À', 'ÿ'); // ISO-8859-1 (äöüß), aber kein Unicode
 		stoks.whitespaceChars('\t', ' ');
+		stoks.whitespaceChars('-', '.'); // Datum
 		stoks.quoteChar('\"');
 		stoks.ordinaryChar('/');
 		stoks.ordinaryChar('(');
@@ -556,15 +550,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 						break;
 				}
 				if (tok != null) { // passiert das jemals? Ja! Bei ordinary Chars
-//					if (tok.equals("|")) {
-//						oper = Selection.Oper.OR;
-//					} else if (tok.equals("-")) {
-//						oper = Selection.Oper.NOT;
-//					} else if (tok.equals("^")) {
-//						oper = Selection.Oper.XOR;
-//					} else if (tok.equals("+")) {
-//						oper = Selection.Oper.AND;
-//					} else {
 						OperToken op = new OperToken(tok, oper);
 						op.brace = brace;
 						op.level = level;
@@ -573,7 +558,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 						prevOp = op; // für close
 						brace = OperToken.Brace.NONE;
 					}				
-//				}
 			}
 			
 			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an.
@@ -766,6 +750,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			ex.printStackTrace();
 		}
 	}
+	
 	private void initWebservice() {
 		if (webserviceCreated) return;
 		Element ele = pl.getWebServiceConfig();

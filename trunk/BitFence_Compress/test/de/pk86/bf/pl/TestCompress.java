@@ -1,7 +1,8 @@
 package de.pk86.bf.pl;
 
+import java.util.BitSet;
+
 import junit.framework.TestCase;
-import de.pk86.bf.Selection;
 
 public class TestCompress extends TestCase {
 	public void test1() {
@@ -32,18 +33,18 @@ public class TestCompress extends TestCase {
 	
 	private void perfSlots(Slot slots) {
 		try {
-	      int[] ints = slots.getBits();
-	      int cnt1 = Selection.countBitsSet(ints);
+	      BitSet bs = slots.getBitset();
+	      int cnt1 = bs.cardinality();
 	      long start = System.currentTimeMillis();
-	      byte[] bts = BfPL.intToByte(ints, true);
-	      long end1 = System.currentTimeMillis();
-	      System.out.println("Dura: " + (end1-start));
-	      
-	      int[] di = BfPL.byteToInt(bts, true);
-	      long end2 = System.currentTimeMillis();
-	      System.out.println("Dura: " + (end2-end1));
-	      int cnt = Selection.countBitsSet(di);
-	      System.out.println("Bits: " + slots.countBits() + ":" + cnt1 + "/" + cnt);
+//	      byte[] bts = BfPL.intToByte(ints, true);
+//	      long end1 = System.currentTimeMillis();
+//	      System.out.println("Dura: " + (end1-start));
+//	      
+//	      int[] di = BfPL.byteToInt(bts, true);
+//	      long end2 = System.currentTimeMillis();
+//	      System.out.println("Dura: " + (end2-end1));
+//	      int cnt = Selection.countBitsSet(di);
+//	      System.out.println("Bits: " + slots.countBits() + ":" + cnt1 + "/" + cnt);
       } catch (Exception e) {
 	      e.printStackTrace();
 	      fail(e.getMessage());
