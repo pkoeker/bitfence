@@ -11,7 +11,7 @@ import de.pkjs.pl.PL;
 import de.pkjs.pl.PLException;
 
 /**
- * @deprecated
+ * @deprecated items aus Attributen der Objekte aufbauen
  * @author peter
  */
 public class ImportItems extends TestCase {
@@ -21,13 +21,13 @@ public class ImportItems extends TestCase {
 	
 	public void testImport1() {
 		HashSet<String> hs = new HashSet<String>(10000);
-		this.importFile("resources/1_firstnames.csv", ImportMain.FIRSTNAMES_DELIM, hs);
-		this.importFile("resources/2_lastnames.csv", ImportMain.LASTNAME_DELIM, hs);
-		this.importFile("resources/3_birthdate.csv", ImportMain.BIRTHDATE_DELIM, hs);
-		this.importFile("resources/4_zip_city.csv", ImportMain.ZIP_CITY_DELIM, hs);
-		this.importFile("resources/5_street_number_ext.csv",ImportMain.STREET_NUMBER_DELIM, hs);
+		this.importFile("resources/1_firstnames.csv", ImportObjects.FIRSTNAMES_DELIM, hs);
+		this.importFile("resources/2_lastnames.csv", ImportObjects.LASTNAME_DELIM, hs);
+		this.importFile("resources/3_birthdate.csv", ImportObjects.BIRTHDATE_DELIM, hs);
+		this.importFile("resources/4_zip_city.csv", ImportObjects.ZIP_CITY_DELIM, hs);
+		this.importFile("resources/5_street_number_ext.csv",ImportObjects.STREET_NUMBER_DELIM, hs);
 		long start = System.currentTimeMillis();
-		PL pl = ImportMain.getPL();
+		PL pl = ImportObjects.getPL();
 		JDataSet ds = pl.getEmptyDataset("item");
 		for(String item:hs) {
 			JDataRow row = ds.createChildRow();
@@ -47,7 +47,7 @@ public class ImportItems extends TestCase {
 	private void importFile(String filename, String delim, HashSet<String> hs) {
 		System.out.println(filename);
 		long start = System.currentTimeMillis();
-		PL pl = ImportMain.getPL();
+		PL pl = ImportObjects.getPL();
 		String s = GuiUtil.fileToString(filename);
 		StringTokenizer toks = new StringTokenizer(s, "\n\r");
 		while (toks.hasMoreTokens()) {
