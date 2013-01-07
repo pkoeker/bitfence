@@ -7,7 +7,6 @@ import de.jdataset.JDataRow;
 import de.jdataset.JDataValue;
 
 /**
- * TODO: Die Klassen Item und Slot vereinen
  * Objekte diese Klassen halten den BitZaun für ein Item
  * @author peter
  */
@@ -26,10 +25,6 @@ public class Slot implements Serializable {
 		this.inserted = true;
 	}
 
-//	public Slot(String itemname, long[] bitFence) {
-//		this.itemname = itemname;
-//		this.bitset = BitSet.valueOf(bitFence);
-//	}
 	public Slot(String itemname, byte[] bitFence) {
 		this.itemname = itemname;
 		this.bitset = BitSet.valueOf(bitFence);
@@ -97,12 +92,6 @@ public class Slot implements Serializable {
 		//return bitCount;
 	}
 
-//	public void validate() {
-//		int cnt = Selection.countBitsSet(fence);
-//		if (cnt != bitCount) {
-//			throw new IllegalStateException("Slot #bits/bitCount mismatch: " + itemname);
-//		}
-//	}
 	
 	public Slot clone() {
 		Slot clone = new Slot(this.itemname);

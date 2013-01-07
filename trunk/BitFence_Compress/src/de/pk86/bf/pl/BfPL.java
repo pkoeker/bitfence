@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sf.ehcache.CacheManager;
@@ -15,9 +17,8 @@ import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataValue;
 import de.jdataset.ParameterList;
-import de.pk86.bf.Const;
 import de.pk86.bf.OperToken;
-import de.pk86.bf.util.ImportMain;
+import de.pk86.bf.util.ImportObjects;
 import de.pkjs.pl.IPLContext;
 import de.pkjs.pl.PL;
 import de.pkjs.pl.PLException;
@@ -69,6 +70,9 @@ public class BfPL {
 	private Element spiderConfig;
 	
 	private PL pl;
+	
+	private static LinkedHashMap<String, Slot> hash = new LinkedHashMap<String, Slot>();
+
 	
 	// Private Constructor
 	private BfPL(String configFilename) {
@@ -143,7 +147,7 @@ public class BfPL {
 			String[] items = this.getObjectItems(oid, ipl);
 			for (int i = 0; i < items.length; i++) {
 				String itemname = items[i];
-				Item.removeBit(oid, itemname, ipl);
+				removeBit(oid, itemname, ipl);
 			}
 			ipl.commitTransaction(transname);
 			return cnt1;
@@ -163,41 +167,13 @@ public class BfPL {
 		// @TODO : Lücken füllen wie?
 		long oid = pl.getOID();
 		return oid;
-//		long ret = -1;
-//		//BfConnection conn = null;
-//		//PreparedStatement ps = null;
-//		try {
-//			//conn = this.getConnection("getMaxOid", true);
-//			//ps = conn.getConnection().prepareStatement(getMaxOid);
-//			//ResultSet rs = ps.executeQuery();
-//			
-//			if (rs.next()) {
-//				ret = rs.getLong(1);
-//				ret++;
-//				if (ret > getMaxOid()) {
-//					throw new IllegalStateException("OID out of range.");
-//				}
-//			} else {
-//				throw new IllegalStateException("Unable to get OID");
-//			}
-//		} catch (SQLException ex) {
-//			throw ex;
-//		} finally {
-//			if (ps != null) {
-//				ps.close();
-//			}
-//			if (conn != null) {
-//				conn.close("ok");
-//			}
-//		}
-//		return ret;
 	}
 	// ObjectItems ##########################################
 	public void addObjectItem(long oid, String itemname) throws Exception {
 		String transname = "insertOI";
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
-			Item.setBit(oid, itemname, ipl);
+			setBit(oid, itemname, ipl);
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
 			if (ipl != null) {
@@ -211,7 +187,7 @@ public class BfPL {
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
 			// Bits
-			Item.removeBit(oid, itemname, ipl);
+			removeBit(oid, itemname, ipl);
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
 			if (ipl != null) {
@@ -400,7 +376,7 @@ public class BfPL {
 		return ret;
 	}
 	public boolean hasItem(long oid, String itemname) throws Exception {
-			boolean b = Item.testBit(oid, itemname, pl);
+			boolean b = testBit(oid, itemname, pl);
 			return b;
 	}
 	public int getItemCount(String itemname) throws Exception {
@@ -487,6 +463,11 @@ public class BfPL {
 			throw ex;
 		}
 	}
+	/**
+	 * @deprecated macht nix sinnvolles
+	 * @return
+	 * @throws Exception
+	 */
 	public int validate() throws Exception {
 		int err = 0;
 		System.out.println("*** start verify ***");
@@ -534,7 +515,7 @@ public class BfPL {
 			String content = row.getValue("content").toLowerCase();
 			ArrayList<String> al = getObjectItems(content);
 			for(String itemname:al) {
-				Item.setBit(oid, itemname, null);
+				setBit(oid, itemname, null);
 				anz++;
 				if (anz % 100 == 0) {
 					System.out.println(anz);
@@ -543,12 +524,12 @@ public class BfPL {
 				}
 			}
 		}
-		Item.whiteAll(ipl);
+		whiteAll(ipl);
 		ipl.commitTransaction("repair");
 	}
 	
 	public static ArrayList<String> getObjectItems(String content) {
-		StringTokenizer toks = new StringTokenizer(content, ImportMain.DEFAULT_DELIM);
+		StringTokenizer toks = new StringTokenizer(content, ImportObjects.DEFAULT_DELIM);
 		ArrayList<String> al = new ArrayList<String>();
 		while(toks.hasMoreTokens()) {
 			String itemname = toks.nextToken();
@@ -728,4 +709,60 @@ public class BfPL {
 		resultSetPage = p;
 	}
 	
+	
+	// Methods
+	private static Slot findSlot(String itemname, boolean force, IPLContext ipl) throws Exception {
+		Slot s = null;
+		if (ipl == null) {
+			s = hash.get(itemname); 
+		} else {
+			s = me.selectSlot(itemname,  ipl);
+		}
+		if (force == true && s == null) {
+			s = new Slot(itemname);
+			hash.put(itemname, s);
+		}
+		return s;		
+	}
+	private static void writeSlot(Slot s, IPLContext ipl) throws Exception {
+		if (ipl == null) {
+			return;
+		}
+		if (s.isInserted() == true) {
+			me.insertSlot(s, ipl);
+		} else {
+			me.updateSlot(s, ipl);
+		}
+	}
+	static void setBit(long l, String itemname, IPLContext ipl) throws Exception {
+		Slot s = findSlot(itemname, true, ipl);
+		s.setBit(l);
+		writeSlot(s, ipl);
+	}
+	static boolean testBit(long l, String itemname, IPLContext ipl) throws Exception {
+		Slot s = findSlot(itemname, false, ipl);
+		if (s == null) {
+			return false;		
+		} else {
+			return s.testBit(l);
+		}
+	}
+	static void removeBit(long l, String itemname, IPLContext ipl) throws Exception {
+		Slot s = findSlot(itemname, false, ipl);
+		if (s == null) {
+			return;		
+		} else {
+			s.removeBit(l);
+			me.updateSlot(s, ipl);
+		}		
+	}
+	
+	static void whiteAll(IPLContext ipl) throws Exception {
+		Iterator<Map.Entry<String, Slot>> it = hash.entrySet().iterator();
+		while(it.hasNext()) {
+			Map.Entry<String, Slot> entry = it.next();
+			writeSlot(entry.getValue(), ipl);
+		}
+	}
+
 }

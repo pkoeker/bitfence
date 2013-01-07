@@ -5,7 +5,7 @@ import net.sf.ehcache.config.CacheConfiguration;
 import de.pkjs.util.Convert;
 import electric.xml.Element;
 
-public class SlotCache {
+class SlotCache {
   private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SlotCache.class);
 
   private String cacheName = "SlotCache";
