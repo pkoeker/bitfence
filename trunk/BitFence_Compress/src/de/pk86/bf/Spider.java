@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import electric.xml.Element;
 import electric.xml.Elements;
 /**
+ * @deprecated
  * @author peter
  */
 class Spider {
