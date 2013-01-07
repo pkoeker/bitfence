@@ -5,8 +5,8 @@ import junit.framework.TestCase;
 public class TestRepair extends TestCase {
 	private ObjectItemService sv = new ObjectItemService();
 
-	public void testRepair() {
-		sv.repair();
+	public void testIndex() {
+		sv.indexDatabase();
 	}
 
 }
