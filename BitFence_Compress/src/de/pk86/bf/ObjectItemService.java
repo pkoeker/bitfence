@@ -188,9 +188,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	/**
-	 * Löscht eine Eigenschaft.<p> 
-	 * Die abhängigen Daten (ObjectItem, Slot) werden
-	 * mit gelöscht.
+	 * Löscht eine Eigenschaft. 
 	 * @param name
 	 */
 	public void deleteItem(String name) {
@@ -730,6 +728,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	/**
+	 * @deprecated macht nix sinnvolles
 	 * Überprüft die Konsistenz der Datenbank.
 	 */
 	public void validate() {
@@ -743,7 +742,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	/**
 	 * Repariert die Datenbank.
 	 */
-	public void repair() {
+	public void indexDatabase() {
 		try {
 			pl.repair();
 		} catch (Exception ex) {
@@ -751,6 +750,20 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	
+	public void clearDatabase() {
+		
+	}
+	
+	public void createDatabase() {
+		
+	}
+	
+	public void importDatabaseCSV(String data) {
+		
+	}
+	public void importDatabaseDataset(JDataSet data) {
+		
+	}
 	private void initWebservice() {
 		if (webserviceCreated) return;
 		Element ele = pl.getWebServiceConfig();

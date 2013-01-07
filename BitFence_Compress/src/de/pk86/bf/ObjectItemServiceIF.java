@@ -18,7 +18,7 @@ public interface ObjectItemServiceIF {
 	public String[] findItems(String pattern);
 	public void startSession(String transname);
 	public void resetAllSessions();
-	/* @deprecated @see #performOper(List)*/
+	/** @deprecated @see #performOper(List)*/
 	public int performOper(String transname, String itemname, Selection.Oper operand);
 	public ExpressionResult performOper(String name, ArrayList<OperToken> al);
 	public ExpressionResult getResultSet(String transname);
@@ -33,12 +33,24 @@ public interface ObjectItemServiceIF {
 	public JDataSet getNextPage(String name);
 	public JDataSet getPrevPage(String name);
 	public void importItems(String text, boolean lowercase);
-	public void indexObject(
-		long oid,
-		String text,
-		boolean createItems,
-		boolean lowercase);
+	public void indexObject(long oid,String text,boolean createItems,boolean lowercase);
 	public void startSpider();
+	/** @deprecated macht nix sinnvolles */
 	public void validate();
-	public void repair();
+	/**
+	 * Erzeugt eine leere Datenbasis
+	 */
+	public void createDatabase();
+	/**
+	 * Importiert Objekte in die Datenbasis;
+	 * @param data
+	 */
+	public void importDatabaseCSV(String content);
+	public void importDatabaseDataset(JDataSet data);
+	/**
+	 * Indiziert die Datenbasis; der Index (BitZaun) wird aus den Objekten neu aufgebaut
+	 */
+	public void indexDatabase();
+	public void clearDatabase();
+
 }
