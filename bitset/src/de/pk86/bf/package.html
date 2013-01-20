@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE>Object Item Service</TITLE>
+	<META NAME="GENERATOR" CONTENT="LibreOffice 3.6  (Linux)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGEDBY" CONTENT="Peter ">
+	<META NAME="CHANGED" CONTENT="20121207;14571900">
+	<!-- Created with AOLpress/2.0 -->
+	<STYLE TYPE="text/css">
+	<!--
+		H2.ctl { font-family: "Lohit Hindi" }
+		H3.ctl { font-family: "Lohit Hindi" }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" BGCOLOR="#ffffff" DIR="LTR">
+<H1>Keyword-Algorithmus (de.pk86.bf) 
+</H1>
+<HR>
+<H2 CLASS="western">Einleitung / Problemstellung 
+</H2>
+<P>Jeder benutzt bei der Recherche im Internet die gängigen
+Suchmaschinen auf inzwischen selbstverständliche Art und Weise:
+&nbsp;<BR>Aus der Menge aller Web-Sites möchte ich all die haben,
+bei denen die Begriffe &quot;bla&quot; und &quot;blub&quot;
+aufgeführt sind, aber es sollen alle weglassen werden, die &quot;blob&quot;
+enthalten: &quot;bla blub -blob&quot;<BR><FONT SIZE=2>(Das gab
+letztens&nbsp;mit Google 14600 Resulte bei 0.14 Sekunden Suchdauer.)</FONT>
+</P>
+<P>Daß die Suchmaschinen recht flott Ergebnisse liefern - selbst bei
+komplizierten Abfragen und großen Datenmengen - wird als
+selbstverständlich angesehen und ist die Voraussetzung für ihren
+Erfolg. 
+</P>
+<P>Nur wie funktioniert sowas? 
+</P>
+<P>Die Aussage &quot;Wird irgendeine große Datenbank sein!&quot; ist
+richtig und falsch zu gleich:<BR>Daten in einer Datenbank vorzuhalten
+ist immer eine gute Idee;<BR>aber wie sieht das mit dem Zugriff auf
+die Daten aus? 
+</P>
+<P>Die Überraschung besteht darin, daß für die Formulierung
+derartiger Such-Abfragen eine relationale Datenbank mit SQL
+ungeeignet ist, weil viel zu langsam. 
+</P>
+<H2 CLASS="western">Features 
+</H2>
+<P>Der hier in Java realisierter Suchalgorithmus ist auf
+Geschwindigkeit optimiert. Jede beliebige Abfrage dauert nicht länger
+als wenige Millisekunden. 
+</P>
+<P>Es können beliebige &quot;Objekte&quot; definiert werden, die mit
+beliebigen &quot;Eigenschaften&quot; versehen sind. 
+</P>
+<P>Auf dieser Basis könne Abfragen bezüglich der &quot;Eigenschaften&quot;
+formuliert und die Ergebnismenge der &quot;Objekte&quot; wird
+geliefert. 
+</P>
+<P>Welcher Art die Objekte und ihre Eigenschaften dabei sind, bleibt
+der Phantasie des Anwenders überlassen. Hier ist ein &quot;Objekt&quot;
+lediglich über eine numerische Object-ID definiert, und eine
+&quot;Eigenschaft&quot; als eine Zeichenkette von bis zu 128 Zeichen.
+</P>
+<H2 CLASS="western">Begrenzungen 
+</H2>
+<P>In einem logischen Ausdruck können keine Eigenschaften mit
+Wildcards eingesetzt werden; also &quot;bl*&quot; für bla, blub,
+blob etc. 
+</P>
+<P>Die Aufeinanderfolge von Eigenschaften ist dem System unbekannt,
+es sei denn, es wird eine Eigenschaft entsprechend
+definiert:<BR>Eigenschaften dürfen hier auch White Space enthalten:
+&quot;Meine Eigenschaft&quot;; auf diese Art können auch beliebte
+englische Ausdrücke als Eigenschaft definiert werden: &quot;open
+source&quot; 
+</P>
+<P>Die Vergleichbarkeit dieser &quot;kleinen&quot; Suchmaschine mit
+den &quot;großen&quot; endet damit, daß derartig riesige
+Datenmengen nicht problemlos gehandhabt werden können. 
+</P>
+<P>Es wird vermutet, daß mit diesem Algorithmus bis zu 5 Millionen
+Objekte mit 100.000 Eigenschaften zuverlässig und schnell
+verarbeitet werden können. Die Datenbank wird dann ca. 3 bis 4 GB
+umfassen. 
+</P>
+<P>Alles was darüber hinaus geht ist eher ein Problem der darunter
+liegenden Datenbank, sehr große Datenbestände zu handhaben; vor
+allem die Datenbestände auf mehrere Rechner zu verteilen. Google
+behauptet 3 Mrd Sites indiziert zu haben; es ist unbekannt, wieviele
+&quot;Eigenschaften&quot; es dabei gibt (alle Worte aus allen
+Sprachen dieser Welt!). Das dürfte dann wohl im zweistellig
+TB-Bereich liegen.... 
+</P>
+<H2 CLASS="western">Installation 
+</H2>
+<P>Das Framework wurde bisher mit Postgres getestet; im Kern ist jede
+Datenbank geeignet, die über die Möglichkeit der Komprimierung
+verfügt.</P>
+<H3 CLASS="western"><BR><BR>
+</H3>
+</BODY>
+</HTML>
