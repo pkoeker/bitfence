@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE Server SYSTEM 'http://jdataset.de/PLConfig.dtd'>
+<Server>
+	<!-- Postgres -->
+	<Database name="adresse" enabled="true">
+    	<JDBC-Driver>org.postgresql.Driver</JDBC-Driver>
+    	<URL>jdbc:postgresql://localhost:5432/bitset</URL>
+    	<!-- Schema kann weggelassen werden: Dann werden die Metadaten aller Schemata eingelesen.
+    	Auch mehrere Schemata angeben: Dann mit Komma getrennt. -->
+    	<Schema>public</Schema>
+    	<Username>peter</Username>
+    	<Password>peter</Password>
+    
+    	<!-- Connection Pool -->
+    	<MaxActiveConnections value="40"/>
+    	<MaxIdleConnections value="10"/>
+    	<MinIdleConnections value="0"/>
+    	<!-- Tomcat JDBC maxWait; 1 Minute -->
+    	<ConnectionTimeOut value="60000"/>
+    	<ValidationQuery>SELECT * FROM OBJEKT WHERE 1 = 0</ValidationQuery>
+    	<!--ValidationQuery>"SELECT * FROM DUAL"</ValidationQuery-->
+    	<TransactionIsolationLevel value="TRANSACTION_READ_UNCOMMITTED" />    
+    	<DetectDatabaseSessionID value="false" />	
+    	<Sequence>
+      	<!--get>SELECT counter FROM counter WHERE oid = 1</get>
+      		<set>UPDATE counter SET counter = ? WHERE oid = 1</set-->
+      		<get>SELECT MAX(oid)+1 FROM OBJEKT</get>
+    	</Sequence>	
+	</Database>
+	
+	<!-- SAPDB -->
+	<Database name="adresse" enabled="false">	
+		<JDBC-Driver>com.sap.dbtech.jdbc.DriverSapDB</JDBC-Driver>
+		<URL>jdbc:sapdb://localhost/MAXDB?cache=all</URL>
+		<Username>bitdemo</Username>
+		<Password>bitdemo</Password>
+		<Sequence>
+			<get>SELECT MAX(oid)+1 FROM OBJEKT</get>
+		</Sequence>
+	</Database>
+	
+	
+	<Dataset> 
+		<!-- Dataset Encoding; default is 'UTF-8' -->
+		<Encoding value='UTF-8' />
+		<!-- Name of Root Datset Element; default is 'Dataset' -->
+		<ElementName value='DataSet' /> 
+	</Dataset>
+	<Format>
+		<DateFormat value='dd.MM.yyyy' />
+		<TimeFormat value='HH:mm' />
+		<TimestampFormat value='dd.MM.yyyy HH:mm:ss' />
+		<DecimalFormat value="#0.00" />
+	</Format>
+	<Options>
+		<Debug value="false" />
+		<Profiler value="false" />
+		<JMX value="true"/>
+    	<SlowQueryLogger loggerName="SlowQueryLogger" defaultMaxExecutionTime="5000"/>
+	</Options>
+	<!-- Zugriffe -->
+	<View name="item">
+		<RootTable pk="itemname" tablename="item">
+			<Column name="*"/>
+		</RootTable>
+	</View>
+	<View name="objekt">
+		<RootTable pk="oid" tablename="objekt">
+			<Column name="*"/>
+		</RootTable>
+	</View>
+	<!--View name="objektitem">
+		<RootTable pk="oid,itemname" tablename="objektitem">
+			<Column name="*"/>
+		</RootTable>
+	</View-->
+</Server>

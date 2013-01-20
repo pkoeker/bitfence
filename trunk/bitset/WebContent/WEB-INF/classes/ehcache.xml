@@ -1,0 +1,9 @@
+<ehcache> 
+	<defaultCache
+           maxEntriesLocalHeap="20000"
+           eternal="false"
+           overflowToDisk="false"
+           timeToIdleSeconds="600"
+           timeToLiveSeconds="600">
+    </defaultCache>
+</ehcache>
