@@ -743,7 +743,7 @@ public class BfPL {
 	// Methods
 	private static Slot findSlot(String itemname, boolean force, IPLContext ipl) throws Exception {
 		Slot s = null;
-		if (ipl == null) {
+		if (ipl == null) { // TODO: cache
 			s = hash.get(itemname); 
 		} else {
 			s = me.selectSlot(itemname,  ipl);
