@@ -6,4 +6,5 @@
            timeToIdleSeconds="600"
            timeToLiveSeconds="600">
     </defaultCache>
+     <cacheEventListenerFactory class="de.pk86.bf.pl.BfCacheRemoveListener" properties="" listenFor="all"/>
 </ehcache>
