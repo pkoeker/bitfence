@@ -50,9 +50,9 @@
 		<FileExtension>.java</FileExtension>
 		<FileExtension>.sh</FileExtension>
 	</Spider>
-	<WebService>
+	<!--WebService>
 		<URL>http://pk86.de:8004</URL>
 		<Service>bitdemo</Service>
-	</WebService>
+	</WebService-->
 </Server>
   
