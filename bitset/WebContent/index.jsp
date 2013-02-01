@@ -15,7 +15,7 @@
   <textarea cols="100" rows="20" name="searchResult" readonly="readonly"><%= bitdemo.getSearchResult() %></textarea> <p/>
   <input type="submit" name="action" value="zur&uuml;ck"/> <%= bitdemo.getPointer() %>
   <input type="submit" name="action" value="weiter"/>
-  </p>
+
   </form>
 </body>
 </html>
