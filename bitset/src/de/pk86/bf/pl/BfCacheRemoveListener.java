@@ -1,5 +1,7 @@
 package de.pk86.bf.pl;
 
+import java.util.BitSet;
+
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
@@ -32,6 +34,11 @@ import net.sf.ehcache.event.CacheManagerEventListener;
  * @since 1.2
  */
 public class BfCacheRemoveListener implements CacheEventListener {
+	  private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BfCacheRemoveListener.class);
+	  private int removed;
+	  private int expired;
+	  private int evicted;
+	
 	/**
 	 * Called immediately after an element has been removed. The remove method
 	 * will block until this method returns.
@@ -48,7 +55,11 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           just deleted
 	 */
 	public void notifyElementRemoved(final Ehcache cache, final Element element) throws CacheException {
-
+		removed++;
+		if (removed % 100 == 0) {
+			System.out.println("removed: " + removed);
+		}
+		this.updateSlot(element);
 	}
 
 	/**
@@ -66,7 +77,8 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           the element which was just put into the cache.
 	 */
 	public void notifyElementPut(final Ehcache cache, final Element element) throws CacheException {
-
+		Slot s = get(element);
+		BitSet bs = s.getBitset();
 	}
 
 	/**
@@ -86,7 +98,8 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           the element which was just put into the cache.
 	 */
 	public void notifyElementUpdated(final Ehcache cache, final Element element) throws CacheException {
-
+		Slot s = get(element);
+		BitSet bs = s.getBitset();
 	}
 
 	/**
@@ -122,7 +135,11 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           this method should not call back into Cache.
 	 */
 	public void notifyElementExpired(final Ehcache cache, final Element element) {
-
+		this.expired++;
+		if (expired % 100 == 0) {
+			System.out.println("expired: " + expired);
+		}
+		this.updateSlot(element);
 	}
 
 	/**
@@ -147,18 +164,49 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 */
 	public Object clone() throws CloneNotSupportedException {
 		
-		return null;
+		throw new CloneNotSupportedException();
 	}
 
 	@Override
-   public void notifyElementEvicted(Ehcache arg0, Element arg1) {
-	   // TODO Auto-generated method stub
-	   
+   public void notifyElementEvicted(Ehcache arg0, Element element) {
+		this.evicted++;
+		if (evicted % 100 == 0) {
+			System.out.println("evicted: " + evicted);
+		}
+		this.updateSlot(element);
    }
 
 	@Override
-   public void notifyRemoveAll(Ehcache arg0) {
-	   // TODO Auto-generated method stub
-	   
+   public void notifyRemoveAll(Ehcache cache) {
+	   // Cache leeren
+		try {
+	      BfPL.getInstance().writeAll(null);
+      } catch (Exception e) {
+	      // TODO Auto-generated catch block
+	      e.printStackTrace();
+      }
    }
+	
+	private void updateSlot(net.sf.ehcache.Element cele) {
+		Slot s = this.get(cele);
+		if (s.isModified()) {
+			try {
+	         BfPL.getInstance().insertOrUpdateSlot(s);
+         } catch (Exception e) {
+	         e.printStackTrace();
+	         logger.error(e.getMessage(), e);
+         }
+		}
+	}
+
+	private Slot get(net.sf.ehcache.Element cele) {
+		if (cele != null) {
+			Object val = cele.getValue();
+			Slot s = (Slot) val;
+			return s;
+		} else {
+			return null;
+		}
+	}
+
 }

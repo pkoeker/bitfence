@@ -1,5 +1,9 @@
 package de.pk86.bf.pl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.config.CacheConfiguration;
 import de.pkjs.util.Convert;
@@ -31,7 +35,7 @@ class SlotCache {
         CacheConfiguration cfg = new CacheConfiguration();
         cfg.setName(cacheName);
         // Properties
-        long maxElesMem = 10000;
+        long maxElesMem = 20000;
         String maxEntriesLocalHeap = ele.getAttribute("maxEntriesLocalHeap");
         if (maxEntriesLocalHeap != null) {
           maxElesMem = Convert.toLong(maxEntriesLocalHeap);
@@ -46,6 +50,7 @@ class SlotCache {
         String overflowToDisk = ele.getAttribute("overflowToDisk");
         if (overflowToDisk != null) {
           cfg.setOverflowToDisk(Convert.toBoolean(overflowToDisk));
+          cfg.setDiskStorePath("/tmp");
         }
         //
         String eternal = ele.getAttribute("eternal");
@@ -53,14 +58,14 @@ class SlotCache {
           cfg.setEternal(Convert.toBoolean(eternal));
         }
         //
-        long time2idl = 600;
+        long time2idl = 1200;
         String timeToIdleSeconds = ele.getAttribute("timeToIdleSeconds");
         if (timeToIdleSeconds != null) {
           time2idl = Convert.toLong(timeToIdleSeconds);
         }
         cfg.setTimeToIdleSeconds(time2idl);
         //
-        long time2live = 600;
+        long time2live = 1200;
         String timeToLiveSeconds = ele.getAttribute("timeToLiveSeconds");
         if (timeToLiveSeconds != null) {
           time2live = Convert.toLong(timeToLiveSeconds);
@@ -74,6 +79,7 @@ class SlotCache {
           cache.setStatisticsEnabled(true);
           //ManagementService.registerMBeans(BfPL.getCacheManager(), getMBeanServer(), true, true, true, true);
         }
+        cache.getCacheEventNotificationService().registerListener(new BfCacheRemoveListener());
       } catch (Exception ex) {
         logger.error(ex.getMessage(), ex);
       }
@@ -105,8 +111,19 @@ class SlotCache {
   }
 
   void removeAll() {
-     if (isEmpty()) return;
+    if (isEmpty()) return;
     cache.removeAll();
+  }
+  
+  List<Slot> getAll() {
+	   List<String> keys = cache.getKeys();
+	   Map<Object, net.sf.ehcache.Element> map = cache.getAll(keys);
+	   List<Slot> list = new ArrayList<Slot>();
+	   for (net.sf.ehcache.Element ele:map.values()) {
+	   	list.add((Slot)ele.getValue());
+	   }
+	   
+	   return list;
   }
 
   public String toString() {
