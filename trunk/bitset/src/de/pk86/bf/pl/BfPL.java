@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -44,21 +45,10 @@ public class BfPL {
 	private String insertObject = "INSERT INTO OBJEKT Values(?,?)";
 	private String deleteObject = "DELETE FROM OBJEKT WHERE oid = ?";
 	//private String getMaxOid = "SELECT MAX(oid)+1 FROM OBJEKT";	
-	// ObjectItem
-//	private String findOIs = "SELECT Itemname FROM OBJEKTITEM WHERE oid = ? ORDER BY Itemname";	
-//	private String insertOI = "INSERT INTO OBJEKTITEM Values(?, ?)";
-//	private String deleteOI = "Delete FROM OBJEKTITEM WHERE oid = ? AND Itemname = ?";
-//	private String deleteItemOIs = "Delete FROM OBJEKTITEM WHERE Itemname = ?";
-//	private String deleteItemOIsLike = "Delete FROM OBJEKTITEM WHERE Itemname LIKE ?";
-//	private String deleteObjectOIs = "Delete FROM OBJEKTITEM WHERE oid = ?";
 	// Item
 	private String findItems = "SELECT Itemname FROM ITEM WHERE Itemname LIKE ? ORDER BY Itemname";
 	private String selectItem = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
 	private String insertItem = "INSERT INTO ITEM Values(?,?)";
-//	private String updateItem = "UPDATE ITEM SET Itemname = ? WHERE Itemname = ?";
-//	private String deleteItem = "Delete FROM ITEM WHERE Itemname = ?";	
-//	private String deleteItemLike = "Delete FROM ITEM WHERE Itemname LIKE ?";	
-//	private String countItemBits = "SELECT SUM(bitCount) as ANZ FROM SLOT WHERE Itemname = ?";	
 	// Slot
 	private String selectSlot = "SELECT Bits FROM ITEM WHERE Itemname = ?";
 	private String getAllSlots = "SELECT Bits FROM ITEM WHERE Itemname = ?";
@@ -72,8 +62,8 @@ public class BfPL {
 	private Element spiderConfig;
 	
 	private PL pl;
-	
-	private static LinkedHashMap<String, Slot> hash = new LinkedHashMap<String, Slot>();
+	private int missing;
+	//private static LinkedHashMap<String, Slot> hash = new LinkedHashMap<String, Slot>();
 
 	
 	// Private Constructor
@@ -433,6 +423,27 @@ public class BfPL {
 		}
 		return ret;
 	}
+	void insertOrUpdateSlot(Slot s) throws Exception {
+		String transname = "insertUpdateSlot";
+		IPLContext ipl = pl.startNewTransaction(transname);
+		try {
+			this.insertOrUpdateSlot(s, ipl);
+			ipl.commitTransaction(transname);
+		} catch (PLException ex) {
+			if (ipl != null) {
+				ipl.rollbackTransaction(transname);
+			}
+			throw ex;
+		}
+	}
+	void insertOrUpdateSlot(Slot s, IPLContext ipl) throws Exception {
+		if (s.isInserted()) {
+			this.insertSlot(s, ipl);
+		} else {
+			this.updateSlot(s, ipl);
+		}
+	}
+	
 	public void insertSlot(Slot s, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
@@ -440,6 +451,7 @@ public class BfPL {
 			byte[] bts = s.getBytes();
 			list.addParameter("bts", bts);
 			int cnt = ipl.executeSql(insertSlot, list);
+			s.setUpdated(); // reset			
 		} catch (PLException ex) {
 			throw ex;
 		}
@@ -451,16 +463,17 @@ public class BfPL {
 			list.addParameter("bts", bts);
 			list.addParameter("itemname", s.itemname);
 			int cnt = ipl.executeSql(updateSlot, list);
+			s.setUpdated(); // reset
 		} catch (PLException ex) {
 			throw ex;
 		}
 	}
 	public void removeSlot(Slot s, IPLContext ipl) throws Exception {
-		//PreparedStatement ps = null;
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", s.itemname);
 			int cnt = ipl.executeSql(deleteSlot, list);
+			// TODO: was tun, wenn wenn cached? Eigenschaft "removed" beim Slot setzen?
 		} catch (PLException ex) {
 			throw ex;
 		}
@@ -505,7 +518,7 @@ public class BfPL {
 		int cnt = pl.executeSql("DELETE FROM ITEM");
 		System.out.println("Items delete: " + cnt);
 		// Slots aus ObjectItems neu aufbauen
-		JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt"); // je 100.000 Objekte paketieren?
+		JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt"); // je 100.000 Objekte paketieren? Mehrere Threads?
 		System.out.println("Objekt rowCount: " + ds.getRowCount());
 		Iterator<JDataRow> it = ds.getChildRows();
 		if (it == null) return;
@@ -519,16 +532,19 @@ public class BfPL {
 			ArrayList<String> al = getObjectItems(content);
 			anzo++;
 			for(String itemname:al) {
-				setBit(oid, itemname, null); // null heißt: alles im Speicher halten!
-				if (anzo % 100 == 0) {
-					anzoi++;
+				setBit(oid, itemname, ipl); 
+				anzoi++;
+				if (anzoi % 1000 == 0) {
 					System.out.println(anzo + "/" +anzoi);
-//					ipl.commitTransaction("repair");
-//					ipl = pl.startNewTransaction("repair");
 				}
 			}
+//			if (anzo > 10000) {
+//				writeAll(ipl); // Cache durchschreiben erzwingen
+//				ipl.commitTransaction("repair");
+//				return;
+//			}
 		}
-		whiteAll(ipl);
+		writeAll(ipl); // Cache durchschreiben erzwingen
 		ipl.commitTransaction("repair");
 	}
 	
@@ -741,21 +757,28 @@ public class BfPL {
 	
 	
 	// Methods
-	private static Slot findSlot(String itemname, boolean force, IPLContext ipl) throws Exception {
+	private Slot findSlot(String itemname, boolean force, IPLContext ipl) throws Exception {
 		Slot s = null;
-		if (ipl == null) { // TODO: cache
-			s = hash.get(itemname); 
-		} else {
-			s = me.selectSlot(itemname,  ipl);
+		s = sc.get(itemname); // Cache
+		if (s != null) 
+			return s;
+		missing++;
+		if (missing % 100 == 0) {
+			System.out.println("findSlot/Missing: " + missing + " " + itemname);
 		}
+		//s = hash.get(itemname); // HashMap
+		s = me.selectSlot(itemname,  ipl); // DB
 		if (force == true && s == null) {
 			s = new Slot(itemname);
-			hash.put(itemname, s);
+			//hash.put(itemname, s);			
+		}
+		if (s != null) {
+			sc.put(s);
 		}
 		return s;		
 	}
-	private static void writeSlot(Slot s, IPLContext ipl) throws Exception {
-		if (ipl == null) {
+	private void writeSlot(Slot s, IPLContext ipl) throws Exception {
+		if (sc != null) {
 			return;
 		}
 		if (s.isInserted() == true) {
@@ -764,13 +787,16 @@ public class BfPL {
 			me.updateSlot(s, ipl);
 		}
 	}
-	static void setBit(long l, String itemname, IPLContext ipl) throws Exception {
+	void setBit(long l, String itemname, IPLContext ipl) throws Exception {
 		Slot s = findSlot(itemname, true, ipl);
 		s.setBit(l);
-		if (ipl != null)
+		if (sc == null) {
 			writeSlot(s, ipl);
+		} else {
+			// Cached
+		}
 	}
-	static boolean testBit(long l, String itemname, IPLContext ipl) throws Exception {
+	boolean testBit(long l, String itemname, IPLContext ipl) throws Exception {
 		Slot s = findSlot(itemname, false, ipl);
 		if (s == null) {
 			return false;		
@@ -778,7 +804,7 @@ public class BfPL {
 			return s.testBit(l);
 		}
 	}
-	static void removeBit(long l, String itemname, IPLContext ipl) throws Exception {
+	void removeBit(long l, String itemname, IPLContext ipl) throws Exception {
 		Slot s = findSlot(itemname, false, ipl);
 		if (s == null) {
 			return;		
@@ -788,12 +814,26 @@ public class BfPL {
 		}		
 	}
 	
-	static void whiteAll(IPLContext ipl) throws Exception {
-		Iterator<Map.Entry<String, Slot>> it = hash.entrySet().iterator();
-		while(it.hasNext()) {
-			Map.Entry<String, Slot> entry = it.next();
-			writeSlot(entry.getValue(), ipl);
+	void writeAll(IPLContext ipl) throws Exception {
+		//sc.removeAll();
+		boolean transStarted = false;
+		if (ipl == null) {
+			ipl = pl.startNewTransaction("writeAll");
+			transStarted = true;
 		}
+	   List<Slot> list = sc.getAll();
+	   for (Slot slot:list) {
+	   	this.insertOrUpdateSlot(slot, ipl);
+	   }
+	   if (transStarted) {
+	   	ipl.commitTransaction("writeAll");
+	   }
+
+//		Iterator<Map.Entry<String, Slot>> it = hash.entrySet().iterator();
+//		while(it.hasNext()) {
+//			Map.Entry<String, Slot> entry = it.next();
+//			writeSlot(entry.getValue(), ipl);
+//		}
 	}
 
 }

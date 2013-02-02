@@ -16,7 +16,8 @@ public class Slot implements Serializable {
 	public String itemname;
 
 	private BitSet bitset;
-	private boolean inserted = false;
+	private boolean inserted;
+	private boolean modified;
 
 	// Constructor
 	public Slot(String itemname) {
@@ -49,12 +50,21 @@ public class Slot implements Serializable {
 	
 	public void setBitset(BitSet bitset) {
 		this.bitset = bitset;
+		//this.modified = true; // siehe #performBrace 
 	}
 
 	boolean isInserted() {
 		return inserted;
 	}
-
+		
+	boolean isModified() {
+		return modified;
+	}
+	
+	void setUpdated() {
+		this.inserted = false;
+		this.modified = false;
+	}
 	/**
 	 * Setzt ein Bit
 	 * 
@@ -64,6 +74,7 @@ public class Slot implements Serializable {
 	 */
 	void setBit(long l) {
 		bitset.set((int)l);
+		this.modified = true; // TODO: prüfen, ob Bit schon zuvor gesetzt war?
 	}
 
 	/**
@@ -85,11 +96,11 @@ public class Slot implements Serializable {
 	 */
 	void removeBit(long l) {
 		bitset.set((int)l, false);
+		this.modified = true; // TODO: prüfen, ob Bit schon zuvor gelöscht war?
 	}
 
 	public int countBits() {
 		return bitset.cardinality();
-		//return bitCount;
 	}
 
 	
