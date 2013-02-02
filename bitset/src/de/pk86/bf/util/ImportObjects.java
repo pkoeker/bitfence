@@ -92,7 +92,7 @@ public class ImportObjects extends TestCase {
 		JDataSet ds = pl.getEmptyDataset("objekt");
 //		JDataSet dsoi = pl.getEmptyDataset("objektitem");
 		
-		for (int i = 0; i < 200000; i++) {
+		for (int i = 0; i < 500000; i++) {
 			StringBuilder sb = new StringBuilder();
 //			HashSet<String> hs = new HashSet<String>();
 			
