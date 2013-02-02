@@ -13,9 +13,9 @@
   <input type="submit" name="action" value="Suchen"/> Anzahl Treffer: <%= bitdemo.getResultSetSize() %> Dauer: <%= bitdemo.getDuration() %><p/>    
   Suchergebnis: <br/> 
   <textarea cols="100" rows="20" name="searchResult" readonly="readonly"><%= bitdemo.getSearchResult() %></textarea> <p/>
-  <input type="submit" name="action" value="zur&uuml;ck"/> <%= bitdemo.getPointer() %>
-  <input type="submit" name="action" value="weiter"/>
-
   </form>
+  
+  <form method="post" style="display:inline"><input type="submit" name="action" value="zur&uuml;ck"/> <%= bitdemo.getPointer() %></form> 
+  <form method="post" style="display:inline"><input type="submit" name="action" value="weiter"/></form>
 </body>
 </html>
