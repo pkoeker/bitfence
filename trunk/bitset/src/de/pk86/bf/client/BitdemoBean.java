@@ -21,15 +21,15 @@ public class BitdemoBean {
 	
 	public void processRequest(HttpServletRequest request) {
 		this.request = request;
-	}
-		
-	public void setSearchPattern(String pattern) {
-		this.expression = pattern.trim();
 		String param = request.getParameter("action");
+		if (param == null) {
+			return;
+		}
 		logger.debug("Parameter: " + param);
 		logger.debug("Expression: " + expression);
+		//System.out.println("processRequest: " + param);
 		try {
-			if (param == null || "suchen".equalsIgnoreCase(param)) {
+			if ("suchen".equalsIgnoreCase(param)) {
 				res = sv.execute(expression);			
 				if (res != null) {
 					this.dispResult(res.firstPage, res.trace);
@@ -38,14 +38,22 @@ public class BitdemoBean {
 				JDataSet ds = sv.getNextPage(res.sessionName);
 				this.res.pointer = (int)ds.getOid();
 				this.dispResult(ds, null);
-			} else {
-					JDataSet ds = sv.getPrevPage(res.sessionName);
-					this.res.pointer = (int)ds.getOid();
-					this.dispResult(ds, null);
+			} else if ("zurück".equalsIgnoreCase(param)) {
+				JDataSet ds = sv.getPrevPage(res.sessionName);
+				this.res.pointer = (int)ds.getOid();
+				this.dispResult(ds, null);
 			}
 		} catch (IllegalStateException ex) {
 			page = ex.getMessage();
 		}
+	}
+		
+	public void setSearchPattern(String pattern) {
+		this.expression = pattern.trim();
+		String param = request.getParameter("action");
+		logger.debug("Parameter: " + param);
+		logger.debug("Expression: " + expression);
+		//System.out.println("setSearchPattern: " + param);
 	}
 		
 	public String getSearchPattern() {
