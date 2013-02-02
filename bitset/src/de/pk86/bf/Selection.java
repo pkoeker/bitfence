@@ -93,7 +93,7 @@ public class Selection {
 				sbe.append(ot2.oper);
 				sbe.append(" " + ot2.token);
 				ot1.token = "[" + getTraceSize() + "]";
-				ot1.slot.setBitset(erg);
+				ot1.slot.setBitset(erg); // TODO: gefährlich! Wenn der Cache diese Daten zurückschreibt! 
 				sbe.append(" ");
 				addTraceElement(sbe.toString(), ot1.slot.getBitset().cardinality());
 				sbe = new StringBuilder();
@@ -187,6 +187,7 @@ public class Selection {
 			return null;
 		}
 		BitSet bs = slot.getBitset();
+		index = start;
 		while(poi < cnt) {
 			index = bs.nextSetBit(index);
 			ret[poi] = index;
