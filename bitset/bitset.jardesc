@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jardesc>
+    <jar path="bitset/bitset.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/bitset/bitset.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/bitset/bitset.mf" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <file path="/bitset/StartServer.bat"/>
+        <file path="/bitset/design.asta"/>
+        <file path="/bitset/DefaultPL.log"/>
+        <file path="/bitset/.project"/>
+        <file path="/bitset/javadoc.xml"/>
+        <file path="/bitset/StartClient.sh"/>
+        <file path="/bitset/.classpath"/>
+        <file path="/bitset/StartClient.bat"/>
+        <javaElement handleIdentifier="=bitset/src"/>
+        <file path="/bitset/DefaultReadable.log"/>
+        <file path="/bitset/StartServer.sh"/>
+    </selectedElements>
+</jardesc>
