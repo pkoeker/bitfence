@@ -1,12 +1,12 @@
 package de.pk86.bf;
 
-import de.pk86.bf.pl.BfPL;
 
 /**
- * @deprecated
  * @author peter
  */
 public class Const {
+	public static String DEFAULT_DELIM = " ;.,()/-";
+
 	/**
 	 * Größe des Datenbank-Slots in Bytes (1024)
 	 */
