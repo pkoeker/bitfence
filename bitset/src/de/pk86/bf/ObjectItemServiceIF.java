@@ -43,10 +43,13 @@ public interface ObjectItemServiceIF {
 	public void createDatabase();
 	/**
 	 * Importiert Objekte in die Datenbasis;
+	 * Objekte werden zeilenweise erwartet; 
+	 * die Eigenschaften der Objekte durch white space getrennt.
 	 * @param data
+	 * @return Anzahl importierter Objekte
 	 */
-	public void importDatabaseCSV(String content);
-	public void importDatabaseDataset(JDataSet data);
+	public int importDatabaseCSV(String content);
+	public int importDatabaseDataset(JDataSet data);
 	/**
 	 * Indiziert die Datenbasis; der Index (BitZaun) wird aus den Objekten neu aufgebaut
 	 */

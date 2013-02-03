@@ -3,12 +3,17 @@ package de.pk86.bf;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
+import de.jdataset.JDataColumn;
+import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
+import de.jdataset.JDataTable;
 import de.pk86.bf.pl.BfPL;
 import electric.registry.Registry;
 import electric.server.http.HTTP;
@@ -558,12 +563,22 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 						brace = OperToken.Brace.NONE;
 					}				
 			}
-			
-			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an.
+			StringBuilder sb = new StringBuilder();
+			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an; wenn Slot null, dann gibts den begriff nicht
+			for (int i = al.size()-1; i>=0; i--) {
+				OperToken ot = al.get(i);
+				if (ot.slot == null) {
+					sb.append(ot.token + " ");
+					al.remove(i);
+				}
+			}
 			long end1 = System.currentTimeMillis();
 			res = this.performOper(name, al);
+			if (sb.length() > 0) {
+				res.missingItems = sb.toString();
+			}
 			res.duraDB1 = end1 - startTime;
-			logger.info(expression + "");
+			logger.info(expression);
 			
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
@@ -759,11 +774,32 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		
 	}
 	
-	public void importDatabaseCSV(String data) {
-		
+	public int importDatabaseCSV(String data) {
+		StringTokenizer toks = new StringTokenizer(data, "\n\r");
+		JDataSet ds = new JDataSet("objekt");
+		JDataTable tbl = new JDataTable("objekt");
+		ds.addRootTable(tbl);
+		JDataColumn colId = tbl.addColumn("oid", Types.INTEGER);
+		colId.setPrimaryKey(true);
+		tbl.addColumn("content", Types.VARCHAR);
+		while (toks.hasMoreTokens()) {
+			String tok = toks.nextToken();
+			JDataRow row = ds.createChildRow();
+			row.setValue("content", tok);
+		}
+		try {
+			int cnt = pl.importObjects(ds);
+			logger.info(cnt + " objects imported");
+			return cnt;
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			return 0;
+		}
 	}
-	public void importDatabaseDataset(JDataSet data) {
+	public int importDatabaseDataset(JDataSet data) {
 		
+		
+		return 0;
 	}
 	private void initWebservice() {
 		if (webserviceCreated) return;

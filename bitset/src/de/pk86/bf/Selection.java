@@ -37,6 +37,7 @@ public class Selection {
 	}
 	
 	int performOper(ArrayList<OperToken> al) {		
+		if (al == null || al.size() == 0) return 0;
 		// Klammer
 		while (al.size() > 1) {
 			int maxLevel = 0;
