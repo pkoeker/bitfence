@@ -49,6 +49,7 @@ public class BitdemoBean {
 	}
 		
 	public void setSearchPattern(String pattern) {
+		if (request == null) return;
 		this.expression = pattern.trim();
 		String param = request.getParameter("action");
 		logger.debug("Parameter: " + param);
