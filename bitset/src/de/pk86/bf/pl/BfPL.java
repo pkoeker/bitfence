@@ -122,6 +122,8 @@ public class BfPL {
 			int cnt = ipl.setDataset(ds);
 			ds.commitChanges();
 			// 3. Items
+			// 3.1 Cache vorher löschen
+			sc.removeAll();
 			Iterator<JDataRow> itc = ds.getChildRows();
 			while(itc.hasNext()) {
 				JDataRow row = itc.next();
