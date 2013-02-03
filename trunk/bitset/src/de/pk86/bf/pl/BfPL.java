@@ -6,19 +6,15 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sf.ehcache.CacheManager;
-
-import org.apache.log4j.xml.DOMConfigurator;
-
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataValue;
 import de.jdataset.ParameterList;
+import de.pk86.bf.Const;
 import de.pk86.bf.OperToken;
 import de.pk86.bf.util.ImportObjects;
 import de.pkjs.pl.IPLContext;
@@ -26,7 +22,6 @@ import de.pkjs.pl.PL;
 import de.pkjs.pl.PLException;
 import electric.xml.Document;
 import electric.xml.Element;
-import electric.xml.ParseException;
 /**
  * @author peter
  */
@@ -109,6 +104,41 @@ public class BfPL {
 	private SlotCache sc;
 
 	// Objects ###################################
+	public int importObjects(JDataSet ds) throws Exception {
+		if (ds == null || ds.getRowCount() == 0) return 0;		
+		IPLContext ipl = pl.startNewTransaction("importObjects");
+		// 1. Primary keys
+		{
+			long oid = pl.getOID(); 
+			Iterator<JDataRow> ito = ds.getChildRows();
+			while(ito.hasNext()) {
+				JDataRow row = ito.next();
+				row.setValue("oid", oid);
+				oid++;
+			}
+		}
+		try {
+			// 2. DataSet
+			int cnt = ipl.setDataset(ds);
+			ds.commitChanges();
+			// 3. Items
+			Iterator<JDataRow> itc = ds.getChildRows();
+			while(itc.hasNext()) {
+				JDataRow row = itc.next();
+				String content = row.getValue("content");
+				long oid = row.getValueLong("oid");
+				this.addObjectItems(oid, content, ipl);
+			}		
+			// 4. Cache durchschreiben
+			this.writeAll(ipl);
+			ipl.commitTransaction("importObjects");
+			return cnt;
+		} catch (PLException ex) {
+			ipl.rollbackTransaction("importObjects");
+			throw ex;
+		}
+	}
+	
 	public void createObject(long oid) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
@@ -161,6 +191,15 @@ public class BfPL {
 		return oid;
 	}
 	// ObjectItems ##########################################
+	public void addObjectItems(long oid, String content, IPLContext ipl) throws Exception {
+		ArrayList<String> al = getObjectItems(content);
+		for (String itemname:al) {
+			setBit(oid, itemname, ipl);
+		}
+	}
+	public void addObjectItem(long oid, String itemname, IPLContext ipl) throws Exception {
+		setBit(oid, itemname, ipl);
+	}
 	public void addObjectItem(long oid, String itemname) throws Exception {
 		String transname = "insertOI";
 		IPLContext ipl = pl.startNewTransaction(transname);
@@ -439,7 +478,7 @@ public class BfPL {
 	void insertOrUpdateSlot(Slot s, IPLContext ipl) throws Exception {
 		if (s.isInserted()) {
 			this.insertSlot(s, ipl);
-		} else {
+		} else if (s.isModified()) {
 			this.updateSlot(s, ipl);
 		}
 	}
@@ -528,7 +567,7 @@ public class BfPL {
 		while(it.hasNext()) {
 			JDataRow row = it.next();
 			long oid = row.getValueLong("oid");
-			String content = row.getValue("content").toLowerCase();
+			String content = row.getValue("content");
 			ArrayList<String> al = getObjectItems(content);
 			anzo++;
 			for(String itemname:al) {
@@ -549,7 +588,8 @@ public class BfPL {
 	}
 	
 	public static ArrayList<String> getObjectItems(String content) {
-		StringTokenizer toks = new StringTokenizer(content, ImportObjects.DEFAULT_DELIM);
+		content = content.toLowerCase();
+		StringTokenizer toks = new StringTokenizer(content, Const.DEFAULT_DELIM);
 		ArrayList<String> al = new ArrayList<String>();
 		while(toks.hasMoreTokens()) {
 			String itemname = toks.nextToken();
