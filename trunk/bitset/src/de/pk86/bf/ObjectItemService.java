@@ -15,9 +15,9 @@ import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
 import de.pk86.bf.pl.BfPL;
-import electric.registry.Registry;
-import electric.server.http.HTTP;
-import electric.util.Context;
+//import electric.registry.Registry;
+//import electric.server.http.HTTP;
+//import electric.util.Context;
 import electric.xml.Element;
 
 /**
@@ -802,31 +802,31 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		return 0;
 	}
 	private void initWebservice() {
-		if (webserviceCreated) return;
-		Element ele = pl.getWebServiceConfig();
-		if (ele == null)
-			return;
-		Element urlEle = ele.getElement("URL");
-		Element srvEle = ele.getElement("Service");
-		if (urlEle == null || srvEle == null)
-			return;
-		String url = urlEle.getTextString();
-		String srv = srvEle.getTextString();
-		System.out.println("*** Starting WebService ***\nURL: "+url+"\nService: "+srv);
-		try {
-			Context context = new Context();
-			// Geht nicht ???
-			// session has expired. cannot create new session object
-			//context.addProperty( "activation", "session" );
-			context.addProperty( "description", "Object Item Web Service" );
-			HTTP.startup(url);
-			Registry.publish(srv, this, ObjectItemServiceIF.class, context);
-			webserviceCreated = true;
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			System.err.println(
-				"Unable to start WebService:\n" + ex.getMessage());
-		}
+//		if (webserviceCreated) return;
+//		Element ele = pl.getWebServiceConfig();
+//		if (ele == null)
+//			return;
+//		Element urlEle = ele.getElement("URL");
+//		Element srvEle = ele.getElement("Service");
+//		if (urlEle == null || srvEle == null)
+//			return;
+//		String url = urlEle.getTextString();
+//		String srv = srvEle.getTextString();
+//		System.out.println("*** Starting WebService ***\nURL: "+url+"\nService: "+srv);
+//		try {
+//			Context context = new Context();
+//			// Geht nicht ???
+//			// session has expired. cannot create new session object
+//			//context.addProperty( "activation", "session" );
+//			context.addProperty( "description", "Object Item Web Service" );
+//			HTTP.startup(url);
+//			Registry.publish(srv, this, ObjectItemServiceIF.class, context);
+//			webserviceCreated = true;
+//		} catch (Exception ex) {
+//			logger.error(ex.getMessage(), ex);
+//			System.err.println(
+//				"Unable to start WebService:\n" + ex.getMessage());
+//		}
 	}
 	private void initSpider() {
 		Element ele = pl.getSpiderConfig();

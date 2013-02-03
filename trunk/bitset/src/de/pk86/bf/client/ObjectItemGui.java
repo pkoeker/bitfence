@@ -62,10 +62,10 @@ public class ObjectItemGui {
 			sv = ServiceFactory.getDirectService();					
 		} else if (ce.value.equals("rmi")) {
 			sv = ServiceFactory.getSpringService();		
-		} else if (ce.value.equals("soap")) {
-			sv = ServiceFactory.getSOAP_Service();		
-		} else if (ce.value.equals("remoteSOAP")) {
-			sv = ServiceFactory.getSOAP_Service("http://pk86.de:8004/bitdemo.wsdl");		
+//		} else if (ce.value.equals("soap")) {
+//			sv = ServiceFactory.getSOAP_Service();		
+//		} else if (ce.value.equals("remoteSOAP")) {
+//			sv = ServiceFactory.getSOAP_Service("http://pk86.de:8004/bitdemo.wsdl");		
 		} else if (ce.value.equals("remoteRMI")) {
 			sv = ServiceFactory.getSpringService("pk86.de:1098");		
 		}
