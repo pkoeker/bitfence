@@ -8,7 +8,7 @@
 <% bitdemo.processRequest(request); %>
 <h2>Personen Suchanfrage</h2>
   <form method="post">
-  Suchbegriffe: <br/> 
+  Suchbegriffe: <sup>[1]</sup><br/> 
   <textarea cols="100" rows="5" name="searchPattern" maxlength="4000"><%= bitdemo.getSearchPattern() %></textarea> <p/>
   <input type="submit" name="action" value="Suchen"/> Anzahl Treffer: <%= bitdemo.getResultSetSize() %> Dauer: <%= bitdemo.getDuration() %><p/>    
   Suchergebnis: <br/> 
@@ -17,5 +17,9 @@
   
   <form method="post" style="display:inline"><input type="submit" name="action" value="zur&uuml;ck"/> <%= bitdemo.getPointer() %></form> 
   <form method="post" style="display:inline"><input type="submit" name="action" value="weiter"/></form>
+  <p/>
+  <sup>[1]</sup> Operatoren: | - ^ ( )<p/>
+  <hr />
+  <a href="import.jsp"> Daten importieren </a>
 </body>
 </html>
