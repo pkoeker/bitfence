@@ -50,6 +50,18 @@
 		<FileExtension>.java</FileExtension>
 		<FileExtension>.sh</FileExtension>
 	</Spider>
+		<!-- Zugriffe -->
+	<View name="item">
+		<RootTable pk="itemname" tablename="item">
+			<Column name="*"/>
+		</RootTable>
+	</View>
+	<View name="objekt">
+		<RootTable pk="oid" tablename="objekt">
+			<Column name="*"/>
+		</RootTable>
+	</View>
+	
 	<!--WebService>
 		<URL>http://pk86.de:8004</URL>
 		<Service>bitdemo</Service>
