@@ -18,20 +18,18 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-logging-api-1.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/ehcache-core-2.5.2.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/GLUE.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/guibuilder.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-api.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-impl.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-xjc.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxws-api.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxws-rt.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxws-tools.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jdataset.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/pkjs_pl.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-log4j12-1.6.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/stax-ex.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/streambuffer.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tomcat-juli.jar"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/pkjs_pl.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
