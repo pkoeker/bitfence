@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import net.sf.ehcache.CacheManager;
+import de.jdataset.JDataColumn;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
+import de.jdataset.JDataTable;
 import de.jdataset.JDataValue;
 import de.jdataset.ParameterList;
 import de.pk86.bf.Const;
@@ -199,9 +201,6 @@ public class BfPL {
 			setBit(oid, itemname, ipl);
 		}
 	}
-	public void addObjectItem(long oid, String itemname, IPLContext ipl) throws Exception {
-		setBit(oid, itemname, ipl);
-	}
 	public void addObjectItem(long oid, String itemname) throws Exception {
 		String transname = "insertOI";
 		IPLContext ipl = pl.startNewTransaction(transname);
@@ -229,6 +228,14 @@ public class BfPL {
 			throw ex;
 		}
 	}
+	
+	/**
+	 * @deprecated macht ganz und gar nix :-(
+	 * @param oid
+	 * @param ipl
+	 * @return
+	 * @throws Exception
+	 */
 	public String[] getObjectItems(long oid, IPLContext ipl) throws Exception {
 		String[] ret = null;
 		// TODO!
@@ -695,7 +702,53 @@ public class BfPL {
 		ParameterList list = new ParameterList();
 		list.addParameter("oids", al);
 		JDataSet ds = pl.getDatasetSql("objekt", sql, list);		
+		JDataTable tbl = ds.getDataTable(); 
+		JDataColumn colPK = tbl.getDataColumn("oid");
+		colPK.setPrimaryKey(true); // PK fürs zurückschreiben
 		return ds;
+	}
+	
+	public int setObjectPage(JDataSet ds) throws Exception {
+		if (ds == null || ds.getRowCount() == 0) return 0;
+		int cnt;
+		IPLContext ipl = null;
+		try {
+			 ipl = pl.startNewTransaction("setObjectPage");
+      	 // BitZaun aktualisieren
+			 Iterator<JDataRow> it = ds.getChildRows();
+			 while (it.hasNext()) {
+				 JDataRow row = it.next();
+				 long oid = row.getValueLong("oid");
+				 String oldContent = row.getDataValue("content").getOldValue();
+				 String content = row.getValue("content");
+				 ArrayList<String> olditems = getObjectItems(oldContent);
+				 ArrayList<String> items = getObjectItems(content);
+				 // TODO: Abgleichen neu/alt
+				 if (row.isInserted() == false) { // keine neuen austragen
+					 for(String itemname:olditems) {
+						 this.removeBit(oid, itemname, ipl);					 
+					 }
+				 }
+				 if (row.isDeleted() == false) { // keine gelöschten neu schreiben
+					 for(String itemname:items) {
+						this.setBit(oid, itemname, ipl);
+					 }
+				 }
+			 }
+	      cnt = ipl.setDataset(ds);
+	      ipl.commitTransaction("setObjectPage");
+	      return cnt;
+      } catch (PLException e) {
+      	logger.error(e.getMessage(), e);
+      	if (ipl != null) {
+      		try {
+	            ipl.rollbackTransaction("setObjectPage");
+            } catch (PLException e1) {
+	            e1.printStackTrace();
+            }
+      	}
+      	throw e;
+      }
 	}
 
 	// INIT ################################
