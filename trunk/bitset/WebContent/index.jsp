@@ -15,11 +15,11 @@
   <textarea cols="100" rows="20" name="searchResult" readonly="readonly"><%= bitdemo.getSearchResult() %></textarea> <p/>
   </form>
   
-  <form method="post" style="display:inline"><input type="submit" name="action" value="zur&uuml;ck"/> <%= bitdemo.getPointer() %></form> 
+  <form method="post" style="display:inline"><input type="submit" name="action" value="zur&uuml;ck"/> <%=bitdemo.getPointer() %></form> 
   <form method="post" style="display:inline"><input type="submit" name="action" value="weiter"/></form>
   <p/>
   <sup>[1]</sup> Operatoren: | - ^ ( )<p/>
   <hr />
-  <a href="import.jsp"> Daten importieren </a>
+  <a href="edit.jsp">Daten editieren</a>  <a href="import.jsp">Daten importieren</a>
 </body>
 </html>
