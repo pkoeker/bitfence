@@ -609,6 +609,17 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			throw ex;
 		}
 	}
+	public int updateObjects(JDataSet ds) {
+		int cnt;
+      try {
+	      cnt = pl.setObjectPage(ds);
+	      return cnt;
+      } catch (Exception ex) {
+	      ex.printStackTrace();
+	      logger.error(ex.getMessage(), ex);
+	      return 0;
+      }
+	}
 	
 	/**
 	 * Erstellt eine Ergebnismenge aus einem Ausdruck.<p>

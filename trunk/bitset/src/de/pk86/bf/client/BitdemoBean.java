@@ -13,6 +13,7 @@ public class BitdemoBean {
 	private String expression = "";
 	ExpressionResult res;
 	private String page = "";
+	private JDataSet currentPage;
 	private HttpServletRequest request;
 	
 	public BitdemoBean() {
@@ -32,16 +33,23 @@ public class BitdemoBean {
 			if ("suchen".equalsIgnoreCase(param)) {
 				res = sv.execute(expression);			
 				if (res != null) {
-					this.dispResult(res.firstPage, res.trace);
+					currentPage = res.firstPage;
+					request.getSession().setAttribute("currentPage", currentPage);
+					this.dispResult(currentPage, res.trace);
+				} else {
+					currentPage = null;
+					request.getSession().setAttribute("currentPage", currentPage);
 				}
 			} else if ("weiter".equalsIgnoreCase(param)) {
-				JDataSet ds = sv.getNextPage(res.sessionName);
-				this.res.pointer = (int)ds.getOid();
-				this.dispResult(ds, null);
+				currentPage = sv.getNextPage(res.sessionName);
+				request.getSession().setAttribute("currentPage", currentPage);
+				this.res.pointer = (int)currentPage.getOid();
+				this.dispResult(currentPage, null);
 			} else if ("zurück".equalsIgnoreCase(param)) {
-				JDataSet ds = sv.getPrevPage(res.sessionName);
-				this.res.pointer = (int)ds.getOid();
-				this.dispResult(ds, null);
+				currentPage = sv.getPrevPage(res.sessionName);
+				request.getSession().setAttribute("currentPage", currentPage);
+				this.res.pointer = (int)currentPage.getOid();
+				this.dispResult(currentPage, null);
 			}
 		} catch (IllegalStateException ex) {
 			page = ex.getMessage();

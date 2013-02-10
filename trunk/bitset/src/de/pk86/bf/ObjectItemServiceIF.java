@@ -32,6 +32,7 @@ public interface ObjectItemServiceIF {
 	public JDataSet getFirstPage(String name);
 	public JDataSet getNextPage(String name);
 	public JDataSet getPrevPage(String name);
+	public int updateObjects(JDataSet ds);
 	public void importItems(String text, boolean lowercase);
 	public void indexObject(long oid,String text,boolean createItems,boolean lowercase);
 	public void startSpider();
