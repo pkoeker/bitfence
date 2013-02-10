@@ -36,7 +36,7 @@
 		<Memo name="memResult"  it="0" ir="0" do="y" tabstop="y"/>
 		<Panel w="4" wy="0" layout="FLOW">
 			<Button label="Other Items" cmd="findOther" />
-			<Button label="< Back" cmd="goBack" />
+			<Button label="&lt; Back" cmd="goBack" />
 			<Button label="More >" cmd="goMore" />
 			<!--Button label="Show Objects" cmd="showObjects" /-->
 		</Panel>
