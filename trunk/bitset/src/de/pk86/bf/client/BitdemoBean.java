@@ -18,6 +18,7 @@ public class BitdemoBean {
 	
 	public BitdemoBean() {
 		sv = ServiceFactory.getDirectService();
+		logger.debug("new BitDemoBean created");
 	}
 	
 	public void processRequest(HttpServletRequest request) {
@@ -31,6 +32,9 @@ public class BitdemoBean {
 		//System.out.println("processRequest: " + param);
 		try {
 			if ("suchen".equalsIgnoreCase(param)) {
+				if (res != null) {
+					sv.endSession(res.sessionId);
+				}
 				res = sv.execute(expression);			
 				if (res != null) {
 					currentPage = res.firstPage;
@@ -41,12 +45,12 @@ public class BitdemoBean {
 					request.getSession().setAttribute("currentPage", currentPage);
 				}
 			} else if ("weiter".equalsIgnoreCase(param)) {
-				currentPage = sv.getNextPage(res.sessionName);
+				currentPage = sv.getNextPage(res.sessionId);
 				request.getSession().setAttribute("currentPage", currentPage);
 				this.res.pointer = (int)currentPage.getOid();
 				this.dispResult(currentPage, null);
 			} else if ("zurück".equalsIgnoreCase(param)) {
-				currentPage = sv.getPrevPage(res.sessionName);
+				currentPage = sv.getPrevPage(res.sessionId);
 				request.getSession().setAttribute("currentPage", currentPage);
 				this.res.pointer = (int)currentPage.getOid();
 				this.dispResult(currentPage, null);

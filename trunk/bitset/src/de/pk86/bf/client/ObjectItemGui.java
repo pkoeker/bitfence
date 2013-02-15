@@ -29,7 +29,7 @@ public class ObjectItemGui {
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemGui.class);
 	private ObjectItemServiceIF sv;
 	private String[] sOper = { "", "and", "or", "xor", "not" };
-	private String sessionName = "~internal~";
+	private int sessionId;
 
 	public static void main(String[] args) {
 		new ObjectItemGui();
@@ -53,7 +53,8 @@ public class ObjectItemGui {
 	}
 
 	public void startTrans(GuiUserEvent event) {
-		sv.startSession("test");
+		Selection sel = sv.startSession();
+		this.sessionId = sel.getSessionId();
 	}
 	
 	public void getService(GuiUserEvent event) {
@@ -86,7 +87,7 @@ public class ObjectItemGui {
 			oper = "0";
 		int iOper = Integer.parseInt(oper);
 		long start = System.currentTimeMillis();
-		int cnt = sv.performOper("test", itemname, Selection.toOper(iOper));
+		int cnt = sv.performOper(sessionId, itemname, Selection.toOper(iOper));
 		long end = System.currentTimeMillis();
 		event.window.setValue("exeTime",  end - start);
 		event.window.setValue("size", Integer.toString(cnt));
@@ -99,7 +100,7 @@ public class ObjectItemGui {
 	}
 
 	public void showResult(GuiUserEvent event) {
-		ExpressionResult erg = sv.getResultSet("test");
+		ExpressionResult erg = sv.getResultSet(sessionId);
 		StringBuilder b = new StringBuilder();
 		for (int i = 0; i < erg.objekts.length; i++) {
 			b.append(Long.toString(erg.objekts[i]));
@@ -122,7 +123,7 @@ public class ObjectItemGui {
 	}
 
 	public void reset(GuiUserEvent event) {
-		sv.endSession("test");
+		sv.endSession(sessionId);
 		GuiList list = (GuiList)event.window.getGuiMember("listHistory");
 		list.setItems((Vector)null);
 		event.window.setValue("size", null);
@@ -154,7 +155,7 @@ public class ObjectItemGui {
 	}
 
 	public void getOtherItems(GuiUserEvent event) {
-		ArrayList<String> items = sv.getOtherItems("test");
+		ArrayList<String> items = sv.getOtherItems(sessionId);
 		for (int i = 0; i < items.size(); i++) {
 			System.out.println(items.get(i));
 		}
@@ -188,14 +189,14 @@ public class ObjectItemGui {
    // Object
    public void readObject(GuiUserEvent event) {
    	long oid = Convert.toLong(event.window.getValue("oid"));
-   	String[] items = sv.getObjectItems(oid);
-   	/*
-   	for (int i = 0; i < items.length; i++) {
-   		System.out.println(items[i]);
-   	}
-   	*/
-   	GuiList list = (GuiList)event.window.getGuiMember("listItems");
-   	list.setItems(items);
+//   	String[] items = sv.getObjectItems(oid);
+//   	/*
+//   	for (int i = 0; i < items.length; i++) {
+//   		System.out.println(items[i]);
+//   	}
+//   	*/
+//   	GuiList list = (GuiList)event.window.getGuiMember("listItems");
+//   	list.setItems(items);
    }
    public void createObject(GuiUserEvent event) {
    	long oid = Convert.toLong(event.window.getValue("oid"));
@@ -245,7 +246,7 @@ public class ObjectItemGui {
    }
    
    public void findOther(GuiUserEvent event) {
-   	ArrayList<String> al = sv.getOtherItems(sessionName);
+   	ArrayList<String> al = sv.getOtherItems(sessionId);
    	StringBuilder buff = new StringBuilder();
    	for(String s:al) {
    		buff.append(s);
@@ -260,11 +261,11 @@ public class ObjectItemGui {
 //   }
    
    public void goBack(GuiUserEvent event) {
-   	JDataSet ds = sv.getPrevPage(sessionName);
+   	JDataSet ds = sv.getPrevPage(sessionId);
    	this.displayPage(event, ds, null);
    }
    public void goMore(GuiUserEvent event) {
-   	JDataSet ds = sv.getNextPage(sessionName);   	
+   	JDataSet ds = sv.getNextPage(sessionId);   	
    	this.displayPage(event, ds, null);
    }
    
