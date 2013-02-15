@@ -18,7 +18,6 @@ import de.jdataset.JDataValue;
 import de.jdataset.ParameterList;
 import de.pk86.bf.Const;
 import de.pk86.bf.OperToken;
-import de.pk86.bf.util.ImportObjects;
 import de.pkjs.pl.IPLContext;
 import de.pkjs.pl.PL;
 import de.pkjs.pl.PLException;
@@ -33,8 +32,6 @@ public class BfPL {
 	// Database
 	private static BfPL me;
 	// Config
-	//public static int maxSlot = 26; // 13 = 106.496; 26 = 212 992 
-	//private static long maxOid = maxSlot * Const.SLOT_BITS -1;
 	private static int maxResultSet = 20000;
 	private static int resultSetPage = 20;
 	// Statements
@@ -54,7 +51,7 @@ public class BfPL {
 	private String deleteSlot = "Delete FROM ITEM WHERE Itemname = ?";
 	//private String deleteSlots = "Delete FROM ITEM WHERE Itemname = ?";
 	private String deleteSlotsLike = "Delete FROM ITEM WHERE Itemname LIKE ?";
-	//
+	
 	private Element webServiceConfig;
 	private Element spiderConfig;
 	
@@ -76,9 +73,6 @@ public class BfPL {
 		if (me == null) {
 			synchronized (BfPL.class) {
 				if (me == null) {
-//					try {
-//						DOMConfigurator.configure("bf_log4j.xml");
-//					} catch (Exception ex) {}
 					me = new BfPL(configFilename);
 					logger.info("Database initialized: " + configFilename);
 				}
@@ -156,6 +150,12 @@ public class BfPL {
 			throw ex;
 		}
 	}
+	/**
+	 * @deprecated @see updateObjects
+	 * @param oid
+	 * @return
+	 * @throws Exception
+	 */
 	public int deleteObject(long oid) throws Exception {
 		// Start Trans
 		IPLContext ipl = null;
@@ -263,13 +263,7 @@ public class BfPL {
 //		}
 		return ret;	
 	}
-	
-	public String[] getObjectItems(long oid) throws Exception {
-		String[] ret = null;
-		ret = this.getObjectItems(oid, null);
-		return ret;
-	}
-	/**
+	/**	 
 	 * @deprecated Das geht jetzt so nicht mehr
 	 * @param oids
 	 * @param items
@@ -707,14 +701,20 @@ public class BfPL {
 		colPK.setPrimaryKey(true); // PK fürs zurückschreiben
 		return ds;
 	}
-	
-	public int setObjectPage(JDataSet ds) throws Exception {
+	/**
+	 * Schreib veränderte (gelöscht, eingefügt, geänderter Content) Objekte in die Datenbasis zurück.
+	 * Der Bitzaun wird dabei aktualisiert.
+	 * @param ds Ein Dataset mit dem Namen "Objekt"
+	 * @return
+	 * @throws Exception
+	 */
+	public int updateObjects(JDataSet ds) throws Exception {
 		if (ds == null || ds.getRowCount() == 0) return 0;
 		int cnt;
 		IPLContext ipl = null;
 		try {
 			 ipl = pl.startNewTransaction("setObjectPage");
-      	 // BitZaun aktualisieren
+      	 // 1. BitZaun aktualisieren
 			 Iterator<JDataRow> it = ds.getChildRows();
 			 while (it.hasNext()) {
 				 JDataRow row = it.next();
@@ -723,18 +723,24 @@ public class BfPL {
 				 String content = row.getValue("content");
 				 ArrayList<String> olditems = getObjectItems(oldContent);
 				 ArrayList<String> items = getObjectItems(content);
-				 // TODO: Abgleichen neu/alt
+				 // 1.1 Alte Attribute austragen
 				 if (row.isInserted() == false) { // keine neuen austragen
 					 for(String itemname:olditems) {
-						 this.removeBit(oid, itemname, ipl);					 
+						 if (items.contains(itemname) == false) {
+							 this.removeBit(oid, itemname, ipl);
+						 }
 					 }
 				 }
+				 // 1.2 Neue Werte schreiben
 				 if (row.isDeleted() == false) { // keine gelöschten neu schreiben
 					 for(String itemname:items) {
-						this.setBit(oid, itemname, ipl);
+						 if (olditems.contains(itemname) == false) {
+							 this.setBit(oid, itemname, ipl);
+						 }
 					 }
 				 }
 			 }
+			 // 2. Dataset schreiben
 	      cnt = ipl.setDataset(ds);
 	      ipl.commitTransaction("setObjectPage");
 	      return cnt;
