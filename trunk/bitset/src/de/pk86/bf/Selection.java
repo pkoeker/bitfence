@@ -2,6 +2,7 @@ package de.pk86.bf;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.List;
 
 import de.jdataset.JDataSet;
@@ -15,7 +16,9 @@ public class Selection {
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Selection.class);
 
 	public static enum Oper {NONE, AND, OR, XOR, NOT}; 
-	private String name;
+	private int sessionId; // Eindeutige ID
+	private Date created = new Date(); // Erzeugt
+	private Date timestamp = new Date(); // Zeitstempel
 	private BfPL pl = BfPL.getInstance();
 	private Slot slot;
 	private int bitCount;
@@ -29,15 +32,24 @@ public class Selection {
    public List<TraceElement> trace = new ArrayList<TraceElement>();
 
 	// Constructor
-	Selection (String name) {
-		this.name = name;
+	Selection (int id) {
+		this.sessionId = id;
 	}
-	String getName() {
-		return this.name;
+	public int getSessionId() {
+		return this.sessionId;
 	}
 	
-	int performOper(ArrayList<OperToken> al) {		
+	Date getTimestampd() {
+		return this.timestamp;
+	}
+	
+	int performOper(ArrayList<OperToken> al) {	
+		items = new ArrayList<String>();
 		if (al == null || al.size() == 0) return 0;
+		// Sich alle items merken
+		for (OperToken ot:al) {
+			items.add(ot.token);
+		}		
 		// Klammer
 		while (al.size() > 1) {
 			int maxLevel = 0;
@@ -61,6 +73,7 @@ public class Selection {
 			ret = bs.cardinality();
 			this.bitCount = ret;
 		}
+		timestamp = new Date();
 		return ret;
 	}
 	
@@ -133,6 +146,7 @@ public class Selection {
 		// Count bits
 		int ret = slot.countBits();
 		this.bitCount = ret;
+		timestamp = new Date(); // Zeitstempel
 		return ret;	
 	}
 	
@@ -206,6 +220,7 @@ public class Selection {
 	}
 	
 	JDataSet getFirstPage() {
+		timestamp = new Date(); // Zeitstempel
 		posi = 0; index = 0;
 		int anz = pl.getResultSetPage();
 		long[] oids = getResult(posi, anz);
@@ -219,6 +234,7 @@ public class Selection {
 	}
 	
 	long[] getNext() {
+		timestamp = new Date(); // Zeitstempel
 		if (posi >= bitCount -1) {
 			throw new IllegalStateException("End of ResultSet reached");
 		}
@@ -232,6 +248,7 @@ public class Selection {
 	}
 	
 	public JDataSet getNextPage() {
+		timestamp = new Date(); // Zeitstempel
 		if (this.hasNext()) {
 			long[] oids = this.getNext();
 	      try {
@@ -247,6 +264,7 @@ public class Selection {
 		}
 	}
 	public JDataSet getPrevPage() {
+		timestamp = new Date(); // Zeitstempel
 		if (posi == 0) {
 			throw new IllegalStateException("Begin of ResultSet reached");
 		}

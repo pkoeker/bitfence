@@ -119,8 +119,12 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 
 	private BfPL pl = BfPL.getInstance();
 	private Spider spider;
-	private Hashtable<String, Selection> sessions = new Hashtable<String, Selection>();
-	private static boolean webserviceCreated;
+	/**
+	 * Session werden nach 15 Minuten timeout gelöscht
+	 */
+	private Hashtable<Integer, Selection> sessions = new Hashtable<Integer, Selection>();
+	
+	private int sessionCounter; // TODO: Beim runterfahren persistent machen
 	// Constructor
 	/**
 	 * Erzeugt einen neuen Dienst.
@@ -128,6 +132,14 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public ObjectItemService() {
 		this.initWebservice();
 		this.initSpider();
+		new SessionRemover(this);
+	}
+	/** 
+	 * Für neue Sessions
+	 * @return
+	 */
+	public int getNewSessionId() {
+		return sessionCounter++;
 	}
 	/**
 	 * Erzeugt ein Objekt mit der angegebenen Nummer.<p>
@@ -139,9 +151,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @throws IllegalArgumentException wenn oid < 0 oder größer MAX_OID
 	 */
 	public void createObject(long oid) {
-//		if (oid < 0 || oid > pl.getMaxOid()) {
-//			throw new IllegalArgumentException("OID out of Range: 0 >= oid =< "+Long.toString(pl.getMaxOid()));
-//		}
 		try {
 			pl.createObject(oid);
 		} catch (Exception ex) {
@@ -235,20 +244,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	/**
-	 * Liefert alle Eigenschaften zu einem Objekt.
-	 * @param oid
-	 * @return String[] Die Eigenschaften des Objekts sortiert nach Alphabet
-	 */
-	public String[] getObjectItems(long oid) {
-		try {
-			return pl.getObjectItems(oid);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			ex.printStackTrace();
-			return null;
-		}
-	}
-	/**
 	 * Prüft, ob das angegebene Objekt den angegebene Eigenschaft hat.
 	 * @param oid
 	 * @param itemname
@@ -310,15 +305,17 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	}
 	/**
 	 * Startet eine neue Session.
-	 * @param name Name der Session.
+	 * @return sessionId, unter dieser id kann auf die Session zugegriffen werden
 	 */
-	public void startSession(String name) {
-		Selection sel = new Selection(name);
-		if (sessions.put(name, sel) != null) {
-			String msg = "Transaction already exists: " + name;
+	public Selection startSession() {
+		int sessionId = this.getNewSessionId();
+		Selection sel = new Selection(sessionId);
+		if (sessions.put(sessionId, sel) != null) {
+			String msg = "Transaction already exists: " + sessionId;
 			logger.error(msg);
 			throw new IllegalArgumentException(msg);
 		}
+		return sel;
 	}
 	/**
 	 * @deprecated Dieses schrittweise Vorgehen ist nicht wirklich optimal: Klammern sind so nicht möglich.
@@ -333,10 +330,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * Transaktion darf auch der Operator NONE angegeben werden.
 	 * @return int Die Größe der Ergebnismenge.
 	 */
-	public int performOper(String name, String itemname, Selection.Oper operand) {
-		Selection sel = sessions.get(name);
+	public int performOper(int sessionId, String itemname, Selection.Oper operand) {
+		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#performOper()\nMissing Session: "+name);
+			throw new IllegalArgumentException("ObjectItemService#performOper()\nMissing Session: "+sessionId);
 		}
 		int erg = 0;
       try {
@@ -353,12 +350,13 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		return erg;
 	}
 	
-	public ExpressionResult performOper(String name, ArrayList<OperToken> al) {
+	public ExpressionResult performOper(ArrayList<OperToken> al) {
 		long start = System.currentTimeMillis();
-		Selection sel = sessions.get(name);
+		int sessionId = this.startSession().getSessionId(); // Hier wird die neue Session erzeugt
+		Selection sel = sessions.get(sessionId);
 		int cnt = sel.performOper(al);
 		long end1 = System.currentTimeMillis();
-		ExpressionResult ret = new ExpressionResult(name);
+		ExpressionResult ret = new ExpressionResult(sessionId);
 		int anz = pl.getResultSetPage();
 		long[] oids = sel.getResult(0, anz); // erste Page
 		ret.objekts = oids;
@@ -377,11 +375,11 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @param name
 	 * @return ExpressionResult Die Objekt-IDs aufsteigend sortiert.
 	 */
-	public ExpressionResult getResultSet(String name) {
-		ExpressionResult ret = new ExpressionResult(name);
-		Selection sel = sessions.get(name);
+	public ExpressionResult getResultSet(int sessionId) {
+		ExpressionResult ret = new ExpressionResult(sessionId);
+		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#getResultSet()\nMissing Transaction: "+name);
+			throw new IllegalArgumentException("ObjectItemService#getResultSet()\nMissing Transaction: "+sessionId);
 		}
 		ret.objekts = sel.getResultSet();
 		return ret;
@@ -410,10 +408,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @return boolean
 	 * @see #getNext
 	 */
-	public boolean hasNext(String name) {
-		Selection sel = sessions.get(name);
+	public boolean hasNext(int sessionId) {
+		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#hasNext()\nMissing Session: "+name);
+			throw new IllegalArgumentException("ObjectItemService#hasNext()\nMissing Session: "+sessionId);
 		}
 		return sel.hasNext();
 	}
@@ -427,10 +425,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @return long[]
 	 * @see #hasNext
 	 */
-	public long[] getNext(String name) {
-		Selection sel = sessions.get(name);
+	public long[] getNext(int sessionId) {
+		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#getNext()\nMissing Session: "+name);
+			throw new IllegalArgumentException("ObjectItemService#getNext()\nMissing Session: "+sessionId);
 		}
 		return sel.getNext();
 	}
@@ -442,10 +440,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @param name Eine laufende Session
 	 * @return ArrayList Menge der noch verfügbaren Eigenschaften.
 	 */
-	public ArrayList<String> getOtherItems(String name) {
-		Selection sel = sessions.get(name);
+	public ArrayList<String> getOtherItems(int sessionId) {
+		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#getOtherItems()\nMissing Transaction: "+name);
+			throw new IllegalArgumentException("ObjectItemService#getOtherItems()\nMissing Transaction: "+sessionId);
 		}
 		try {
 			long[] oids = sel.getResultSet();
@@ -461,19 +459,19 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * Beendet eine Session und gibt den Speicher wieder frei.
 	 * @param name
 	 */
-	public void endSession(String name) {
-		Selection sel = sessions.get(name);
+	public void endSession(int sessionId) {
+		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#endTrans()\nMissing Session: "+name);
+			throw new IllegalArgumentException("ObjectItemService#endTrans()\nMissing Session: "+sessionId);
 		}
-		sessions.remove(name);		
+		sessions.remove(sessionId);		
 		sel.reset();
 	}
 	/**
 	 * Löscht alle Sessions
 	 */
 	public void resetAllSessions() {
-		sessions = new Hashtable<String, Selection>();
+		sessions = new Hashtable<Integer, Selection>();
 	}
 	/**
 	 * Startet eine Session und erstellt eine Ergebnismenge aus einem
@@ -490,15 +488,11 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @see #hasNext
 	 * @see #getNext
 	 */
-	public ExpressionResult execute(String name, String expression) {
-		try { 
-			this.endSession(name);
-		} catch (Exception e) {}
+	public ExpressionResult execute(String expression) {
 		expression = expression.toLowerCase();
+		ExpressionResult res = null;
 
 		long startTime = System.currentTimeMillis(); // Zeit messen
-		ExpressionResult res = null;
-		this.startSession(name);
 		Selection.Oper oper = Selection.Oper.AND;
 		
 		StreamTokenizer stoks = new StreamTokenizer(new StringReader(expression));
@@ -573,7 +567,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				}
 			}
 			long end1 = System.currentTimeMillis();
-			res = this.performOper(name, al);
+			res = this.performOper(al);
 			if (sb.length() > 0) {
 				res.missingItems = sb.toString();
 			}
@@ -587,12 +581,12 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		return res;
 	}
 	
-	public JDataSet getFirstPage(String name) {
-		Selection sel = sessions.get(name);
+	public JDataSet getFirstPage(int sessionId) {
+		Selection sel = sessions.get(sessionId);
 		return sel.getFirstPage();
 	}
-	public JDataSet getNextPage(String name) {
-		Selection sel = sessions.get(name);
+	public JDataSet getNextPage(int sessionId) {
+		Selection sel = sessions.get(sessionId);
 		try {
 			JDataSet ds = sel.getNextPage();
 			return ds; 
@@ -600,8 +594,8 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			throw ex;
 		}
 	}
-	public JDataSet getPrevPage(String name) {
-		Selection sel = sessions.get(name);
+	public JDataSet getPrevPage(int sessionId) {
+		Selection sel = sessions.get(sessionId);
 		try {
 			JDataSet ds = sel.getPrevPage();
 			return ds;
@@ -612,7 +606,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public int updateObjects(JDataSet ds) {
 		int cnt;
       try {
-	      cnt = pl.setObjectPage(ds);
+	      cnt = pl.updateObjects(ds);
 	      return cnt;
       } catch (Exception ex) {
 	      ex.printStackTrace();
@@ -621,24 +615,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
       }
 	}
 	
-	/**
-	 * Erstellt eine Ergebnismenge aus einem Ausdruck.<p>
-	 * Die Eigenschaften sind durch White Space getrennt (Tab, Leerzeichen, neue
-	 * Zeile).<br>
-	 * Wenn kein Operator angegeben, wird AND verwendet; ansonsten "|" für OR, "-"
-	 * für NOT und "^" für XOR; "+" für AND.<p> 
-	 * Eigenschaften können selbst auch White Space enthalten; dann sind sie in
-	 * Anführungszeichen "Meine Eigenschaft" einzuschließen.<br> Der Ausdruck darf
-	 * Java-Style-Kommentare enthalten (// oder /*)
-	 * @param expression Ein Ausdruck, bei dem gültigen Eigenschaften und
-	 * Operatoren; alles durch White Space getrennt.
-	 * @return long[] Die Ergebnismenge wie bei getResultSet
-	 */
-	public ExpressionResult execute(String expression) {
-		String name = "~internal~";
-		ExpressionResult ret = this.execute(name, expression);
-		return ret;
-	}
 	
 	/**
 	 * Importiert durch White Space getrennte Eigenschaften.<p> 
@@ -844,6 +820,61 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		if (ele != null) {
 			spider = new Spider(this, ele);
 		}
+	}	
+	
+	/**
+	 * Nach 15 Minuten Session beenden
+	 * @return
+	 */
+	int checkSessionTimeout() {
+		int cnt = 0;
+		long now = System.currentTimeMillis();
+		for (Selection sel:sessions.values()) {
+			long timestamp = sel.getTimestampd().getTime();
+			if (now - timestamp > 1000 * 60 * 15) {
+				logger.warn("Session timed out: " + sel);
+				this.endSession(sel.getSessionId());
+				cnt++;
+			}
+		}		
+		return cnt;
 	}
 	
+	//########################################################
+	private static final class SessionRemover extends Thread {
+		private static int sleep = 60 * 1000; // Eine Minute
+		private ObjectItemService srv;
+		private static boolean brun = true;
+
+		// Constructor
+		private SessionRemover(ObjectItemService srv) {
+			logger.info("SessionRemover created");
+			this.srv = srv;
+			this.setPriority(MIN_PRIORITY);
+		}
+
+		// Methods
+		@Override
+		public void run() {
+			// erzwingt schlafen...check...schlafen...
+			int cnt = 0;
+			try {
+				sleep(sleep);
+			} catch (InterruptedException e) {
+				// nix
+			}
+			while (brun) {
+				if (cnt % 3600 == 0) { // Einmal pro Stunde ein Lebenszeichen
+					logger.info("SessionRemover.run " + cnt);
+				}
+				cnt++;
+				srv.checkSessionTimeout();
+				try {
+					sleep(sleep);
+				} catch (InterruptedException e) {
+					// nix
+				}
+			}
+		}
+	}
 }
