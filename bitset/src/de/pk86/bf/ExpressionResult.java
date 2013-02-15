@@ -11,7 +11,7 @@ import de.jdataset.JDataSet;
 public class ExpressionResult implements Serializable {
    private static final long serialVersionUID = 1L;
    
-   public String sessionName;
+   public int sessionId;
    
    public String expression;
    public String missingItems;
@@ -33,8 +33,8 @@ public class ExpressionResult implements Serializable {
    	
    }
    
-   public ExpressionResult(String name) {
-   	this.sessionName = name;
+   public ExpressionResult(int sessionId) {
+   	this.sessionId = sessionId;
    }
    
    public String getFirstPage() {
