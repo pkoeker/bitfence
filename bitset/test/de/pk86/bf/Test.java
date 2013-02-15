@@ -18,13 +18,13 @@ public class Test {
 		
 		long start = System.currentTimeMillis();
 		//System.out.println(start);
-		sv.startSession("test");
-		int cntl = sv.performOper("test", "Beispiel", Selection.Oper.OR);
-		while (sv.hasNext("test")) {
-			long[] erg = sv.getNext("test");
+		int sessionId = sv.startSession().getSessionId();
+		int cntl = sv.performOper(sessionId, "Beispiel", Selection.Oper.OR);
+		while (sv.hasNext(sessionId)) {
+			long[] erg = sv.getNext(sessionId);
 			//System.out.println(erg.length);
 		}
-		sv.endSession("test");
+		sv.endSession(sessionId);
 		System.out.println(System.currentTimeMillis() - start);
 		
 		
