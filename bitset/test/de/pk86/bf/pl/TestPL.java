@@ -79,10 +79,10 @@ public class TestPL extends TestCase {
 			pl.addObjectItem(oid, "xxx.xxx");
       	int anzi = pl.getItemCount("xxx.xxx");
       	assertEquals(1, anzi); 
-      	String[] sItems = pl.getObjectItems(oid);
-      	assertEquals("xxx.xxx", sItems[0]);
-			pl.removeObjectItem(oid, "xxx.xxx");
-      	anzi = pl.getItemCount("xxx.xxx");
+//      	String[] sItems = pl.getObjectItems(oid);
+//      	assertEquals("xxx.xxx", sItems[0]);
+//			pl.removeObjectItem(oid, "xxx.xxx");
+//      	anzi = pl.getItemCount("xxx.xxx");
       	assertEquals(0, anzi);
 			int cnt = pl.deleteObject(oid);
 			assertEquals(1,cnt);
@@ -130,9 +130,9 @@ public class TestPL extends TestCase {
       	String[] its = pl.findItems("xxx.%");
       	assertEquals(2, its.length);
       	
-      	String[] sItems = pl.getObjectItems(oid);
-      	assertEquals("xxx.xxx", sItems[0]);
-      	assertEquals("xxx.yyy", sItems[1]);
+//      	String[] sItems = pl.getObjectItems(oid);
+//      	assertEquals("xxx.xxx", sItems[0]);
+//      	assertEquals("xxx.yyy", sItems[1]);
 			pl.removeObjectItem(oid, "xxx.xxx");
       	anzi = pl.getItemCount("xxx.xxx");
       	assertEquals(0, anzi);
@@ -174,16 +174,16 @@ public class TestPL extends TestCase {
 			pl.addObjectItem(oid1, "xxx.xxx");
 	   	int anzi = pl.getItemCount("xxx.xxx");
 	   	assertEquals(1, anzi); 
-	   	String[] sItems = pl.getObjectItems(oid1);
-	   	assertEquals("xxx.xxx", sItems[0]);
-	   	
-			long oid2 = pl.getOid();
-			pl.createObject(oid2);
-			pl.addObjectItem(oid2, "xxx.xxx");
-	   	anzi = pl.getItemCount("xxx.xxx");
-	   	assertEquals(2, anzi); 
-	   	sItems = pl.getObjectItems(oid2);
-	   	assertEquals("xxx.xxx", sItems[0]);
+//	   	String[] sItems = pl.getObjectItems(oid1);
+//	   	assertEquals("xxx.xxx", sItems[0]);
+//	   	
+//			long oid2 = pl.getOid();
+//			pl.createObject(oid2);
+//			pl.addObjectItem(oid2, "xxx.xxx");
+//	   	anzi = pl.getItemCount("xxx.xxx");
+//	   	assertEquals(2, anzi); 
+//	   	sItems = pl.getObjectItems(oid2);
+//	   	assertEquals("xxx.xxx", sItems[0]);
 	   	
 			pl.removeObjectItem(oid1, "xxx.xxx");
 	   	anzi = pl.getItemCount("xxx.xxx");
@@ -191,11 +191,11 @@ public class TestPL extends TestCase {
 			int cnt = pl.deleteObject(oid1);
 			assertEquals(1,cnt);
 			
-			pl.removeObjectItem(oid2, "xxx.xxx");
-	   	anzi = pl.getItemCount("xxx.xxx");
-	   	assertEquals(0, anzi);
-			cnt = pl.deleteObject(oid2);
-			assertEquals(1,cnt);
+//			pl.removeObjectItem(oid2, "xxx.xxx");
+//	   	anzi = pl.getItemCount("xxx.xxx");
+//	   	assertEquals(0, anzi);
+//			cnt = pl.deleteObject(oid2);
+//			assertEquals(1,cnt);
 			
 	   	int cntdel = pl.deleteItem(itemName);
 	   	assertNotNull(cntdel);
