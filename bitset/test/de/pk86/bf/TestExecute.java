@@ -17,7 +17,7 @@ public class TestExecute extends TestCase {
 		x = srv.execute("marco freitag  01.07.1981  08297  zwönitz  mertensheide");
 		x = srv.execute("marco freitag  01.07.1981  08297  zwönitz  mertensheide  2");
 		boolean b = srv.hasItem("sonja");
-		System.out.println(x.objekts.length);
+		//System.out.println(x.objekts.length);
 		if (!GuiUtil.yesNoMessage(null, "Return to continue", "Start")) {
 			return;
 		}
