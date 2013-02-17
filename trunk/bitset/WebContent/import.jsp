@@ -8,7 +8,7 @@
 <% importb.processRequest(request); %>
 <h2>Daten importieren</h2>
   <form method="post">
-  Datensätze:<br/> 
+  Datensätze zeilenweise angeben; Attribute getrennt durch Leerzeichen sowie: ;.,()/-<br/> 
   <textarea cols="100" rows="20" name="importData" maxlength="4000"><%= importb.getImportData() %></textarea> <p/>
   <input type="submit" name="action" value="importieren"/> Anzahl Datensätze importiert: <%= importb.getDataSize() %> Dauer: <%= importb.getDuration() %><p/>    
   </form>
