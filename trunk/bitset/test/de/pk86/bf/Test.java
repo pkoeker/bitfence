@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Hashtable;
 
+import de.jdataset.JDataSet;
+
 
 /**
  * @author peter
@@ -21,7 +23,7 @@ public class Test {
 		int sessionId = sv.startSession().getSessionId();
 		int cntl = sv.performOper(sessionId, "Beispiel", Selection.Oper.OR);
 		while (sv.hasNext(sessionId)) {
-			long[] erg = sv.getNext(sessionId);
+			JDataSet ds = sv.getNextPage(sessionId);
 			//System.out.println(erg.length);
 		}
 		sv.endSession(sessionId);
