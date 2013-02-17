@@ -28,7 +28,7 @@ table.myTable td, table.myTable th { border:1px solid black; }
 		<% } %>
 	</table>
 	<p/>
-	<input type="submit" name="action" value="speichern"/>
+	<input type="submit" name="action" value="speichern"/> <%= edit.getSubmitResult() %>
   </form>
   <p/>
   <hr />
