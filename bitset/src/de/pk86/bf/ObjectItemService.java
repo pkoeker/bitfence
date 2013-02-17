@@ -132,7 +132,9 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public ObjectItemService() {
 		this.initWebservice();
 		this.initSpider();
-		new SessionRemover(this);
+		SessionRemover remover = new SessionRemover(this);
+		remover.setDaemon(true);
+		remover.start();
 	}
 	/** 
 	 * Für neue Sessions
