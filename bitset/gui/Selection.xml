@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<!DOCTYPE GDL SYSTEM 'http://guibuilder.de/gdl.dtd'>
+<GDL>
+<Form label="Keyword Selection" restore="SIZE_LOCATION" OnOpen="startTrans">
+<Menubar>
+	<Menu label="Edit">
+		<Item label="Edit Objects..." cmd="editObjects"/>
+		<Item label="Expression Editor..." cmd="editExpr"/>
+	</Menu>
+	<Menu label="Tools">
+		<Item label="Reset" cmd="resetAllSessions"/>
+		<Item label="Validate" cmd="validate"/>
+		<Separator/>
+		<Item label="StartSpider" cmd="spider"/>
+	</Menu>
+</Menubar>
+<Panel label="links" eol="false">
+	<Group label="Items" >
+		<Text label="Item:" name="textItem" eol="false" it="0"  w="1" />
+		<Button label="Find" cmd="findItems" it="0" ir="0"/>	
+		<List name="listItems" ir="0"/>
+	</Group>
+</Panel>
+<Panel label="mitte" eol="false">
+	<Group label="Selection History">
+		<List name="listHistory" do="y" ir="0"/>
+	</Group>
+	<Group label="Operator" wy="0">
+		<OptionGroup name="oper">
+			<Option label="AND" cmd="1"/>
+			<Option label="OR" cmd="2"/>
+			<Option label="XOR" cmd="3"/>
+			<Option label="NOT" cmd="4"/>
+		</OptionGroup>
+	</Group>
+	<Panel label="Button" wy="0">
+		<Button label="Execute" an="C" w="2" cmd="execute"/>
+		<Number label="Time:" name="exeTime" do="y" w="1"/>
+		<Button label="Magic" an="C" w="2" cmd="getOtherItems"/>
+	</Panel>
+</Panel>
+<Panel label="rechts">
+	<Group label="Result Set">
+		<Number label="# Objects:" name="size" it="0" fill="H" wx="1" do="y" eol="false"/>
+		<Button label="Reset" it="0" ir="0" cmd="reset"/>
+		<Check label="Show ResultSet" name="show" it="0" x="1" w="2" OnChange="showResultChanged"/>
+		<Memo name="memResult"  ir="0" tabstop="true" do="y"/>
+	</Group>
+</Panel>
+</Form>
+</GDL>
