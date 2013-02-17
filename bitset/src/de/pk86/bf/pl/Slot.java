@@ -44,6 +44,10 @@ public class Slot implements Serializable {
 	public BitSet getBitset() {
 		return bitset;
 	}
+	/**
+	 * Für Persistenz des BitSet
+	 * @return
+	 */
 	public byte[] getBytes() {
 		return bitset.toByteArray();
 	}
@@ -73,7 +77,9 @@ public class Slot implements Serializable {
 	 * @return boolean Wenn true, dann wurde das Bit wirklich gesetzt
 	 */
 	void setBit(long l) {
-		bitset.set((int)l);
+		synchronized(bitset) {
+			bitset.set((int)l);
+		}
 		this.modified = true; // TODO: prüfen, ob Bit schon zuvor gesetzt war?
 	}
 
@@ -95,7 +101,9 @@ public class Slot implements Serializable {
 	 * @return boolean Wenn true, dann wurde das Bit wirklich gelöscht
 	 */
 	void removeBit(long l) {
-		bitset.set((int)l, false);
+		synchronized(bitset) {
+			bitset.set((int)l, false);
+		}
 		this.modified = true; // TODO: prüfen, ob Bit schon zuvor gelöscht war?
 	}
 
@@ -107,8 +115,9 @@ public class Slot implements Serializable {
 	public Slot clone() {
 		Slot clone = new Slot(this.itemname);
 		clone.inserted = true;
-		clone.bitset = (BitSet)bitset.clone();
-		
+		synchronized(bitset) {
+			clone.bitset = (BitSet)bitset.clone();
+		}		
 		return clone;
 	}
 }
