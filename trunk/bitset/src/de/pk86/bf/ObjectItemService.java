@@ -566,10 +566,12 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	
 	public JDataSet getFirstPage(int sessionId) {
 		Selection sel = sessions.get(sessionId);
+		if (sel == null) return null;
 		return sel.getFirstPage();
 	}
 	public JDataSet getNextPage(int sessionId) {
 		Selection sel = sessions.get(sessionId);
+		if (sel == null) return null;
 		try {
 			JDataSet ds = sel.getNextPage();
 			return ds; 
@@ -579,6 +581,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	}
 	public JDataSet getPrevPage(int sessionId) {
 		Selection sel = sessions.get(sessionId);
+		if (sel == null) return null;
 		try {
 			JDataSet ds = sel.getPrevPage();
 			return ds;
