@@ -22,6 +22,7 @@ public class EditBean {
 		
 	}
 	public void processRequest(HttpServletRequest request) {
+		anzahl = 0; dura = 0;
 		this.request = request;
 		Enumeration<String> en = request.getParameterNames();
 		this.page = (JDataSet)request.getSession().getAttribute("currentPage");
@@ -43,7 +44,7 @@ public class EditBean {
 			long start = System.currentTimeMillis();
 			if (page.hasChanges()) {
 				JDataSet dsChanges = page.getChanges();
-				int cnt = sv.updateObjects(dsChanges);
+				anzahl = sv.updateObjects(dsChanges);
 				page.commitChanges();
 			}
 			long end = System.currentTimeMillis();
@@ -53,5 +54,13 @@ public class EditBean {
 	}
 	public JDataSet getPage() {
 		return page;
+	}
+	
+	public String getSubmitResult() {
+		if (anzahl != 0 && dura != 0) {
+			return " Anzahl Änderungen: " + anzahl + " Dauer[ms]: " + dura;
+		} else {
+			return "";
+		}
 	}
 }

@@ -26,6 +26,8 @@ public class Selection {
 	private long duration;
 	private int posi; // Pointer im Resultset
 	private int index; // Pointer im Bitset
+	private int indexTop;
+	private int indexBottom;
 	private ArrayList<String> items = new ArrayList<String>();
 	private String missingItems = ""; 
 	
@@ -186,29 +188,44 @@ public class Selection {
 	int getResultSetSize() {
 		return bitCount;
 	}
-	long[] getResultSet() {
+	int[] getResultSet() {
 		if (this.bitCount > pl.getMaxResultSet()) {
 			throw new IllegalStateException("Maximum ResultSet Size exceeded: " + Integer.toString(bitCount));
 		}
-		return getResult(0, bitCount);
+		return getResult(0, bitCount, true);
 	}
-	long[] getResult(int start, int cnt) {
+	private int[] getResult(int start, int cnt, boolean forward) {
 		if (start + cnt > bitCount) {
 			cnt = bitCount - start;
 		}
-		long[] ret = new long[cnt];
-		int poi = 0; // Pointer zum Array
+		int[] ret = new int[cnt];
+		int poi;
+		if (forward) {
+			poi = 0; // Pointer zum Array
+			index = indexBottom;
+		} else {
+			poi = cnt - 1;
+			index = indexTop;
+		}
 		if (slot == null) {
 			return null;
 		}
 		BitSet bs = slot.getBitset();
-		index = start;
-		while(poi < cnt) {
-			index = bs.nextSetBit(index);
-			ret[poi] = index;
-			index++;
-			poi++;
-		}				
+		for (int i = 0; i < cnt; i++) {
+			if (forward) {			
+				index++;
+				index = bs.nextSetBit(index);
+				ret[poi] = index;
+				poi++;
+			} else {
+				index--;
+				index = bs.previousSetBit(index);
+				ret[poi] = index;
+				poi--;
+			}
+		}
+		indexTop = ret[0];
+		indexBottom = ret[cnt-1];
 		return ret;
 	}
 	boolean hasNext() {
@@ -222,8 +239,8 @@ public class Selection {
 	JDataSet getFirstPage() {
 		timestamp = new Date(); // Zeitstempel
 		posi = 0; index = 0;
-		int anz = pl.getResultSetPage();
-		long[] oids = getResult(posi, anz);
+		int anz = pl.getResultSetPage(); // 20
+		int[] oids = getResult(posi, anz, true);
       try {
 	      JDataSet ds = pl.getObjectPage(oids);
 	      return ds;
@@ -233,24 +250,24 @@ public class Selection {
       }
 	}
 	
-	long[] getNext() {
+	private int[] getNext() {
 		timestamp = new Date(); // Zeitstempel
 		if (posi >= bitCount -1) {
 			throw new IllegalStateException("End of ResultSet reached");
 		}
-		int anz = pl.getResultSetPage();
+		int anz = pl.getResultSetPage(); // 20
 		if (posi + anz > bitCount) {
 			anz = bitCount - posi;
 		}
 		posi = posi + anz;
-		long[] ret = getResult(posi, anz);
+		int[] ret = getResult(posi, anz, true);
 		return ret;
 	}
 	
 	public JDataSet getNextPage() {
 		timestamp = new Date(); // Zeitstempel
 		if (this.hasNext()) {
-			long[] oids = this.getNext();
+			int[] oids = this.getNext();
 	      try {
 		      JDataSet ds = pl.getObjectPage(oids);
 		      ds.setOid(posi);
@@ -268,9 +285,9 @@ public class Selection {
 		if (posi == 0) {
 			throw new IllegalStateException("Begin of ResultSet reached");
 		}
-		int anz = pl.getResultSetPage();
+		int anz = pl.getResultSetPage(); // 20
 		posi = posi - anz;
-		long[] oids = getResult(posi, anz);
+		int[] oids = getResult(posi, anz, false);
 		if (posi < 0) posi = 0;
       try {
 	      JDataSet ds = pl.getObjectPage(oids);

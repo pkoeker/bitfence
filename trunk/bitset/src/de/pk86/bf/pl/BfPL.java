@@ -270,7 +270,7 @@ public class BfPL {
 	 * @return
 	 * @throws Exception
 	 */
-	public ArrayList<String> getOtherItems(long[] oids, ArrayList<String> items) throws Exception {
+	public ArrayList<String> getOtherItems(int[] oids, ArrayList<String> items) throws Exception {
 		ArrayList<String> ret = new ArrayList<String>();
 		// in oid
 		StringBuilder bo = new StringBuilder();
@@ -684,11 +684,11 @@ public class BfPL {
       }		
 	}
 	
-	public JDataSet getObjectPage(long[] oids) throws Exception {
+	public JDataSet getObjectPage(int[] oids) throws Exception {
 		if (oids == null) {
 			return null;
 		}
-		ArrayList<Long> al = new ArrayList<Long>();
+		ArrayList<Integer> al = new ArrayList<Integer>();
 		for (int i = 0; i < oids.length; i++) {
 			al.add(oids[i]);
 		}

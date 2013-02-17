@@ -89,5 +89,4 @@ public class BfServerConfig {
 			return null;
 		}
 	}
-
 }
