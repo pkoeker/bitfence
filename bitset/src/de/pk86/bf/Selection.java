@@ -375,5 +375,7 @@ public class Selection {
    		this.elements = cnt;
    	}
    }
-
+   public String toString() {
+   	return "SessionID: " + this.sessionId;
+   }
 }
