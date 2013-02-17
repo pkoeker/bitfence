@@ -357,9 +357,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		int cnt = sel.performOper(al);
 		long end1 = System.currentTimeMillis();
 		ExpressionResult ret = new ExpressionResult(sessionId);
-		int anz = pl.getResultSetPage();
-		long[] oids = sel.getResult(0, anz); // erste Page
-		ret.objekts = oids;
+		//int anz = pl.getResultSetPage();
 		JDataSet ds = sel.getFirstPage();
 		ret.firstPage = ds;
 		ret.resultsetSize = sel.getResultSetSize();
@@ -381,7 +379,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		if (sel == null) {
 			throw new IllegalArgumentException("ObjectItemService#getResultSet()\nMissing Transaction: "+sessionId);
 		}
-		ret.objekts = sel.getResultSet();
+		//ret.objekts = sel.getResultSet();
 		return ret;
 	}
 	
@@ -416,23 +414,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		return sel.hasNext();
 	}
 	/**
-	 * Liefert die nächste "Page" aus dem ResultSet.<p>
-	 * Die Größe der Page wird in BF_PLConfig.xml eingestellt.
-	 * Der default-Wert beträgt 20. Die letzte Page kann naturgemäß
-	 * auch kleiner sein, wenn die Ergebnismenge nicht durch die
-	 * Pagegröße teilbar ist.
-	 * @param name
-	 * @return long[]
-	 * @see #hasNext
-	 */
-	public long[] getNext(int sessionId) {
-		Selection sel = sessions.get(sessionId);
-		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#getNext()\nMissing Session: "+sessionId);
-		}
-		return sel.getNext();
-	}
-	/**
 	 * Liefert die Menge der in der Ergebnismenge noch nicht angesprochenen
 	 * Eigenschaften.<p>
 	 * Vorsicht!<br>
@@ -446,7 +427,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			throw new IllegalArgumentException("ObjectItemService#getOtherItems()\nMissing Transaction: "+sessionId);
 		}
 		try {
-			long[] oids = sel.getResultSet();
+			int[] oids = sel.getResultSet();
 			ArrayList<String> items = sel.getItems();
 			return pl.getOtherItems(oids, items);
 		} catch (Exception ex) {

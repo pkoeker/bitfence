@@ -3,6 +3,7 @@ package de.pk86.bf.client;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -14,6 +15,7 @@ import de.guibuilder.framework.GuiUtil;
 import de.guibuilder.framework.GuiWindow;
 import de.guibuilder.framework.event.GuiChangeEvent;
 import de.guibuilder.framework.event.GuiUserEvent;
+import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.pk86.bf.ExpressionResult;
 import de.pk86.bf.ObjectItemServiceIF;
@@ -102,9 +104,13 @@ public class ObjectItemGui {
 	public void showResult(GuiUserEvent event) {
 		ExpressionResult erg = sv.getResultSet(sessionId);
 		StringBuilder b = new StringBuilder();
-		for (int i = 0; i < erg.objekts.length; i++) {
-			b.append(Long.toString(erg.objekts[i]));
-			b.append(" ");
+		Iterator<JDataRow> it = erg.firstPage.getChildRows();
+		if (it != null) {
+			while (it.hasNext()) {
+				JDataRow row = it.next();
+				b.append(row.getValue("oid"));
+				b.append(" ");
+			}
 		}
 		event.window.setValue("memResult", b.toString());
 	}

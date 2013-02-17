@@ -27,7 +27,6 @@ class SlotCache {
 		return cache.getMemoryStoreSize() == 0;
 	}
 
-	@SuppressWarnings("deprecation")
    SlotCache(Element ele) {
 		if (ele != null) {
 			String sEnabled = ele.getAttribute("enabled");

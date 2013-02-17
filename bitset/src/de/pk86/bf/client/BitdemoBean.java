@@ -11,7 +11,7 @@ public class BitdemoBean {
 	
 	private ObjectItemServiceIF sv;
 	private String expression = "";
-	ExpressionResult res;
+	private ExpressionResult res;
 	private String page = "";
 	private JDataSet currentPage;
 	private HttpServletRequest request;
@@ -44,16 +44,18 @@ public class BitdemoBean {
 					currentPage = null;
 					request.getSession().setAttribute("currentPage", currentPage);
 				}
-			} else if ("weiter".equalsIgnoreCase(param)) {
-				currentPage = sv.getNextPage(res.sessionId);
-				request.getSession().setAttribute("currentPage", currentPage);
-				this.res.pointer = (int)currentPage.getOid();
-				this.dispResult(currentPage, null);
-			} else if ("zurück".equalsIgnoreCase(param)) {
-				currentPage = sv.getPrevPage(res.sessionId);
-				request.getSession().setAttribute("currentPage", currentPage);
-				this.res.pointer = (int)currentPage.getOid();
-				this.dispResult(currentPage, null);
+			} else if (res != null) { 
+				if ("weiter".equalsIgnoreCase(param)) {
+					currentPage = sv.getNextPage(res.sessionId);
+					request.getSession().setAttribute("currentPage", currentPage);
+					this.res.pointer = (int)currentPage.getOid();
+					this.dispResult(currentPage, null);
+				} else if ("zurück".equalsIgnoreCase(param)) {
+					currentPage = sv.getPrevPage(res.sessionId);
+					request.getSession().setAttribute("currentPage", currentPage);
+					this.res.pointer = (int)currentPage.getOid();
+					this.dispResult(currentPage, null);
+				}
 			}
 		} catch (IllegalStateException ex) {
 			page = ex.getMessage();
@@ -61,11 +63,11 @@ public class BitdemoBean {
 	}
 		
 	public void setSearchPattern(String pattern) {
-		if (request == null) return;
 		this.expression = pattern.trim();
+		if (request == null) return;
+		logger.debug("Expression: " + expression);
 		String param = request.getParameter("action");
 		logger.debug("Parameter: " + param);
-		logger.debug("Expression: " + expression);
 		//System.out.println("setSearchPattern: " + param);
 	}
 		

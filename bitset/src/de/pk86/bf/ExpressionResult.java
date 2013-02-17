@@ -1,9 +1,7 @@
 package de.pk86.bf;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
@@ -15,7 +13,7 @@ public class ExpressionResult implements Serializable {
    
    public String expression;
    public String missingItems;
-   public long[] objekts; // nur die erste Page
+
    public int resultsetSize;
    public long duraDB1;
    public long duraAlg;
@@ -29,9 +27,7 @@ public class ExpressionResult implements Serializable {
    /**
     * @deprecated nur für SOAP
     */
-   public ExpressionResult() {
-   	
-   }
+   public ExpressionResult() { }
    
    public ExpressionResult(int sessionId) {
    	this.sessionId = sessionId;

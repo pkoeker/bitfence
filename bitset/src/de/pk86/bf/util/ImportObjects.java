@@ -89,12 +89,9 @@ public class ImportObjects extends TestCase {
 		long end1 = System.currentTimeMillis();
 		PL pl = getPL();
 		JDataSet ds = pl.getEmptyDataset("objekt");
-//		JDataSet dsoi = pl.getEmptyDataset("objektitem");
 		
 		for (int i = 0; i < 500000; i++) {
-			StringBuilder sb = new StringBuilder();
-//			HashSet<String> hs = new HashSet<String>();
-			
+			StringBuilder sb = new StringBuilder();			
 			double r1 = Math.random();
 			double d1 = r1 * al1.size();
 			long i1 = Math.round(d1)-1;
@@ -102,13 +99,6 @@ public class ImportObjects extends TestCase {
 			String s1 = al1.get((int)i1); 
 			sb.append(s1);
 			sb.append(" ");
-//			StringTokenizer toks1 = new StringTokenizer(s1, ImportMain.FIRSTNAMES_DELIM);
-//			while(toks1.hasMoreTokens()) {
-//				String tok = toks1.nextToken().toLowerCase();
-//				if (tok.length() > 0) {
-//					hs.add(tok);
-//				}
-//			}
 
 			double r2 = Math.random();
 			double d2 = r2 * al2.size();
@@ -117,13 +107,7 @@ public class ImportObjects extends TestCase {
 			String s2 = al2.get((int)i2); 
 			sb.append(s2);
 			sb.append(" ");
-//			StringTokenizer toks2 = new StringTokenizer(s2, ImportMain.LASTNAME_DELIM);
-//			while(toks2.hasMoreTokens()) {
-//				String tok = toks2.nextToken().toLowerCase();
-//				if (tok.length() > 0) {
-//					hs.add(tok);
-//				}
-//			}
+
 			// Geschlecht
 			String gend;
 			if (i % 2 == 0) {
@@ -131,7 +115,6 @@ public class ImportObjects extends TestCase {
 			} else {
 				gend = "w";
 			}
-//			hs.add(gend);
 			sb.append(gend + " ");
 			
 
@@ -142,13 +125,6 @@ public class ImportObjects extends TestCase {
 			String s3 = al3.get((int)i3); 
 			sb.append(s3);
 			sb.append(" ");
-//			StringTokenizer toks3 = new StringTokenizer(s3, ImportMain.BIRTHDATE_DELIM);
-//			while(toks3.hasMoreTokens()) {
-//				String tok = toks3.nextToken().toLowerCase();
-//				if (tok.length() > 0) {
-//					hs.add(tok);
-//				}
-//			}
 
 			double r4 = Math.random();
 			double d4 = r4 * al4.size();
@@ -157,13 +133,6 @@ public class ImportObjects extends TestCase {
 			String s4 = al4.get((int)i4); 
 			sb.append(s4);
 			sb.append(" ");
-//			StringTokenizer toks4 = new StringTokenizer(s4, ImportMain.ZIP_CITY_DELIM);
-//			while(toks4.hasMoreTokens()) {
-//				String tok = toks4.nextToken().toLowerCase();
-//				if (tok.length() > 0) {
-//					hs.add(tok);
-//				}
-//			}
 
 			double r5 = Math.random();
 			double d5 = r5 * al5.size();
@@ -171,14 +140,7 @@ public class ImportObjects extends TestCase {
 			if (i5 == -1) i5 = 0;
 			String s5 = al5.get((int)i5); 
 			sb.append(s5);
-			sb.append(" ");
-//			StringTokenizer toks5 = new StringTokenizer(s5, ImportMain.STREET_NUMBER_DELIM);
-//			while(toks5.hasMoreTokens()) {
-//				String tok = toks5.nextToken().toLowerCase();
-//				if (tok.length() > 0) {
-//					hs.add(tok);
-//				}
-//			}
+			//sb.append(" ");
 			
 			JDataRow row = ds.createChildRow();
 			row.setValue("oid", i);
@@ -186,17 +148,11 @@ public class ImportObjects extends TestCase {
 			s = s.replaceAll(";", " ");
 			row.setValue("content", s);
 			
-//			for(String soi:hs) {
-//				JDataRow rowoi = dsoi.createChildRow();
-//				rowoi.setValue("oid", i);
-//				rowoi.setValue("itemname", soi);
-//			}
 		}
 		long end2 = System.currentTimeMillis();
 		try {
 			ArrayList<JDataSet> alds = new ArrayList<JDataSet>();
 			alds.add(ds);
-//			alds.add(dsoi);
 	      int anz = pl.setDataset(alds);
 			long end3 = System.currentTimeMillis();
 			System.out.println(anz + " Dauer: " + (end1-start) + "/" + (end2-end1) + "/" + (end3-end2));

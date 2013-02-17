@@ -23,7 +23,6 @@ public interface ObjectItemServiceIF {
 	public ExpressionResult getResultSet(int sessionId);
 	public String getObjekts(long[] oids);
 	public boolean hasNext(int sessionId);
-	public long[] getNext(int sessionId);
 	public ArrayList<String> getOtherItems(int sessionId);
 	public void endSession(int sessionId);
 	public ExpressionResult execute(String expression);
