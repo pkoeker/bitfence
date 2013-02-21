@@ -6,7 +6,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sf.ehcache.CacheManager;
@@ -264,52 +266,43 @@ public class BfPL {
 		return ret;	
 	}
 	/**	 
-	 * @deprecated Das geht jetzt so nicht mehr
+	 * 
 	 * @param oids
 	 * @param items
 	 * @return
 	 * @throws Exception
 	 */
-	public ArrayList<String> getOtherItems(int[] oids, ArrayList<String> items) throws Exception {
-		ArrayList<String> ret = new ArrayList<String>();
-		// in oid
-		StringBuilder bo = new StringBuilder();
-		for (int i = 0; i < oids.length; i++) {
-			bo.append(Long.toString(oids[i]));
-			bo.append(",");
-		}
-		bo.deleteCharAt(bo.length()-1);
-		// not in items
-		String sbi = null;
-		if (items != null && items.size() > 0) {
-			StringBuilder bi = new StringBuilder();	
-			for (int i = 0; i < items.size(); i++) {
-				String s = (String)items.get(i);
-				bi.append("'");
-				bi.append(s);
-				bi.append("',");
-			}
-			bi.deleteCharAt(bi.length()-1);
-			sbi = bi.toString();
-		}
+	public Map<String,Integer> getOtherItems(int[] oids, ArrayList<String> items) throws Exception {
+		LinkedHashMap<String,Integer> map = new LinkedHashMap<String,Integer>();
 		try {
-			String sql = "SELECT DISTINCT itemname, COUNT(itemname) AS anz FROM ObjektItem WHERE oid IN(" + bo.toString()+")";
-			if (sbi != null) {
-				sql = sql + " AND itemname NOT IN("+sbi+")";
+			String sql = "SELECT oid, content FROM Objekt WHERE oid IN(?)";
+			ParameterList list = new ParameterList();
+			ArrayList<Integer> al = new ArrayList<Integer>(oids.length);
+			for(int i = 0; i < oids.length; i++) {
+				al.add(oids[i]);
 			}
-			sql = sql + " group by itemname order by anz desc";
-			JDataSet ds = pl.getDatasetSql("otherItems", sql);
+			list.addParameter("oids", al);
+			JDataSet ds = pl.getDatasetSql("otherItems", sql, list);
 			Iterator<JDataRow> it = ds.getChildRows();
 			if (it != null) {
 				while (it.hasNext()) {
 					JDataRow row = it.next();
-					ret.add(row.getValue("itemname"));
+					String content = row.getValue("content");
+					ArrayList<String> cItems = getObjectItems(content);
+					for(String item:cItems) {
+						Integer i = map.get(item);
+						if (i == null) {
+							map.put(item, new Integer(1));
+						} else {
+							map.put(item, new Integer(i.intValue()+1));
+						}
+					}
 				}
 			}
 		} catch (PLException ex) {
 			throw ex;	
 		}
-		return ret;
+		return map;
 	}
 	// Items #############################################
 	public String[] findItems(String pattern) throws Exception {
