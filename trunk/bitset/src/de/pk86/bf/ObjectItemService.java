@@ -431,7 +431,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 		try {
 			int[] oids = sel.getResultSet();
-			ArrayList<String> items = sel.getItems();
+			ArrayList<String> items = sel.getItems(); 
 			return pl.getOtherItems(oids, items);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
@@ -511,10 +511,16 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 						brace = OperToken.Brace.OPEN;
 						break;
 					case ')':
-						level--;
-						brace = OperToken.Brace.NONE;
-						if (prevOp != null) {
-							prevOp.brace = OperToken.Brace.CLOSE;
+						if (level > 0) { // Problem: mehr ")" als "("
+							level--;
+							brace = OperToken.Brace.NONE;
+							if (prevOp != null) {
+								if (prevOp.brace == OperToken.Brace.OPEN) { // Problem: wenn (x), dann beide Klammern raus, Level-- 
+									prevOp.brace = OperToken.Brace.NONE;
+								} else {
+									prevOp.brace = OperToken.Brace.CLOSE; 
+								}
+							}
 						}
 						break;
 					case '|':
