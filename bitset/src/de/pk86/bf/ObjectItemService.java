@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import de.jdataset.JDataColumn;
@@ -15,10 +16,10 @@ import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
 import de.pk86.bf.pl.BfPL;
+import electric.xml.Element;
 //import electric.registry.Registry;
 //import electric.server.http.HTTP;
 //import electric.util.Context;
-import electric.xml.Element;
 
 /**
  * Dieser Dienst bietet die Möglichkeiten einer "Suchmaschine" im Kleinen.
@@ -423,10 +424,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @param name Eine laufende Session
 	 * @return ArrayList Menge der noch verfügbaren Eigenschaften.
 	 */
-	public ArrayList<String> getOtherItems(int sessionId) {
+	public Map<String,Integer> getOtherItems(int sessionId) {
 		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#getOtherItems()\nMissing Transaction: "+sessionId);
+			throw new IllegalArgumentException("ObjectItemService#getOtherItems()\nMissing Session: "+sessionId);
 		}
 		try {
 			int[] oids = sel.getResultSet();
