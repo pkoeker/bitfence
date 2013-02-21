@@ -46,13 +46,14 @@ public class Selection {
 	}
 	
 	int performOper(ArrayList<OperToken> al) {	
-		items = new ArrayList<String>();
 		if (al == null || al.size() == 0) return 0;
+		items = new ArrayList<String>();
 		// Sich alle items merken
 		for (OperToken ot:al) {
 			items.add(ot.token);
 		}		
 		// Klammer
+		int cnt = 0;
 		while (al.size() > 1) {
 			int maxLevel = 0;
 			int startIndex = 0;
@@ -64,6 +65,10 @@ public class Selection {
 				}
 			}			
 			this.performBrace(al, startIndex, maxLevel);
+			cnt++;
+			if (cnt > 2000) { // Notbremse Endlosschleife
+				return 0;
+			}
 		} 
 		
 		this.slot = al.get(0).slot;
@@ -80,6 +85,7 @@ public class Selection {
 	}
 	
 	private void performBrace(ArrayList<OperToken> al, int startIndex, int level) {
+		//System.out.println(al+ " : " + startIndex + "/" +level);
 		int cnt = 0;
 		for (int i = startIndex; i < al.size(); i++) {
 			OperToken ot = al.get(i);
@@ -90,14 +96,16 @@ public class Selection {
 				}
 			}
 		}
-		if (cnt == 1) { // (a)
-			al.get(startIndex).level--;
+		if (cnt == 1) { // (a) // überflüssig?
+			OperToken ot = al.get(startIndex);
+			ot.level--;
+			//System.out.println(al+ " : " + ot.level);
 			return;
 		}
 		OperToken ot1 = al.get(startIndex);
-		StringBuilder sbe = new StringBuilder();
-		sbe.append(ot1.token + " ");
+		addTraceElement(ot1.token, ot1.slot.getBitset().cardinality());
 		ot1.slot = ot1.slot.clone(); // HACK
+		StringBuilder sbe = new StringBuilder();
 		for (int i = startIndex+1; i < startIndex + cnt; i++) {
 			OperToken ot2 = al.get(i);
 			//System.out.println(ot1+ "--" + ot2);
