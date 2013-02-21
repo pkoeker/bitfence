@@ -217,7 +217,7 @@ public class Selection {
 				index = bs.nextSetBit(index);
 				ret[poi] = index;
 				poi++;
-			} else {
+			} else if (index >0){
 				index--;
 				index = bs.previousSetBit(index);
 				ret[poi] = index;
