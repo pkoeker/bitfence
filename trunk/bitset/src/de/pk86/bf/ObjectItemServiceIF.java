@@ -1,5 +1,6 @@
 package de.pk86.bf;
 import java.util.ArrayList;
+import java.util.Map;
 
 import de.jdataset.JDataSet;
 /**
@@ -23,7 +24,7 @@ public interface ObjectItemServiceIF {
 	public ExpressionResult getResultSet(int sessionId);
 	public String getObjekts(long[] oids);
 	public boolean hasNext(int sessionId);
-	public ArrayList<String> getOtherItems(int sessionId);
+	public Map<String,Integer> getOtherItems(int sessionId);
 	public void endSession(int sessionId);
 	public ExpressionResult execute(String expression);
 	public JDataSet getFirstPage(int sessionId);

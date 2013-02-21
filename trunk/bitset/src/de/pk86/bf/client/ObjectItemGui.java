@@ -2,8 +2,9 @@ package de.pk86.bf.client;
 
 import java.awt.Component;
 import java.awt.Cursor;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.swing.JOptionPane;
@@ -161,7 +162,7 @@ public class ObjectItemGui {
 	}
 
 	public void getOtherItems(GuiUserEvent event) {
-		ArrayList<String> items = sv.getOtherItems(sessionId);
+		Map<String,Integer> items = sv.getOtherItems(sessionId);
 		for (int i = 0; i < items.size(); i++) {
 			System.out.println(items.get(i));
 		}
@@ -252,13 +253,13 @@ public class ObjectItemGui {
    }
    
    public void findOther(GuiUserEvent event) {
-   	ArrayList<String> al = sv.getOtherItems(sessionId);
+   	Map<String,Integer> al = sv.getOtherItems(sessionId);
    	StringBuilder buff = new StringBuilder();
-   	for(String s:al) {
-   		buff.append(s);
+   	for(Entry<String,Integer> e:al.entrySet()) {
+   		buff.append(e);
    		buff.append('\n');
    	}
-   	event.window.setValue("memOther", buff.toString());
+   	event.window.setValue("memResult", buff.toString());
    }
 //   public void showObjects(GuiUserEvent event) {
 //   	ExpressionResult res = sv.getResultSet(sessionName);
