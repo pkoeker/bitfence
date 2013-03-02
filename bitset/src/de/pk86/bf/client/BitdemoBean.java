@@ -1,5 +1,7 @@
 package de.pk86.bf.client;
 
+import java.rmi.RemoteException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import de.jdataset.JDataSet;
@@ -35,7 +37,7 @@ public class BitdemoBean {
 				if (res != null) {
 					sv.endSession(res.sessionId);
 				}
-				res = sv.execute(expression);			
+				res = sv.execute(expression);	// throws RemoteException		
 				if (res != null) {
 					currentPage = res.firstPage;
 					request.getSession().setAttribute("currentPage", currentPage);
@@ -57,7 +59,7 @@ public class BitdemoBean {
 					this.dispResult(currentPage, null);
 				}
 			}
-		} catch (IllegalStateException ex) {
+		} catch (RemoteException ex) {
 			page = ex.getMessage();
 		}
 	}

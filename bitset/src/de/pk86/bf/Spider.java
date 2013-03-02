@@ -42,6 +42,10 @@ class Spider {
 			this.index(dir);
 		}
 	}
+	/**
+	 * @deprecated Überarbeiten
+	 * @param directory
+	 */
 	void index(String directory) {
 		File dir = new File(directory);
 		String[] files = dir.list();
@@ -53,8 +57,8 @@ class Spider {
 					try {					
 						File f = new File(directory, sf);
 						FileReader reader = new FileReader(f);
-						long oid = sv.createObject();
-						sv.indexObject(oid, reader, true, true);
+						//long oid = sv.createObject();
+						//sv.indexObject(oid, reader, true, true);
 						reader.close();
 						System.out.print(".");
 					} catch (Exception ex) {

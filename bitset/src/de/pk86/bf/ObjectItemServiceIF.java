@@ -1,4 +1,5 @@
 package de.pk86.bf;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -7,11 +8,12 @@ import de.jdataset.JDataSet;
  * @author peter
  */
 public interface ObjectItemServiceIF {
-	public void createObject(long oid);
-	public long createObject();
-	public void deleteObject(long oid);
+	public void createObject(long oid, String content);
+	//public long createObject();
+	//public void deleteObject(long oid);
 	public void createItem(String name);
 	public void deleteItem(String name);
+	/** @deprecated unused */
 	public boolean hasItem(long oid, String itemname);
 	public boolean hasItem(String itemname);
 	public int getItemCount(String itemname);
@@ -26,7 +28,7 @@ public interface ObjectItemServiceIF {
 	public boolean hasNext(int sessionId);
 	public Map<String,Integer> getOtherItems(int sessionId);
 	public void endSession(int sessionId);
-	public ExpressionResult execute(String expression);
+	public ExpressionResult execute(String expression) throws RemoteException;
 	public JDataSet getFirstPage(int sessionId);
 	public JDataSet getNextPage(int sessionId);
 	public JDataSet getPrevPage(int sessionId);
@@ -34,12 +36,6 @@ public interface ObjectItemServiceIF {
 	public void importItems(String text, boolean lowercase);
 	public void indexObject(long oid,String text,boolean createItems,boolean lowercase);
 	public void startSpider();
-	/** @deprecated macht nix sinnvolles */
-	public void validate();
-	/**
-	 * Erzeugt eine leere Datenbasis
-	 */
-	public void createDatabase();
 	/**
 	 * Importiert Objekte in die Datenbasis;
 	 * Objekte werden zeilenweise erwartet; 
@@ -53,6 +49,5 @@ public interface ObjectItemServiceIF {
 	 * Indiziert die Datenbasis; der Index (BitZaun) wird aus den Objekten neu aufgebaut
 	 */
 	public void indexDatabase();
-	public void clearDatabase();
 
 }
