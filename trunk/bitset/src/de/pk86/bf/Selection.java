@@ -52,7 +52,7 @@ public class Selection {
 		for (OperToken ot:al) {
 			items.add(ot.token);
 		}		
-		// Klammer
+		// Klammer; von der innersten Klammer das erste Token suchen
 		int cnt = 0;
 		while (al.size() > 1) {
 			int maxLevel = 0;

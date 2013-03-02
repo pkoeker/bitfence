@@ -1,7 +1,6 @@
 package de.pk86.bf.client;
 
 import java.awt.Component;
-import java.awt.Cursor;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -168,12 +167,6 @@ public class ObjectItemGui {
 		}
 	}
 
-	public void validate(GuiUserEvent event) {
-		event.window.getComponent().setCursor(new Cursor(Cursor.WAIT_CURSOR));
-		sv.validate();
-		event.window.getComponent().setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-	}
-
 	public void spider(GuiUserEvent event) {
 		sv.startSpider();
 	}
@@ -194,29 +187,25 @@ public class ObjectItemGui {
    	this.startTrans(event);
    }
    // Object
-   public void readObject(GuiUserEvent event) {
-   	long oid = Convert.toLong(event.window.getValue("oid"));
-//   	String[] items = sv.getObjectItems(oid);
-//   	/*
-//   	for (int i = 0; i < items.length; i++) {
-//   		System.out.println(items[i]);
-//   	}
-//   	*/
-//   	GuiList list = (GuiList)event.window.getGuiMember("listItems");
-//   	list.setItems(items);
-   }
-   public void createObject(GuiUserEvent event) {
-   	long oid = Convert.toLong(event.window.getValue("oid"));
-   	sv.createObject(oid);
-   }
-   public void deleteObject(GuiUserEvent event) {
-   	long oid = Convert.toLong(event.window.getValue("oid"));
-   	sv.deleteObject(oid);
-   }
-   public void setOid(GuiUserEvent event) {
-   	long oid = Convert.toLong(event.window.getValue("oid"));
-   	System.out.println(oid);
-   }
+//   public void readObject(GuiUserEvent event) {
+//   	long oid = Convert.toLong(event.window.getValue("oid"));
+////   	String[] items = sv.getObjectItems(oid);
+////   	/*
+////   	for (int i = 0; i < items.length; i++) {
+////   		System.out.println(items[i]);
+////   	}
+////   	*/
+////   	GuiList list = (GuiList)event.window.getGuiMember("listItems");
+////   	list.setItems(items);
+//   }
+//   public void deleteObject(GuiUserEvent event) {
+//   	long oid = Convert.toLong(event.window.getValue("oid"));
+////   	sv.deleteObject(oid);
+//   }
+//   public void setOid(GuiUserEvent event) {
+//   	long oid = Convert.toLong(event.window.getValue("oid"));
+//   	System.out.println(oid);
+//   }
    // Items
 	public void findItems(GuiUserEvent event) {
 		String item = (String) event.window.getValue("textItem");
@@ -243,13 +232,17 @@ public class ObjectItemGui {
    public void ee_execute(GuiUserEvent event) {
    	String exp = (String)event.window.getValue("memExpr");
    	long start = System.currentTimeMillis();
-   	ExpressionResult res = sv.execute(exp);
-   	event.window.setValue("size", res.resultsetSize);
-   	long end2 = System.currentTimeMillis();
-   	long duraTotal = end2-start; 
-   	String sd = res.duraDB1 + "/" + res.duraAlg + "/" + res.duraDB2 + " " + duraTotal;
-   	event.window.setValue("exeTime", sd);
-   	this.displayPage(event, res.firstPage, res.trace);
+   	try {
+   		ExpressionResult res = sv.execute(exp);
+   		event.window.setValue("size", res.resultsetSize);
+   		long end2 = System.currentTimeMillis();
+   		long duraTotal = end2-start; 
+   		String sd = res.duraDB1 + "/" + res.duraAlg + "/" + res.duraDB2 + " " + duraTotal;
+   		event.window.setValue("exeTime", sd);
+   		this.displayPage(event, res.firstPage, res.trace);
+   	} catch (Exception ex) {
+   		GuiUtil.showEx(ex);
+   	}
    }
    
    public void findOther(GuiUserEvent event) {

@@ -3,6 +3,7 @@ package de.pk86.bf;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
+import java.rmi.RemoteException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -148,43 +149,15 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * Erzeugt ein Objekt mit der angegebenen Nummer.<p>
 	 * Diese Objekt-ID ist nicht weiter als ein Identifier für
 	 * eine beliebige Information. In der Datenbank kann die Tabelle
-	 * "Object" um beliebige weitere Spalten ergänzt werden oder
+	 * "Objekt" um beliebige weitere Spalten ergänzt werden oder
 	 * diese Object-ID wird als Identifier für eine andere Datenquelle verwendet.
 	 * @param oid Object-ID
+	 * @param content
 	 * @throws IllegalArgumentException wenn oid < 0 oder größer MAX_OID
 	 */
-	public void createObject(long oid) {
+	public void createObject(long oid, String content) {
 		try {
-			pl.createObject(oid);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			ex.printStackTrace();
-		}
-	}
-	/**
-	 * Erzeugt eine neues Objekt und liefert dabei die vergebene oid.
-	 * @return long Die oid des neuen Objekts oder -1 wenn dabei ein Fehler
-	 * aufgetreten ist.
-	 */
-	public long createObject() {
-		long ret = -1;
-		try {
-			ret = pl.getOid();
-			this.createObject(ret);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			ex.printStackTrace();
-		}
-		return ret;
-	}
-	/**
-	 * Löscht das Object mit der angegebenen Nummer.<p>
-	 * Die Eigenschaften zu diesem Objekt werden mit gelöscht.
-	 * @param oid
-	 */
-	public void deleteObject(long oid) {
-		try {
-			pl.deleteObject(oid);
+			pl.createObject(oid, content);
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			ex.printStackTrace();
@@ -217,36 +190,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	/**
-	 * Versieht ein Objekt mit einer weiteren Eigenschaft.
-	 * @param oid
-	 * @param itemname
-	 */
-	public void addObjectItem(long oid, String itemname) {
-		try {
-//			boolean set = Item.setBit(oid, itemname);
-//			if (set) {
-				pl.addObjectItem(oid, itemname);
-//			}
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			ex.printStackTrace();
-		}
-	}
-	/**
-	 * Entfernt eine Eigenschaft vom Objekt.
-	 * @param oid
-	 * @param itemname
-	 */
-	public void removeObjectItem(long oid, String itemname) {
-		try {
-			pl.removeObjectItem(oid, itemname);
-//			Item.removeBit(oid, itemname);
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			ex.printStackTrace();
-		}
-	}
-	/**
+	 * @deprecated unused
 	 * Prüft, ob das angegebene Objekt den angegebene Eigenschaft hat.
 	 * @param oid
 	 * @param itemname
@@ -472,7 +416,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @see #hasNext
 	 * @see #getNext
 	 */
-	public ExpressionResult execute(String expression) {
+	public ExpressionResult execute(String expression) throws RemoteException {
 		expression = expression.toLowerCase();
 		ExpressionResult res = null;
 
@@ -547,6 +491,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 						brace = OperToken.Brace.NONE;
 					}				
 			}
+			// Prüfen Level
+			if (level != 0) {
+				throw new RemoteException("Unterschiedliche Anzahl öffnender und schließender Klammern.");
+			}
 			StringBuilder sb = new StringBuilder();
 			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an; wenn Slot null, dann gibts den begriff nicht
 			for (int i = al.size()-1; i>=0; i--) {
@@ -566,7 +514,11 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
-			ex.printStackTrace();
+			if (ex instanceof RemoteException) {
+				throw (RemoteException)ex;
+			} else {
+				throw new RemoteException(ex.getMessage(), ex);
+			}
 		}
 		return res;
 	}
@@ -703,7 +655,8 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				// 2.c Bit setzen
 				boolean set = pl.hasItem(oid, tok);
 				if (!set) {
-					pl.addObjectItem(oid, tok);
+					// TODO
+					//pl.addObjectItem(oid, tok);
 				}				
 			}
 		} catch (Exception ex) {
@@ -724,18 +677,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	/**
-	 * @deprecated macht nix sinnvolles
-	 * Überprüft die Konsistenz der Datenbank.
-	 */
-	public void validate() {
-		try {
-			int err = pl.validate();
-		} catch (Exception ex) {
-			logger.error(ex.getMessage(), ex);
-			ex.printStackTrace();
-		}
-	}
-	/**
 	 * Repariert die Datenbank.
 	 */
 	public void indexDatabase() {
@@ -745,15 +686,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			ex.printStackTrace();
 		}
 	}
-	
-	public void clearDatabase() {
-		
-	}
-	
-	public void createDatabase() {
-		
-	}
-	
+			
 	public int importDatabaseCSV(String data) {
 		StringTokenizer toks = new StringTokenizer(data, "\n\r");
 		JDataSet ds = new JDataSet("objekt");

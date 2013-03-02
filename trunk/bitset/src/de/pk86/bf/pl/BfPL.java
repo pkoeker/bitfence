@@ -139,62 +139,30 @@ public class BfPL {
 		}
 	}
 	
-	public void createObject(long oid) throws Exception {
-		try {
-			ParameterList list = new ParameterList();
-			list.addParameter("oid", oid);
-			list.addParameter("content", (String)null);
-			int cnt = pl.executeSql(insertObject, list);
-			if (cnt != 1) {
-				throw new IllegalArgumentException("PL#createObject: INSERT Failed");
-			}
-		} catch (PLException ex) {
-			throw ex;
-		}
-	}
-	/**
-	 * @deprecated @see updateObjects
-	 * @param oid
-	 * @return
-	 * @throws Exception
-	 */
-	public int deleteObject(long oid) throws Exception {
-		// Start Trans
+	public void createObject(long oid, String content) throws Exception {
 		IPLContext ipl = null;
-		String transname = "deleteObject";
 		try {
-			// Object
-			ipl = pl.startNewTransaction(transname);
+			ipl = pl.startNewTransaction("createObject");
 			ParameterList list = new ParameterList();
 			list.addParameter("oid", oid);
-			int cnt1 = ipl.executeSql(deleteObject, list);
-			if (cnt1 != 1) {				
-				throw new IllegalArgumentException("PL#deleteObject: DELETE Failed");
+			list.addParameter("content", content);
+			int cnt = ipl.executeSql(insertObject, list);
+			if (cnt != 1) {
+				ipl.rollbackTransaction("createObject");
+				throw new IllegalArgumentException("PL#createObject: INSERT Failed");
+			} else {
+				ArrayList<String> items = getObjectItems(content);
+				for(String itemname:items) {
+					this.setBit(oid, itemname, ipl);
+				}
+				ipl.commitTransaction("createObject");
 			}
-			// Bits
-			String[] items = this.getObjectItems(oid, ipl);
-			for (int i = 0; i < items.length; i++) {
-				String itemname = items[i];
-				removeBit(oid, itemname, ipl);
-			}
-			ipl.commitTransaction(transname);
-			return cnt1;
 		} catch (PLException ex) {
 			if (ipl != null) {
-				ipl.rollbackTransaction(transname);
+				ipl.rollbackTransaction("createObject");
 			}
 			throw ex;
 		}
-	}
-	/**
-	 * Siehe createObject()
-	 * @return long
-	 * @throws Exception
-	 */
-	public long getOid() throws Exception {
-		// @TODO : Lücken füllen wie?
-		long oid = pl.getOID();
-		return oid;
 	}
 	// ObjectItems ##########################################
 	public void addObjectItems(long oid, String content, IPLContext ipl) throws Exception {
@@ -203,68 +171,7 @@ public class BfPL {
 			setBit(oid, itemname, ipl);
 		}
 	}
-	public void addObjectItem(long oid, String itemname) throws Exception {
-		String transname = "insertOI";
-		IPLContext ipl = pl.startNewTransaction(transname);
-		try {
-			setBit(oid, itemname, ipl);
-			ipl.commitTransaction(transname);
-		} catch (PLException ex) {
-			if (ipl != null) {
-				ipl.rollbackTransaction(transname);
-			}
-			throw ex;
-		}
-	}
-	public void removeObjectItem(long oid, String itemname) throws Exception {
-		String transname = "deleteOI";
-		IPLContext ipl = pl.startNewTransaction(transname);
-		try {
-			// Bits
-			removeBit(oid, itemname, ipl);
-			ipl.commitTransaction(transname);
-		} catch (PLException ex) {
-			if (ipl != null) {
-				ipl.rollbackTransaction(transname);
-			}
-			throw ex;
-		}
-	}
 	
-	/**
-	 * @deprecated macht ganz und gar nix :-(
-	 * @param oid
-	 * @param ipl
-	 * @return
-	 * @throws Exception
-	 */
-	public String[] getObjectItems(long oid, IPLContext ipl) throws Exception {
-		String[] ret = null;
-		// TODO!
-//		try {
-//			ParameterList list = new ParameterList();
-//			list.addParameter("oid", oid);
-//			JDataSet ds;
-//			if (ipl != null) {
-//				ds = ipl.getDatasetSql("OI", findOIs, list);
-//			} else {
-//				ds = pl.getDatasetSql("OI", findOIs, list);
-//			}
-//			ret = new String[ds.getRowCount()];
-//			Iterator<JDataRow> it = ds.getChildRows();
-//			int i = 0;
-//			if (it != null) {
-//				while(it.hasNext()) {
-//					JDataRow row = it.next();			
-//					ret[i] = row.getValue("itemname");
-//					i++;
-//				}
-//			}
-//		} catch (PLException ex) {
-//			throw ex;
-//		}
-		return ret;	
-	}
 	/**	 
 	 * 
 	 * @param oids
@@ -512,36 +419,6 @@ public class BfPL {
 		} catch (PLException ex) {
 			throw ex;
 		}
-	}
-	/**
-	 * @deprecated macht nix sinnvolles
-	 * @return
-	 * @throws Exception
-	 */
-	public int validate() throws Exception {
-		int err = 0;
-		System.out.println("*** start verify ***");
-		{
-			// 1. Check Items / Number of Bits -- BitCount
-			JDataSet ds = pl.getDatasetSql("slot", "SELECT itemname, bits FROM SLOT");
-			Iterator<JDataRow> it = ds.getChildRows();
-			if (it == null) return 0;
-			while(it.hasNext()) {
-				JDataRow row = it.next();
-				String itemname = row.getValue("itemname");
-				JDataValue val = row.getDataValue("bits");
-				Object oval = val.getObjectValue();
-				Slot slot = new Slot(itemname, (byte[])oval);
-				try {
-					//slot.validate();
-				} catch (Exception ex) {
-					System.err.println("PL#validate: "+ex.getMessage());
-					err++;
-				}
-			}	
-		}
-		System.out.println("*** verified ***");
-		return err;
 	}
 	/**
 	 * TODO: Benötigt 3GB bei 200.000 Objekten!

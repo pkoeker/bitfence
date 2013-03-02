@@ -201,7 +201,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 
 	private Slot get(net.sf.ehcache.Element cele) {
 		if (cele != null) {
-			Object val = cele.getValue();
+			Object val = cele.getObjectValue();
 			Slot s = (Slot) val;
 			return s;
 		} else {
