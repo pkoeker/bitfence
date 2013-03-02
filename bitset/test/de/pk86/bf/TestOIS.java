@@ -1,5 +1,7 @@
 package de.pk86.bf;
 
+import java.rmi.RemoteException;
+
 import junit.framework.TestCase;
 
 public class TestOIS extends TestCase {
@@ -20,39 +22,7 @@ public class TestOIS extends TestCase {
 		assertEquals(false, b);		
 	}
 	
-	public void testObject1() {
-		long oid = sv.createObject();
-		sv.deleteObject(oid);
-	}
 	
-	public void testObjectItem1() {
-		String itemname = "xxx.zzz";
-		if (sv.hasItem(itemname)) {
-			sv.deleteItem(itemname);
-		}
-		sv.createItem(itemname);
-		long oid = sv.createObject();
-		sv.addObjectItem(oid, itemname);
-		int anzi = sv.getItemCount(itemname);
-		assertEquals(1, anzi);
-		boolean b = sv.hasItem(oid, itemname);
-		assertEquals(true, b);
-		
-//		String[] oits = sv.getObjectItems(oid);
-//		assertEquals(1, oits.length);
-//		assertEquals(itemname, oits[0]);
-		
-		ExpressionResult oids = sv.execute(itemname);
-//		assertEquals(1, oids.objekts.length);
-//		assertEquals(oid, oids.objekts[0]);
-
-		sv.removeObjectItem(oid, itemname);
-		anzi = sv.getItemCount(itemname);
-		assertEquals(0, anzi);
-		
-		sv.deleteObject(oid);
-		sv.deleteItem(itemname);
-	}
 	public void testObjectItem2() {
 		sv.createItem("123.xxx");
 		sv.createItem("123.yyy");
