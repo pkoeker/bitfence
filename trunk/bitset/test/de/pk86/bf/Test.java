@@ -79,14 +79,14 @@ public class Test {
 				while ( s != null) {
 					String leitID = s.substring(1,7);
 					long oid = Long.parseLong(leitID);
-					sv.createObject(oid);
+					//##sv.createObject(oid);
 					String slgws = s.substring(69);
 					slgws = slgws.substring(0, slgws.length()-1).trim();
 					for (int i = 0; i < slgws.length(); i = i+4) {
 						String slgwID = slgws.substring(i,i+4);
 						String item = hash.get(slgwID);
 						if (item != null) {
-							sv.addObjectItem(oid, item);
+							//##sv.addObjectItem(oid, item);
 							cnt++;
 						}
 					}
