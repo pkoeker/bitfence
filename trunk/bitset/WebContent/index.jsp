@@ -5,6 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
 <head><title>Address Search Engine Demo</title></head>
 <body bgcolor="white">
+<!--Local IP: <%=request.getLocalAddr() %> Remote IP: <%=request.getRemoteAddr() %> --> 
 <% bitdemo.processRequest(request); %>
 <h2>Personen Suchanfrage</h2>
   <form method="post">
