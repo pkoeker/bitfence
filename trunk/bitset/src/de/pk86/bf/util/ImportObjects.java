@@ -126,11 +126,12 @@ public class ImportObjects extends TestCase {
 			sb.append(s3);
 			sb.append(" ");
 
+			// Straße Hausnummer Zusatz
 			double r4 = Math.random();
 			double d4 = r4 * al4.size();
 			long i4 = Math.round(d4)-1;
 			if (i4 == -1) i4 = 0;
-			String s4 = al4.get((int)i4); 
+			String s4 = al4.get((int)i4);
 			sb.append(s4);
 			sb.append(" ");
 
