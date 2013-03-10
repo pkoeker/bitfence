@@ -25,7 +25,8 @@ public class ImportObjects extends TestCase {
 	static PL getPL() {
 		if (pl == null) {
 	      try {	      	
-		      pl = new PL("BitDemoPLConfig.xml");
+		      //pl = new PL("BitDemoPLConfig.xml");
+		      pl = new PL("BF_PLConfig.xml");
 	      } catch (Exception e) {
 		      e.printStackTrace();
 		      throw new IllegalStateException(e);
@@ -76,7 +77,7 @@ public class ImportObjects extends TestCase {
 				al4.add(tok);
 			}
 		}
-		// Straße nr, zusatz
+		// Straße 
 		ArrayList<String> al5 = new ArrayList<String>(50000);
 		{
 			String s = GuiUtil.fileToString("resources/5_street_number_ext.csv");
@@ -86,11 +87,21 @@ public class ImportObjects extends TestCase {
 				al5.add(tok);
 			}
 		}
+		// Straße nr, zusatz
+		ArrayList<String> al6 = new ArrayList<String>(500);
+		{
+			String s = GuiUtil.fileToString("resources/6_Hausnummer.csv");
+			StringTokenizer toks = new StringTokenizer(s, "\n\r");
+			while (toks.hasMoreTokens()) {
+				String tok = toks.nextToken();
+				al6.add(tok);
+			}
+		}
 		long end1 = System.currentTimeMillis();
 		PL pl = getPL();
 		JDataSet ds = pl.getEmptyDataset("objekt");
 		
-		for (int i = 0; i < 500000; i++) {
+		for (int i = 0; i < 1000000; i++) {
 			StringBuilder sb = new StringBuilder();			
 			double r1 = Math.random();
 			double d1 = r1 * al1.size();
@@ -125,8 +136,7 @@ public class ImportObjects extends TestCase {
 			String s3 = al3.get((int)i3); 
 			sb.append(s3);
 			sb.append(" ");
-
-			// Straße Hausnummer Zusatz
+			// PLZ Ort
 			double r4 = Math.random();
 			double d4 = r4 * al4.size();
 			long i4 = Math.round(d4)-1;
@@ -135,12 +145,22 @@ public class ImportObjects extends TestCase {
 			sb.append(s4);
 			sb.append(" ");
 
+			// Straße 
 			double r5 = Math.random();
 			double d5 = r5 * al5.size();
 			long i5 = Math.round(d5)-1;
 			if (i5 == -1) i5 = 0;
 			String s5 = al5.get((int)i5); 
-			sb.append(s5);
+			String[] s5a = s5.split(";");
+			sb.append(s5a[0]);
+			sb.append(" ");
+			// Hausnummer Zusatz
+			double r6 = Math.random();
+			double d6 = r6 * al6.size();
+			long i6 = Math.round(d6)-1;
+			if (i6 == -1) i6 = 0;
+			String s6 = al6.get((int)i6); 
+			sb.append(s6);
 			//sb.append(" ");
 			
 			JDataRow row = ds.createChildRow();
