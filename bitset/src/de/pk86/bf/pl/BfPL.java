@@ -427,35 +427,43 @@ public class BfPL {
 	public void repair() throws Exception {
 		// Slots aus den ObjectItems aufbauen.
 		// 1. Alle Slots wegwerfen
-		int cnt = pl.executeSql("DELETE FROM ITEM");
-		System.out.println("Items delete: " + cnt);
+//		int cnt = pl.executeSql("DELETE FROM ITEM");
+//		System.out.println("Items delete: " + cnt);
 		// Slots aus ObjectItems neu aufbauen
-		JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt"); // je 100.000 Objekte paketieren? Mehrere Threads?
-		System.out.println("Objekt rowCount: " + ds.getRowCount());
-		Iterator<JDataRow> it = ds.getChildRows();
-		if (it == null) return;
-		IPLContext ipl = pl.startNewTransaction("repair");
-		int anzo = 0;
-		int anzoi = 0;
-		while(it.hasNext()) {
-			JDataRow row = it.next();
-			long oid = row.getValueLong("oid");
-			String content = row.getValue("content");
-			ArrayList<String> al = getObjectItems(content);
-			anzo++;
-			for(String itemname:al) {
-				setBit(oid, itemname, ipl); 
-				anzoi++;
-				if (anzoi % 1000 == 0) {
-					System.out.println(anzo + "/" +anzoi);
+		int STEP = 100000;
+		int start = 0;
+		while (true) {
+			ParameterList list = new ParameterList();
+			list.addParameter("1", start);
+			list.addParameter("2", start+STEP);
+			start += STEP+1;
+			JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt WHERE OID between ? AND ?", list); // je 100.000 Objekte paketieren? Mehrere Threads?
+			System.out.println("Objekt rowCount: " + ds.getRowCount());
+			if (ds.getRowCount() == 0) {
+				break;
+			}
+			Iterator<JDataRow> it = ds.getChildRows();
+			if (it == null) return;
+			IPLContext ipl = pl.startNewTransaction("repair");
+			int anzo = 0;
+			int anzoi = 0;
+			while(it.hasNext()) {
+				JDataRow row = it.next();
+				long oid = row.getValueLong("oid");
+				String content = row.getValue("content");
+				ArrayList<String> al = getObjectItems(content);
+				anzo++;
+				for(String itemname:al) {
+					setBit(oid, itemname, ipl); 
+					anzoi++;
+					if (anzoi % 1000 == 0) {
+						System.out.println(anzo + "/" +anzoi);
+					}
 				}
 			}
-//			if (anzo > 10000) {
-//				writeAll(ipl); // Cache durchschreiben erzwingen
-//				ipl.commitTransaction("repair");
-//				return;
-//			}
+			ipl.commitTransaction("repair");
 		}
+		IPLContext ipl = pl.startNewTransaction("repair");
 		writeAll(ipl); // Cache durchschreiben erzwingen
 		ipl.commitTransaction("repair");
 	}
