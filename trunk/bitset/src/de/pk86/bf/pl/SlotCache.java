@@ -59,14 +59,14 @@ class SlotCache {
 					cfg.setEternal(Convert.toBoolean(eternal));
 				}
 				//
-				long time2idl = 1200;
+				long time2idl = 12000;
 				String timeToIdleSeconds = ele.getAttribute("timeToIdleSeconds");
 				if (timeToIdleSeconds != null) {
 					time2idl = Convert.toLong(timeToIdleSeconds);
 				}
 				cfg.setTimeToIdleSeconds(time2idl);
 				//
-				long time2live = 1200;
+				long time2live = 12000;
 				String timeToLiveSeconds = ele.getAttribute("timeToLiveSeconds");
 				if (timeToLiveSeconds != null) {
 					time2live = Convert.toLong(timeToLiveSeconds);
