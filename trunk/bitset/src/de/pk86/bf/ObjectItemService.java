@@ -790,7 +790,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				// nix
 			}
 			while (brun) {
-				if (cnt % 3600 == 0) { // Einmal pro Stunde ein Lebenszeichen
+				if (cnt % 120 == 0) { // Einmal pro Stunde ein Lebenszeichen
 					logger.info("SessionRemover.run " + cnt);
 				}
 				cnt++;
