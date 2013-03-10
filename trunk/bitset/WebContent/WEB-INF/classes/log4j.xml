@@ -16,7 +16,7 @@
     	<param name="Target" value="System.out"/> 
     	<layout class="org.apache.log4j.PatternLayout"> 
       		<!--param name="ConversionPattern" value="%-5p %c{1} - %m%n"/--> 
-            <param name="ConversionPattern" value="%-5p -- %t -- %C{1}.%M [line %L] -- %m %n"/>
+            <param name="ConversionPattern" value="%d{HH:mm:ss,SSS} -- %-5p -- %t -- %C{1}.%M [line %L] -- %m %n"/>
     	</layout> 
   	</appender> 
 
@@ -35,7 +35,7 @@
         <appender-ref ref="SlowQueryAppender"/>
 	</logger>
     <root>
-        <priority value="debug"/>
+        <priority value="info"/>
         <appender-ref ref="ReadableFileAppender"/>
         <appender-ref ref="console"/>
     </root>
