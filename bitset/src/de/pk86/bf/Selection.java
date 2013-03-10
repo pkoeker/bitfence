@@ -203,6 +203,7 @@ public class Selection {
 		return getResult(0, bitCount, true);
 	}
 	private int[] getResult(int start, int cnt, boolean forward) {
+		if (bitCount == 0) return null;
 		if (start + cnt > bitCount) {
 			cnt = bitCount - start;
 		}
