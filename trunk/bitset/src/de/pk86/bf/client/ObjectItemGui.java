@@ -131,7 +131,7 @@ public class ObjectItemGui {
 	public void reset(GuiUserEvent event) {
 		sv.endSession(sessionId);
 		GuiList list = (GuiList)event.window.getGuiMember("listHistory");
-		list.setItems((Vector)null);
+		list.setItems((Vector<Object>)null);
 		event.window.setValue("size", null);
 		event.window.setValue("memResult", null);
 		this.startTrans(event);
