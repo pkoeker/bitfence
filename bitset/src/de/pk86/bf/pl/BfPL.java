@@ -421,7 +421,7 @@ public class BfPL {
 		}
 	}
 	/**
-	 * TODO: Benötigt 3GB bei 200.000 Objekten!
+	 * maxEntriesLocalHeap anpassen: Bei 1 Mio 25000 für ca. 6GB
 	 * @throws Exception
 	 */
 	public void repair() throws Exception {
@@ -432,12 +432,14 @@ public class BfPL {
 		// Slots aus ObjectItems neu aufbauen
 		int STEP = 100000;
 		int start = 0;
+		int anzo = 0;
+		int anzoi = 0;
 		while (true) {
 			ParameterList list = new ParameterList();
 			list.addParameter("1", start);
 			list.addParameter("2", start+STEP);
 			start += STEP+1;
-			JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt WHERE OID between ? AND ?", list); // je 100.000 Objekte paketieren? Mehrere Threads?
+			JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt WHERE OID between ? AND ?", list); 
 			System.out.println("Objekt rowCount: " + ds.getRowCount());
 			if (ds.getRowCount() == 0) {
 				break;
@@ -445,8 +447,6 @@ public class BfPL {
 			Iterator<JDataRow> it = ds.getChildRows();
 			if (it == null) return;
 			IPLContext ipl = pl.startNewTransaction("repair");
-			int anzo = 0;
-			int anzoi = 0;
 			while(it.hasNext()) {
 				JDataRow row = it.next();
 				long oid = row.getValueLong("oid");
@@ -463,9 +463,9 @@ public class BfPL {
 			}
 			ipl.commitTransaction("repair");
 		}
-		IPLContext ipl = pl.startNewTransaction("repair");
-		writeAll(ipl); // Cache durchschreiben erzwingen
-		ipl.commitTransaction("repair");
+		IPLContext iplc = pl.startNewTransaction("WriteCache");
+		writeAll(iplc); // Cache durchschreiben erzwingen
+		iplc.commitTransaction("WriteCache");
 	}
 	
 	public static ArrayList<String> getObjectItems(String content) {
