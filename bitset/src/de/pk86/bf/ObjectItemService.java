@@ -496,7 +496,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				throw new RemoteException("Unterschiedliche Anzahl öffnender und schließender Klammern.");
 			}
 			StringBuilder sb = new StringBuilder();
-			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an; wenn Slot null, dann gibts den begriff nicht
+			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an; wenn Slot null, dann gibts den Begriff nicht
 			for (int i = al.size()-1; i>=0; i--) {
 				OperToken ot = al.get(i);
 				if (ot.slot == null) {
