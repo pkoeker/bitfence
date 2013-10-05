@@ -24,7 +24,7 @@ public class EditBean {
 	public void processRequest(HttpServletRequest request) {
 		anzahl = 0; dura = 0;
 		this.request = request;
-		Enumeration<String> en = request.getParameterNames();
+		//Enumeration<String> en = request.getParameterNames();
 		this.page = (JDataSet)request.getSession().getAttribute("currentPage");
 		String param = request.getParameter("action");
 		if (param == null) {
