@@ -113,13 +113,14 @@ public class Selection {
 				logger.warn("Missing Slot: " + ot2.token);
 				missingItems += ot2.token + " ";
 			} else {
+				int bitCount = ot2.slot.getBitset().cardinality();
 				BitSet erg = performOper(ot1.slot.getBitset(), ot2.slot.getBitset(), ot2.oper);
 				sbe.append(ot2.oper);
 				sbe.append(" " + ot2.token);
 				ot1.token = "[" + getTraceSize() + "]";
 				ot1.slot.setBitset(erg); // TODO: gefährlich! Wenn der Cache diese Daten zurückschreibt! 
-				sbe.append(" ");
-				addTraceElement(sbe.toString(), ot1.slot.getBitset().cardinality());
+				//sbe.append(" ");
+				addTraceElement(sbe.toString()+"{"+bitCount+"}", ot1.slot.getBitset().cardinality());
 				sbe = new StringBuilder();
 			}
 		}
