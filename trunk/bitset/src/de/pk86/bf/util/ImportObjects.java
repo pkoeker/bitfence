@@ -171,15 +171,17 @@ public class ImportObjects extends TestCase {
 			
 		}
 		long end2 = System.currentTimeMillis();
-		try {
-			ArrayList<JDataSet> alds = new ArrayList<JDataSet>();
-			alds.add(ds);
-	      int anz = pl.setDataset(alds);
-			long end3 = System.currentTimeMillis();
-			System.out.println(anz + " Dauer: " + (end1-start) + "/" + (end2-end1) + "/" + (end3-end2));
-      } catch (PLException e) {
-	      e.printStackTrace();
-	      fail(e.getMessage());
-      }		
+		long sz = ds.getSize();
+		System.out.println(sz + "/" + end2);
+//		try {
+//			ArrayList<JDataSet> alds = new ArrayList<JDataSet>();
+//			alds.add(ds);
+//	      int anz = pl.setDataset(alds);
+//			long end3 = System.currentTimeMillis();
+//			System.out.println(anz + " Dauer: " + (end1-start) + "/" + (end2-end1) + "/" + (end3-end2));
+//      } catch (PLException e) {
+//	      e.printStackTrace();
+//	      fail(e.getMessage());
+//      }		
 	}
 }
