@@ -11,10 +11,18 @@ import de.pk86.bf.ObjectItemServiceIF;
  *
  */
 public class ServiceFactory {
+	
+	private static ObjectItemService srv;
 
 	public static ObjectItemServiceIF getDirectService() {
-		ObjectItemService srv = new ObjectItemService();
-		return srv;
+		if (srv == null) {
+			synchronized (ServiceFactory.class) {
+				if (srv == null) {
+					srv = new ObjectItemService();
+				}
+			}
+		}
+		return srv;	      
 	}
 //	public static ObjectItemServiceIF getSOAP_Service(String url) {
 //		try {
