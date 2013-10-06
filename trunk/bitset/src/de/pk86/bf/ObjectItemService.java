@@ -18,9 +18,6 @@ import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
 import de.pk86.bf.pl.BfPL;
 import electric.xml.Element;
-//import electric.registry.Registry;
-//import electric.server.http.HTTP;
-//import electric.util.Context;
 
 /**
  * Dieser Dienst bietet die Möglichkeiten einer "Suchmaschine" im Kleinen.
@@ -145,6 +142,9 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public int getNewSessionId() {
 		return sessionCounter++;
 	}
+	public int countActiveSessions() {
+		return sessions.size();
+	}
 	/**
 	 * Erzeugt ein Objekt mit der angegebenen Nummer.<p>
 	 * Diese Objekt-ID ist nicht weiter als ein Identifier für
@@ -255,6 +255,11 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @return sessionId, unter dieser id kann auf die Session zugegriffen werden
 	 */
 	public Selection startSession() {
+		if (sessions.size() >= ObjectItemServiceIF.MAX_SESSIONS) {
+			String msg = "Maximum number of sessions exceeded";
+			logger.error(msg);
+			throw new IllegalArgumentException(msg);
+		}
 		int sessionId = this.getNewSessionId();
 		Selection sel = new Selection(sessionId);
 		if (sessions.put(sessionId, sel) != null) {
@@ -383,17 +388,23 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 		return null;
 	}
+	public boolean hasSession(int sessionId) {
+		return sessions.contains(sessionId);
+	}
 	/**
 	 * Beendet eine Session und gibt den Speicher wieder frei.
-	 * @param name
+	 * @param sessionId
+	 * @return true, wenn Session beendet wurde.
 	 */
-	public void endSession(int sessionId) {
+	public boolean endSession(int sessionId) {
 		Selection sel = sessions.get(sessionId);
 		if (sel == null) {
-			throw new IllegalArgumentException("ObjectItemService#endTrans()\nMissing Session: "+sessionId);
+			logger.error("ObjectItemService#endSession()\nMissing Session: " + sessionId);
+			return false;
 		}
 		sessions.remove(sessionId);		
 		sel.reset();
+		return true;
 	}
 	/**
 	 * Löscht alle Sessions
@@ -758,9 +769,11 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		for (Selection sel:sessions.values()) {
 			long timestamp = sel.getTimestampd().getTime();
 			if (now - timestamp > 1000 * 60 * 15) {
-				logger.warn("Session timed out: " + sel);
-				this.endSession(sel.getSessionId());
-				cnt++;
+				boolean terminated = this.endSession(sel.getSessionId());
+				if (terminated) {
+					logger.warn("Session timed out: " + sel);
+					cnt++;
+				}
 			}
 		}		
 		return cnt;
@@ -791,7 +804,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			}
 			while (brun) {
 				if (cnt % 120 == 0) { // Einmal pro Stunde ein Lebenszeichen
-					logger.info("SessionRemover.run " + cnt);
+					logger.info("SessionRemover#run; Active Sessions: " + srv.countActiveSessions());
 				}
 				cnt++;
 				srv.checkSessionTimeout();

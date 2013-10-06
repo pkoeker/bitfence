@@ -8,6 +8,9 @@ import de.jdataset.JDataSet;
  * @author peter
  */
 public interface ObjectItemServiceIF {
+	public static String DEFAULT_DELIM = " ;.,()/-";
+	public static int MAX_SESSIONS = 1000;
+	
 	public void createObject(long oid, String content);
 	//public long createObject();
 	//public void deleteObject(long oid);
@@ -18,6 +21,10 @@ public interface ObjectItemServiceIF {
 	public boolean hasItem(String itemname);
 	public int getItemCount(String itemname);
 	public String[] findItems(String pattern);
+	/**
+	 * Wirft eine IllegalArgumentException, wenn MAX_SESSIONS (1000) überschritten
+	 * @return
+	 */
 	public Selection startSession();
 	public void resetAllSessions();
 	/** @deprecated @see #performOper(List)*/
@@ -27,7 +34,18 @@ public interface ObjectItemServiceIF {
 	public String getObjekts(long[] oids);
 	public boolean hasNext(int sessionId);
 	public Map<String,Integer> getOtherItems(int sessionId);
-	public void endSession(int sessionId);
+	/**
+	 * Liefert true, wenn eine Session mit der angegebenen Id existiert
+	 * vor {@link #endSession(int)} aufrufen.
+	 * @param sessionId
+	 * @return
+	 */
+	public boolean hasSession(int sessionId);
+	/**
+	 * @param sessionId
+	 * @return false, wenn die angegebene Session nicht (mehr) existiert.
+	 */
+	public boolean endSession(int sessionId);
 	public ExpressionResult execute(String expression) throws RemoteException;
 	public JDataSet getFirstPage(int sessionId);
 	public JDataSet getNextPage(int sessionId);
