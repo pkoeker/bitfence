@@ -18,7 +18,7 @@ import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
 import de.jdataset.JDataValue;
 import de.jdataset.ParameterList;
-import de.pk86.bf.Const;
+import de.pk86.bf.ObjectItemServiceIF;
 import de.pk86.bf.OperToken;
 import de.pkjs.pl.IPLContext;
 import de.pkjs.pl.PL;
@@ -470,7 +470,7 @@ public class BfPL {
 	
 	public static ArrayList<String> getObjectItems(String content) {
 		content = content.toLowerCase();
-		StringTokenizer toks = new StringTokenizer(content, Const.DEFAULT_DELIM);
+		StringTokenizer toks = new StringTokenizer(content, ObjectItemServiceIF.DEFAULT_DELIM);
 		ArrayList<String> al = new ArrayList<String>();
 		while(toks.hasMoreTokens()) {
 			String itemname = toks.nextToken();
