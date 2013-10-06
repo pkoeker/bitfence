@@ -34,8 +34,9 @@ public class BitdemoBean {
 		//System.out.println("processRequest: " + param);
 		try {
 			if ("suchen".equalsIgnoreCase(param)) {
-				if (res != null) {
-					sv.endSession(res.sessionId);
+				if (res != null) { // Neu suchen: Ggf. bestehende Session zuvor beenden (die kann aber durch ein Timeout bereits beendet worden sein!)
+					boolean terminated = sv.endSession(res.sessionId);
+					res = null;
 				}
 				res = sv.execute(expression);	// throws RemoteException		
 				if (res != null) {
