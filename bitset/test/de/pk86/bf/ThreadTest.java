@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
 
+import de.pk86.bf.client.ServiceFactory;
+
 //import de.pkjs.pltest.ConnectionPoolTest;
 
 public class ThreadTest extends TestCase {
@@ -21,12 +23,14 @@ public class ThreadTest extends TestCase {
 
    private long startTime;
    private long endTime;
+   private static ObjectItemServiceIF srv;
 
    public ThreadTest() {
    }
 
    public void setUp() throws Exception {
       logger.info("setUp");
+      srv = ServiceFactory.getSpringService("10.8.0.1");
    }
 
    public void tearDown() throws Exception {
@@ -96,17 +100,22 @@ public class ThreadTest extends TestCase {
       }
       
       public void run() {
-   		ObjectItemService srv = new ObjectItemService();
+   		//##ObjectItemService srv = new ObjectItemService();
          logger.debug("Worker started: "+name);
          long start = System.currentTimeMillis();
          for (int i = 0; i < runCount; i++) {
          	// ACHTUNG! Logger ausschalten!
-      		//long[] x = srv.execute("\"§ 100 a II. WoBauG\" | \"§ 1021 BGB\"");   
-      		//long[] x = srv.execute("\"§ 100 a II. WoBauG\"");   
-      		//long[] x = srv.execute("AGBG"); //  Postgres 6142/Sec [5864]; MaxDB: 7561 [7558]
-      		boolean b = srv.hasItem("AGBG"); // Postgres ? [7713]; MaxDB: 10272 [11621]
+        	 try {
+      		ExpressionResult res1 = srv.execute("w | m"); 
+      		ExpressionResult res2 = srv.execute("hans berlin münchen"); 
+      		ExpressionResult res3 = srv.execute("(hans | maria) hamburg köln"); 
+      		boolean b = srv.hasItem("Berlin"); // Postgres ? [7713]; MaxDB: 10272 [11621]
       		//int len = x.length;
       		int xxx = 0;
+        	 } catch (Exception ex) {
+        		 System.out.println(ex.getMessage());
+        	 
+        	 }
          } // End For
          synchronized(okSema) {
          	okCounter++;
