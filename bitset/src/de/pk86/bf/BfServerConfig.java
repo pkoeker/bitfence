@@ -44,9 +44,7 @@ public class BfServerConfig {
 
 	public BfServerConfig() {
 		if (!"localhost".equalsIgnoreCase(registryHost)) {
-			System.setProperty("java.rmi.server.hostname", registryHost); // Für
-																							  // abweichende
-			                                                              // IP-Adresse
+			System.setProperty("java.rmi.server.hostname", registryHost); // Für abweichende IP-Adresse
 		}
 	}
 
