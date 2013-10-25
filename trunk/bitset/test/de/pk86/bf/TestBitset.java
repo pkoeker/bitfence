@@ -14,7 +14,7 @@ import de.jdataset.JDataSet;
 /**
  * @author peter
  */
-public class Test {
+public class TestBitset {
 	public static void main(String[] args) {
 		ObjectItemService sv = new ObjectItemService();
 		
