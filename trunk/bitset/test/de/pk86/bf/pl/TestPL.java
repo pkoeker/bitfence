@@ -1,34 +1,35 @@
 package de.pk86.bf.pl;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import de.pk86.bf.client.ObjectItemGui;
 
-public class TestPL extends TestCase {
+public class TestPL /*extends TestCase*/ {
 	
-	public static void main(String[] args) {
-		TestPL me = new TestPL();
-   	if (!ObjectItemGui.yesNoMessage(null, "Return to continue", "Start")) {
-   		return;
-   	}
-		me.test0();
-		me.test1();
-		me.testItem1();
-   	if (!ObjectItemGui.yesNoMessage(null, "Return to continue", "End")) {
-   		return;
-   	}
-	}
+//	public static void main(String[] args) {
+//		TestPL me = new TestPL();
+//   	if (!ObjectItemGui.yesNoMessage(null, "Return to continue", "Start")) {
+//   		return;
+//   	}
+//		me.test0();
+//		me.test1();
+//		me.testItem1();
+//   	if (!ObjectItemGui.yesNoMessage(null, "Return to continue", "End")) {
+//   		return;
+//   	}
+//	}
 	
-	public void test0() {
+	@Test public void test0() {
 		BfPL pl = BfPL.getInstance();
 		assertNotNull(pl);
 	}
-	public void test1() {
+	@Test public void test1() {
 //		BfPL pl = BfPL.getInstance();
 //		long oid = pl.getMaxOid();
 //		assertNotNull(oid);
 	}
-	
-	public void testItem1() {
+	@Test public void testItem1() {
 		BfPL pl = BfPL.getInstance();
 		try {
 			String itemName = "xxx.xxx";
@@ -52,7 +53,7 @@ public class TestPL extends TestCase {
 	}
 		
 	
-	public void testRenameItem() {
+	@Test public void testRenameItem() {
 		BfPL pl = BfPL.getInstance();
 		try {
 			String itemName = "xxx.xxx";
@@ -73,7 +74,7 @@ public class TestPL extends TestCase {
 	   }
 	}
 	
-	public void testValid() {
+	@Test public void testValid() {
 //		BfPL pl = BfPL.getInstance();
 //		try {
 //			pl.validate();
