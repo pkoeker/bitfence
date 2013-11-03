@@ -35,11 +35,12 @@ public class TestPL /*extends TestCase*/ {
 			String itemName = "xxx.xxx";
 	      boolean yes = pl.hasItem(itemName);
 	      if (yes) {
-	      	int cntdel = pl.deleteItem(itemName);
+	      	int cntdel = pl.deleteItem(itemName); 
 	      	assertNotNull(cntdel);
 	      }
-	      int cntcrea = pl.createItem(itemName);
-	      assertEquals(1, cntcrea);
+	      pl.createItem(itemName);
+	      boolean b = pl.hasItem(itemName);
+	      assertEquals(true, b);
 	      String[] its = pl.findItems("xxx.xxx");
 	      assertEquals(1, its.length);
       	int cntdel = pl.deleteItem(itemName);
@@ -62,7 +63,7 @@ public class TestPL /*extends TestCase*/ {
 	      	int cntdel = pl.deleteItem(itemName);
 	      	assertNotNull(cntdel);
 	      }
-	      int cntcrea = pl.createItem(itemName);
+	      pl.createItem(itemName);
 	      int anz = pl.renameItem(itemName, "xxx.123");
       	assertNotNull(anz);
       	int cntdel = pl.deleteItem("xxx.123");
