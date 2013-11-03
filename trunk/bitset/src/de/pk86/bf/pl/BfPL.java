@@ -44,7 +44,7 @@ public class BfPL {
 	// Item
 	private String findItems = "SELECT Itemname FROM ITEM WHERE Itemname LIKE ? ORDER BY Itemname";
 	private String selectItem = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
-	private String insertItem = "INSERT INTO ITEM Values(?,?)";
+	private String selectItemBits = "SELECT Itemname,bits FROM ITEM WHERE Itemname = ?";
 	// Slot
 	private String selectSlot = "SELECT Bits FROM ITEM WHERE Itemname = ?";
 	private String getAllSlots = "SELECT Bits FROM ITEM WHERE Itemname = ?";
@@ -59,8 +59,6 @@ public class BfPL {
 	
 	private PL pl;
 	private int missing;
-	//private static LinkedHashMap<String, Slot> hash = new LinkedHashMap<String, Slot>();
-
 	
 	// Private Constructor
 	private BfPL(String configFilename) {
@@ -217,7 +215,7 @@ public class BfPL {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("pattern", pattern);
-			JDataSet ds = pl.getDatasetSql("findItems", findItems, list);
+			JDataSet ds = pl.getDatasetSql("", findItems, list);
 			ret = new String[ds.getRowCount()];
 			Iterator<JDataRow> it = ds.getChildRows();
 			if (it != null) {
@@ -234,16 +232,18 @@ public class BfPL {
 		
 		return ret;
 	}
-	public int createItem(String name) throws Exception{
+	public void createItem(String name) throws Exception{
+		IPLContext ipl = null;
+		String transname ="createItem";
 		try {
-			ParameterList list = new ParameterList();
-			list.addParameter("name", name);
-			int cnt = pl.executeSql(insertItem, list);
-			if (cnt != 1) {
-				throw new IllegalArgumentException("PL#createItem: INSERT Failed");
-			}
-			return cnt;
+			Slot s = new Slot(name);
+			ipl = pl.startNewTransaction(transname);			
+			this.insertSlot(s, ipl);
+			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
+			if (ipl != null) {
+				ipl.rollbackTransaction(transname);
+			}
 			throw ex;
 		}
 	}
@@ -318,8 +318,11 @@ public class BfPL {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", itemname);
-			JDataSet ds = pl.getDatasetSql("countItemBits", selectItem, list);
+			JDataSet ds = pl.getDatasetSql("countItemBits", selectItemBits, list);
 			JDataRow row = ds.getChildRow(0);
+			if (row == null) {
+				return 0;
+			}
 			Object oval = row.getDataValue("bits").getObjectValue();
 			BitSet bs = BitSet.valueOf((byte[])oval);
 			ret = bs.cardinality();
@@ -386,14 +389,15 @@ public class BfPL {
 		}
 	}
 	
-	public void insertSlot(Slot s, IPLContext ipl) throws Exception {
+	public int insertSlot(Slot s, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", s.itemname);
 			byte[] bts = s.getBytes();
 			list.addParameter("bts", bts);
 			int cnt = ipl.executeSql(insertSlot, list);
-			s.setUpdated(); // reset			
+			s.setUpdated(); // reset
+			return cnt;
 		} catch (PLException ex) {
 			throw ex;
 		}
@@ -415,7 +419,7 @@ public class BfPL {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", s.itemname);
 			int cnt = ipl.executeSql(deleteSlot, list);
-			// TODO: was tun, wenn wenn cached? Eigenschaft "removed" beim Slot setzen?
+			// TODO: was tun, wenn cached? Eigenschaft "removed" beim Slot setzen?
 		} catch (PLException ex) {
 			throw ex;
 		}
@@ -480,7 +484,7 @@ public class BfPL {
 	}
 
 	/**
-	 * Die Liste mit den Tokes wird mit den Slots ergänzt;
+	 * Die Liste mit den Tokens wird mit den Slots ergänzt;
 	 * entweder aus dem Cache oder aus der Datenbank frisch eingelesen.
 	 * Achtung! Wird ein Item angegeben, welches nicht existiert, bleibt slot null!
 	 * @param al
