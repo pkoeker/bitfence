@@ -12,12 +12,13 @@ public interface ObjectItemServiceIF {
 	public static int MAX_SESSIONS = 1000;
 	
 	public void createObject(long oid, String content);
-	//public long createObject();
-	//public void deleteObject(long oid);
+	/**
+	 * Erzeugt ein neues Schlüsselwort
+	 * @param name
+	 * @return 1 = OK
+	 */
 	public void createItem(String name);
 	public void deleteItem(String name);
-	/** @deprecated unused */
-	public boolean hasItem(long oid, String itemname);
 	public boolean hasItem(String itemname);
 	public int getItemCount(String itemname);
 	public String[] findItems(String pattern);
