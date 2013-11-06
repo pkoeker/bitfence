@@ -10,7 +10,7 @@ import de.jdataset.JDataValue;
  * Objekte diese Klassen halten den BitZaun für ein Item
  * @author peter
  */
-public class Slot implements Serializable {
+public class Item implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public String itemname;
@@ -20,18 +20,18 @@ public class Slot implements Serializable {
 	private boolean modified;
 
 	// Constructor
-	public Slot(String itemname) {
+	public Item(String itemname) {
 		this.itemname = itemname;
 		this.bitset = new BitSet();
 		this.inserted = true;
 	}
 
-	public Slot(String itemname, byte[] bitFence) {
+	public Item(String itemname, byte[] bitFence) {
 		this.itemname = itemname;
 		this.bitset = BitSet.valueOf(bitFence);
 	}
 
-	public Slot(String itemname, JDataRow row) {
+	public Item(String itemname, JDataRow row) {
 		this.itemname = itemname;
 		JDataValue val = row.getDataValue("bits");
 		Object oval = val.getObjectValue();
@@ -112,8 +112,8 @@ public class Slot implements Serializable {
 	}
 
 	
-	public Slot clone() {
-		Slot clone = new Slot(this.itemname);
+	public Item clone() {
+		Item clone = new Item(this.itemname);
 		clone.inserted = true;
 		synchronized(bitset) {
 			clone.bitset = (BitSet)bitset.clone();

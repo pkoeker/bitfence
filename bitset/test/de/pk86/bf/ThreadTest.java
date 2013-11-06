@@ -1,14 +1,16 @@
 package de.pk86.bf;
 
+import static org.junit.Assert.*;
 import junit.framework.TestCase;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import de.pk86.bf.client.ServiceFactory;
 
 //import de.pkjs.pltest.ConnectionPoolTest;
 
-public class ThreadTest extends TestCase {
+public class ThreadTest /*extends TestCase*/ {
    /**
     * Logger for this class
     */
@@ -23,14 +25,15 @@ public class ThreadTest extends TestCase {
 
    private long startTime;
    private long endTime;
-   private static ObjectItemServiceIF srv;
+   //private static ObjectItemServiceIF srv = ServiceFactory.getSpringService("10.8.0.1");
+   private static ObjectItemServiceIF srv = ServiceFactory.getDirectService();
 
    public ThreadTest() {
    }
-
+   
    public void setUp() throws Exception {
       logger.info("setUp");
-      srv = ServiceFactory.getSpringService("10.8.0.1");
+      //srv = ServiceFactory.getSpringService("10.8.0.1");
    }
 
    public void tearDown() throws Exception {
@@ -47,7 +50,7 @@ public class ThreadTest extends TestCase {
       }
    }
 
-   public void testThread() {
+   @Test public void testThread() {
       int maxThreads = 400;
       int runCounts = 100; 
       //int totalRuns = runCounts * maxThreads;
@@ -107,8 +110,11 @@ public class ThreadTest extends TestCase {
          	// ACHTUNG! Logger ausschalten!
         	 try {
       		ExpressionResult res1 = srv.execute("w | m"); 
+      		srv.endSession(res1.sessionId);
       		ExpressionResult res2 = srv.execute("hans berlin münchen"); 
+      		srv.endSession(res2.sessionId);
       		ExpressionResult res3 = srv.execute("(hans | maria) hamburg köln"); 
+      		srv.endSession(res3.sessionId);
       		boolean b = srv.hasItem("Berlin"); // Postgres ? [7713]; MaxDB: 10272 [11621]
       		//int len = x.length;
       		int xxx = 0;

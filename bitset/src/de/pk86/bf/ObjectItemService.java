@@ -413,8 +413,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		sessions = new Hashtable<Integer, Selection>();
 	}
 	/**
-	 * Startet eine Session und erstellt eine Ergebnismenge aus einem
-	 * Ausdruck.<p> 
+	 * Startet eine Session und erstellt eine Ergebnismenge aus einem Ausdruck.<p> 
 	 * Eigenschaften können selbst auch White Space enthalten; dann sind sie in
 	 * Anführungszeichen "Meine Eigenschaft" einzuschließen.<br> Der Ausdruck darf
 	 * Java-Style-Kommentare enthalten (// oder /*)
@@ -767,7 +766,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		int cnt = 0;
 		long now = System.currentTimeMillis();
 		for (Selection sel:sessions.values()) {
-			long timestamp = sel.getTimestampd().getTime();
+			long timestamp = sel.getTimestamp().getTime();
 			if (now - timestamp > 1000 * 60 * 15) {
 				boolean terminated = this.endSession(sel.getSessionId());
 				if (terminated) {

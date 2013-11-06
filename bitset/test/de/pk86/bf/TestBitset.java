@@ -12,6 +12,7 @@ import de.jdataset.JDataSet;
 
 
 /**
+ * @deprecated
  * @author peter
  */
 public class TestBitset {

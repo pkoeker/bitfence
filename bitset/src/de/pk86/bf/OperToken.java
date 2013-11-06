@@ -1,6 +1,6 @@
 package de.pk86.bf;
 
-import de.pk86.bf.pl.Slot;
+import de.pk86.bf.pl.Item;
 
 public class OperToken {
 	public static enum Brace {OPEN,NONE,CLOSE};
@@ -9,7 +9,7 @@ public class OperToken {
 	public Selection.Oper oper;
 	public Brace brace = Brace.NONE;
 	public int level; // Klammer-level
-	public Slot slot;
+	public Item slot;
 	
 	public OperToken(String token, Selection.Oper oper) {
 		this.token = token;

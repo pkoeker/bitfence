@@ -1,13 +1,13 @@
 package de.pk86.bf;
 
-import java.rmi.RemoteException;
+import static org.junit.Assert.*;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
-public class TestOIS extends TestCase {
+public class TestOIS /*extends TestCase*/ {
 	private ObjectItemService sv = new ObjectItemService();
 	
-	public void testItem1() {
+	@Test public void testItem1() {
 		String itemname = "xxx.zzz";
 		if (sv.hasItem(itemname)) {
 			sv.deleteItem(itemname);
@@ -23,7 +23,7 @@ public class TestOIS extends TestCase {
 	}
 	
 	
-	public void testObjectItem2() {
+	@Test public void testObjectItem2() {
 		sv.createItem("123.xxx");
 		sv.createItem("123.yyy");
 		sv.createItem("123.zzz");

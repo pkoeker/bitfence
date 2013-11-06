@@ -1,18 +1,21 @@
 package de.pk86.bf.bitset;
 
+import static org.junit.Assert.*;
+
 import java.util.BitSet;
 
-import junit.framework.TestCase;
-import de.pk86.bf.pl.BfPL;
-import de.pk86.bf.pl.Slot;
+import org.junit.Test;
 
-public class TestBitSet extends TestCase {
-	public void test1() {
+import de.pk86.bf.pl.BfPL;
+import de.pk86.bf.pl.Item;
+
+public class TestBitSet /*extends TestCase*/ {
+	@Test public void test1() {
 		BfPL pl = BfPL.getInstance();
 		try {
-	      Slot s1 = pl.getSlot("w");
+	      Item s1 = pl.getSlot("w");
 	      long[] l1 = getOids(s1);
-	      Slot s2 = pl.getSlot("berlin");
+	      Item s2 = pl.getSlot("berlin");
 	      long[] l2 = getOids(s2);
 	      BitSet b1 = new BitSet(200000);
 	      BitSet b2 = new BitSet(200000);
@@ -36,7 +39,7 @@ public class TestBitSet extends TestCase {
 	}
 	
 	
-	private long[] getOids(Slot slot) {
+	private long[] getOids(Item slot) {
 		BitSet bs = slot.getBitset();
 		long[] ret = new long[slot.countBits()];
 		int poi = 0; // Pointer zum Array
