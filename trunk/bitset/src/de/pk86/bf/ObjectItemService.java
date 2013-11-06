@@ -427,6 +427,14 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @see #getNext
 	 */
 	public ExpressionResult execute(String expression) throws RemoteException {
+		if (expression.equals("repair()")) {
+			try {
+				pl.repair();
+			} catch (Exception ex) {
+				logger.error(ex.getMessage(), ex);
+			}
+			return null;
+		}
 		expression = expression.toLowerCase();
 		ExpressionResult res = null;
 
