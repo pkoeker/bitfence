@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.jdataset.JDataSet;
 import de.pk86.bf.pl.BfPL;
-import de.pk86.bf.pl.Slot;
+import de.pk86.bf.pl.Item;
 
 /**
  * Hält den Zustand einer Schlagwortselektion
@@ -20,7 +20,7 @@ public class Selection {
 	private Date created = new Date(); // Erzeugt
 	private Date timestamp = new Date(); // Zeitstempel
 	private BfPL pl = BfPL.getInstance();
-	private Slot slot;
+	private Item slot;
 	private int bitCount;
 	private int calls;
 	private long duration;
@@ -41,7 +41,7 @@ public class Selection {
 		return this.sessionId;
 	}
 	
-	Date getTimestampd() {
+	Date getTimestamp() {
 		return this.timestamp;
 	}
 	

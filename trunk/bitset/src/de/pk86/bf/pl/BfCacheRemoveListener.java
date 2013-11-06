@@ -77,7 +77,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           the element which was just put into the cache.
 	 */
 	public void notifyElementPut(final Ehcache cache, final Element element) throws CacheException {
-		Slot s = get(element);
+		Item s = get(element);
 		BitSet bs = s.getBitset();
 	}
 
@@ -98,7 +98,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           the element which was just put into the cache.
 	 */
 	public void notifyElementUpdated(final Ehcache cache, final Element element) throws CacheException {
-		Slot s = get(element);
+		Item s = get(element);
 		BitSet bs = s.getBitset();
 	}
 
@@ -188,7 +188,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
    }
 	
 	private void updateSlot(net.sf.ehcache.Element cele) {
-		Slot s = this.get(cele);
+		Item s = this.get(cele);
 		if (s.isModified()) {
 			try {
 	         BfPL.getInstance().insertOrUpdateSlot(s);
@@ -199,10 +199,10 @@ public class BfCacheRemoveListener implements CacheEventListener {
 		}
 	}
 
-	private Slot get(net.sf.ehcache.Element cele) {
+	private Item get(net.sf.ehcache.Element cele) {
 		if (cele != null) {
 			Object val = cele.getObjectValue();
-			Slot s = (Slot) val;
+			Item s = (Item) val;
 			return s;
 		} else {
 			return null;

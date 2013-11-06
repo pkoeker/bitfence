@@ -7,7 +7,7 @@ import junit.framework.TestCase;
 public class TestCompress extends TestCase {
 	public void test1() {
 		BfPL pl = BfPL.getInstance();
-      Slot slots;
+      Item slots;
       try {
 	      slots = pl.getSlot("w");	      
 	      perfSlots(slots);
@@ -31,7 +31,7 @@ public class TestCompress extends TestCase {
       }
 	}
 	
-	private void perfSlots(Slot slots) {
+	private void perfSlots(Item slots) {
 		try {
 	      BitSet bs = slots.getBitset();
 	      int cnt1 = bs.cardinality();

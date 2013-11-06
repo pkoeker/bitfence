@@ -1,12 +1,15 @@
 package de.pk86.bf;
 
+import static org.junit.Assert.*;
+
 import java.rmi.RemoteException;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+
 import de.guibuilder.framework.GuiUtil;
 
-public class TestExecute extends TestCase {
-	public void test1() {
+public class TestExecute /*extends TestCase*/ {
+	@Test public void test1() {
 		ObjectItemService srv = new ObjectItemService();
 		//long[] x = srv.execute("\"§ 100 a II. WoBauG\" | \"§ 1021 BGB\"");
 		//boolean b = srv.hasItem("AGBG");

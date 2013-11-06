@@ -97,7 +97,7 @@ public class BfPL {
 		return cacheManager;
 	}
 	
-	private SlotCache sc;
+	private ItemCache sc;
 
 	// Objects ###################################
 	public int importObjects(JDataSet ds) throws Exception {
@@ -125,7 +125,7 @@ public class BfPL {
 				JDataRow row = itc.next();
 				String content = row.getValue("content");
 				long oid = row.getValueLong("oid");
-				this.addObjectItems(oid, content, ipl);
+				this.createObjectItems(oid, content, ipl);
 			}		
 			// 4. Cache durchschreiben
 			this.writeAll(ipl);
@@ -149,10 +149,7 @@ public class BfPL {
 				ipl.rollbackTransaction("createObject");
 				throw new IllegalArgumentException("PL#createObject: INSERT Failed");
 			} else {
-				ArrayList<String> items = getObjectItems(content);
-				for(String itemname:items) {
-					this.setBit(oid, itemname, ipl);
-				}
+				this.createObjectItems(oid, content, ipl);
 				ipl.commitTransaction("createObject");
 			}
 		} catch (PLException ex) {
@@ -163,7 +160,7 @@ public class BfPL {
 		}
 	}
 	// ObjectItems ##########################################
-	public void addObjectItems(long oid, String content, IPLContext ipl) throws Exception {
+	private void createObjectItems(long oid, String content, IPLContext ipl) throws Exception {
 		ArrayList<String> al = getObjectItems(content);
 		for (String itemname:al) {
 			setBit(oid, itemname, ipl);
@@ -236,7 +233,7 @@ public class BfPL {
 		IPLContext ipl = null;
 		String transname ="createItem";
 		try {
-			Slot s = new Slot(name);
+			Item s = new Item(name);
 			ipl = pl.startNewTransaction(transname);			
 			this.insertSlot(s, ipl);
 			ipl.commitTransaction(transname);
@@ -332,8 +329,8 @@ public class BfPL {
 		return ret;
 	}
 	// Slots ###########################################
-	public Slot selectSlot(String itemname, IPLContext ipl) throws Exception {
-		Slot ret = null;
+	private Item selectSlot(String itemname, IPLContext ipl) throws Exception {
+		Item ret = null;
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", itemname);
@@ -342,15 +339,16 @@ public class BfPL {
 				return null;
 			}
 			JDataRow row = ds.getChildRow(0);
-			ret = new Slot(itemname, row);
+			ret = new Item(itemname, row);
 		} catch (PLException ex) {
 			System.out.println("SQL-Exception in PL#selectSlot: " +ex.getMessage());
+			throw ex;
 		}
 
 		return ret;
 	}
-	public Slot getSlot(String itemname) throws Exception {
-		Slot ret = new Slot(itemname);
+	public Item getSlot(String itemname) throws Exception {
+		Item ret = new Item(itemname);
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", itemname);
@@ -360,7 +358,7 @@ public class BfPL {
 				JDataRow row = it.next();
 				JDataValue val = row.getDataValue("bits");
 				Object oval = val.getObjectValue();
-				ret = new Slot(itemname, (byte[])oval);
+				ret = new Item(itemname, (byte[])oval);
 			}
 		} catch (PLException ex) {
 			System.out.println("SQL-Exception in PL#selectSlot: " +ex.getMessage());
@@ -368,7 +366,7 @@ public class BfPL {
 		}
 		return ret;
 	}
-	void insertOrUpdateSlot(Slot s) throws Exception {
+	void insertOrUpdateSlot(Item s) throws Exception {
 		String transname = "insertUpdateSlot";
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
@@ -381,7 +379,7 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	void insertOrUpdateSlot(Slot s, IPLContext ipl) throws Exception {
+	void insertOrUpdateSlot(Item s, IPLContext ipl) throws Exception {
 		if (s.isInserted()) {
 			this.insertSlot(s, ipl);
 		} else if (s.isModified()) {
@@ -389,7 +387,7 @@ public class BfPL {
 		}
 	}
 	
-	public int insertSlot(Slot s, IPLContext ipl) throws Exception {
+	public int insertSlot(Item s, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", s.itemname);
@@ -402,7 +400,7 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	public void updateSlot(Slot s, IPLContext ipl) throws Exception {
+	public void updateSlot(Item s, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
 			byte[] bts = s.getBytes();
@@ -414,7 +412,7 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	public void removeSlot(Slot s, IPLContext ipl) throws Exception {
+	public void removeSlot(Item s, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", s.itemname);
@@ -497,7 +495,7 @@ public class BfPL {
 		for(OperToken ot:al) {
 			boolean cached = false;		
 			if (sc != null) {
-				Slot cs = sc.get(ot.token);
+				Item cs = sc.get(ot.token);
 				if (cs != null) {
 					ot.slot = cs;
 					cached = true;
@@ -524,7 +522,7 @@ public class BfPL {
 			      	JDataRow row = it.next();
 			      	String itemname = row.getValue("itemname");
 			      	if (itemname.equals(ot.token)) {
-			      		Slot slot = new Slot(itemname, row);
+			      		Item slot = new Item(itemname, row);
 			      		ot.slot = slot;
 			      		if (sc != null) {
 			      			sc.put(slot);
@@ -674,7 +672,7 @@ public class BfPL {
 			// Caches
 			Element scEle = optEle.getElement("SlotCache");
 			if (scEle != null) {
-				sc = new SlotCache(scEle);
+				sc = new ItemCache(scEle);
 			}
 			Element ocEle = optEle.getElement("ObjektCache");
 			// TODO: ObjektCache
@@ -738,10 +736,8 @@ public class BfPL {
 		resultSetPage = p;
 	}
 	
-	
-	// Methods
-	private Slot findSlot(String itemname, boolean force, IPLContext ipl) throws Exception {
-		Slot s = null;
+	private Item findSlot(String itemname, boolean force, IPLContext ipl) throws Exception {
+		Item s = null;
 		s = sc.get(itemname); // Cache
 		if (s != null) 
 			return s;
@@ -749,29 +745,27 @@ public class BfPL {
 		if (missing % 100 == 0) {
 			System.out.println("findSlot/Missing: " + missing + " " + itemname);
 		}
-		//s = hash.get(itemname); // HashMap
-		s = me.selectSlot(itemname,  ipl); // DB
+		s = this.selectSlot(itemname,  ipl); // DB
 		if (force == true && s == null) {
-			s = new Slot(itemname);
-			//hash.put(itemname, s);			
+			s = new Item(itemname);
 		}
 		if (s != null) {
 			sc.put(s);
 		}
 		return s;		
 	}
-	private void writeSlot(Slot s, IPLContext ipl) throws Exception {
+	private void writeSlot(Item s, IPLContext ipl) throws Exception {
 		if (sc != null) {
 			return;
 		}
 		if (s.isInserted() == true) {
-			me.insertSlot(s, ipl);
+			this.insertSlot(s, ipl);
 		} else {
-			me.updateSlot(s, ipl);
+			this.updateSlot(s, ipl);
 		}
 	}
-	void setBit(long l, String itemname, IPLContext ipl) throws Exception {
-		Slot s = findSlot(itemname, true, ipl);
+	private void setBit(long l, String itemname, IPLContext ipl) throws Exception {
+		Item s = findSlot(itemname, true, ipl);
 		s.setBit(l);
 		if (sc == null) {
 			writeSlot(s, ipl);
@@ -779,21 +773,21 @@ public class BfPL {
 			// Cached
 		}
 	}
-	boolean testBit(long l, String itemname, IPLContext ipl) throws Exception {
-		Slot s = findSlot(itemname, false, ipl);
+	private boolean testBit(long l, String itemname, IPLContext ipl) throws Exception {
+		Item s = findSlot(itemname, false, ipl);
 		if (s == null) {
 			return false;		
 		} else {
 			return s.testBit(l);
 		}
 	}
-	void removeBit(long l, String itemname, IPLContext ipl) throws Exception {
-		Slot s = findSlot(itemname, false, ipl);
+	private void removeBit(long l, String itemname, IPLContext ipl) throws Exception {
+		Item s = findSlot(itemname, false, ipl);
 		if (s == null) {
 			return;		
 		} else {
 			s.removeBit(l);
-			me.updateSlot(s, ipl);
+			this.updateSlot(s, ipl);
 		}		
 	}
 	
@@ -804,8 +798,8 @@ public class BfPL {
 			ipl = pl.startNewTransaction("writeAll");
 			transStarted = true;
 		}
-	   List<Slot> list = sc.getAll();
-	   for (Slot slot:list) {
+	   List<Item> list = sc.getAll();
+	   for (Item slot:list) {
 	   	this.insertOrUpdateSlot(slot, ipl);
 	   }
 	   if (transStarted) {

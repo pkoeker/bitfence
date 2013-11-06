@@ -6,6 +6,7 @@ import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 
 /**
+ * @deprecated unused
  * Domain-Object für Content 
  * @author peter
  */

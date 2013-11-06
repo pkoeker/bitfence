@@ -9,8 +9,8 @@ import net.sf.ehcache.config.CacheConfiguration;
 import de.pkjs.util.Convert;
 import electric.xml.Element;
 
-class SlotCache {
-	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SlotCache.class);
+class ItemCache {
+	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ItemCache.class);
 
 	private String cacheName = "SlotCache";
 	private boolean enabled;
@@ -27,7 +27,7 @@ class SlotCache {
 		return cache.getMemoryStoreSize() == 0;
 	}
 
-   SlotCache(Element ele) {
+   ItemCache(Element ele) {
 		if (ele != null) {
 			String sEnabled = ele.getAttribute("enabled");
 			enabled = Convert.toBoolean(sEnabled);
@@ -88,26 +88,26 @@ class SlotCache {
 		}
 	}
 
-	void put(Slot s) {
+	void put(Item s) {
 		if (s == null || s.itemname == null)
 			return;
 		net.sf.ehcache.Element cele = new net.sf.ehcache.Element(s.itemname, s);
 		cache.put(cele);
 	}
 
-	Slot get(String key) {
+	Item get(String key) {
 		if (isEmpty())
 			return null;
 		net.sf.ehcache.Element cele = cache.get(key);
 		return this.get(cele);
 	}
 
-	private Slot get(net.sf.ehcache.Element cele) {
+	private Item get(net.sf.ehcache.Element cele) {
 		if (isEmpty())
 			return null;
 		if (cele != null) {
 			Object val = cele.getValue();
-			Slot s = (Slot) val;
+			Item s = (Item) val;
 			return s;
 		} else {
 			return null;
@@ -120,12 +120,12 @@ class SlotCache {
 		cache.removeAll();
 	}
 
-	List<Slot> getAll() {
+	List<Item> getAll() {
 		List<String> keys = cache.getKeys();
 		Map<Object, net.sf.ehcache.Element> map = cache.getAll(keys);
-		List<Slot> list = new ArrayList<Slot>();
+		List<Item> list = new ArrayList<Item>();
 		for (net.sf.ehcache.Element ele : map.values()) {
-			list.add((Slot) ele.getValue());
+			list.add((Item) ele.getValue());
 		}
 
 		return list;
