@@ -1,7 +1,5 @@
 package de.pk86.bf.client;
 
-import java.util.Enumeration;
-
 import javax.servlet.http.HttpServletRequest;
 
 import de.jdataset.JDataRow;
