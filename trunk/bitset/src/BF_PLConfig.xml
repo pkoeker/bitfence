@@ -3,10 +3,10 @@
 	<Database name='bitfence' enabled='true'>
     <!-- POSTGRES -->
     <JDBC-Driver>org.postgresql.Driver</JDBC-Driver>
-    <URL>jdbc:postgresql://localhost/bitset?prepareThreshold=3</URL>
+    <URL>jdbc:postgresql://localhost/bitsettest?prepareThreshold=3</URL>
 	<Schema>public</Schema>
-    <Username>peter</Username>
-    <Password>peter</Password>
+    <Username>bitset</Username>
+    <Password>bitset</Password>
     <!-- MAXDB -->
 	<!--JDBC-Driver>com.sap.dbtech.jdbc.DriverSapDB</JDBC-Driver>
     <URL>jdbc:sapdb://localhost/MAXDB?cache=all</URL-->
