@@ -1,11 +1,13 @@
 package de.pk86.bf.pl;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import de.pk86.bf.client.ObjectItemGui;
+import org.junit.Test;
 
 public class TestPL /*extends TestCase*/ {
+	private BfPL pl = AllTest2.getPL();
 	
 //	public static void main(String[] args) {
 //		TestPL me = new TestPL();
@@ -20,33 +22,37 @@ public class TestPL /*extends TestCase*/ {
 //   	}
 //	}
 	
-	@Test public void test0() {
-		BfPL pl = BfPL.getInstance();
-		assertNotNull(pl);
-	}
-	@Test public void test1() {
-//		BfPL pl = BfPL.getInstance();
-//		long oid = pl.getMaxOid();
-//		assertNotNull(oid);
-	}
-	@Test public void testItem1() {
-		BfPL pl = BfPL.getInstance();
+	/**
+	 * Item Anlegen, Item löschen
+	 */
+	@Test public void testItemCreateDelete() {
 		try {
 			String itemName = "xxx.xxx";
+			// Löschen, falls vorhanden
 	      boolean yes = pl.hasItem(itemName);
 	      if (yes) {
 	      	int cntdel = pl.deleteItem(itemName); 
-	      	assertNotNull(cntdel);
+	      	assertEquals(1,cntdel);
 	      }
-	      pl.createItem(itemName);
+	      // fehlt jetzt
 	      boolean b = pl.hasItem(itemName);
+	      assertEquals(false, b);
+	      // create
+	      pl.createItem(itemName);
+	      // ist jetzt vorhanden
+	      b = pl.hasItem(itemName);
 	      assertEquals(true, b);
+	      //
 	      String[] its = pl.findItems("xxx.xxx");
 	      assertEquals(1, its.length);
+	      // löschen
       	int cntdel = pl.deleteItem(itemName);
-      	assertNotNull(cntdel);
+      	assertEquals(1,cntdel);
       	int anzi = pl.getItemCount("xxx.xxx");
+      	// ist jetzt wieder weg
       	assertEquals(0, anzi);
+	      b = pl.hasItem(itemName);
+	      assertEquals(false, b);
       } catch (Exception e) {      	
       	e.printStackTrace();
       	fail(e.getMessage());
@@ -76,7 +82,6 @@ public class TestPL /*extends TestCase*/ {
 	}
 	
 	@Test public void testValid() {
-//		BfPL pl = BfPL.getInstance();
 //		try {
 //			pl.validate();
 //	   } catch (Exception e) {      	

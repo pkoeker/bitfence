@@ -7,24 +7,24 @@ import junit.framework.TestCase;
 public class TestCompress extends TestCase {
 	public void test1() {
 		BfPL pl = BfPL.getInstance();
-      Item slots;
+      Item items;
       try {
-	      slots = pl.getSlot("w");	      
-	      perfSlots(slots);
-	      slots = pl.getSlot("m");
-	      perfSlots(slots);
-	      slots = pl.getSlot("berlin");
-	      perfSlots(slots);
-	      slots = pl.getSlot("münchen");
-	      perfSlots(slots);
-	      slots = pl.getSlot("braunschweig");
-	      perfSlots(slots);
-	      slots = pl.getSlot("01");
-	      perfSlots(slots);
-	      slots = pl.getSlot("01.01.1900");
-	      perfSlots(slots);
-	      slots = pl.getSlot("10999");
-	      perfSlots(slots);
+	      items = pl.loadItem("w");	      
+	      perfSlots(items);
+	      items = pl.loadItem("m");
+	      perfSlots(items);
+	      items = pl.loadItem("berlin");
+	      perfSlots(items);
+	      items = pl.loadItem("münchen");
+	      perfSlots(items);
+	      items = pl.loadItem("braunschweig");
+	      perfSlots(items);
+	      items = pl.loadItem("01");
+	      perfSlots(items);
+	      items = pl.loadItem("01.01.1900");
+	      perfSlots(items);
+	      items = pl.loadItem("10999");
+	      perfSlots(items);
       } catch (Exception e) {
 	      // TODO Auto-generated catch block
 	      e.printStackTrace();

@@ -10,6 +10,7 @@ import de.pk86.bf.TestOIS;
 @RunWith(Suite.class)
 @SuiteClasses({
 	TestImport.class,
+	TestObjekt.class,
 	TestPL.class,
 	TestOIS.class
 

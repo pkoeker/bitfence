@@ -13,9 +13,9 @@ public class TestBitSet /*extends TestCase*/ {
 	@Test public void test1() {
 		BfPL pl = BfPL.getInstance();
 		try {
-	      Item s1 = pl.getSlot("w");
+	      Item s1 = pl.loadItem("w");
 	      long[] l1 = getOids(s1);
-	      Item s2 = pl.getSlot("berlin");
+	      Item s2 = pl.loadItem("berlin");
 	      long[] l2 = getOids(s2);
 	      BitSet b1 = new BitSet(200000);
 	      BitSet b2 = new BitSet(200000);

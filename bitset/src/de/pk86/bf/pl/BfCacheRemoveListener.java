@@ -59,7 +59,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 		if (removed % 100 == 0) {
 			System.out.println("removed: " + removed);
 		}
-		this.updateSlot(element);
+		this.updateItem(element);
 	}
 
 	/**
@@ -139,7 +139,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 		if (expired % 100 == 0) {
 			System.out.println("expired: " + expired);
 		}
-		this.updateSlot(element);
+		this.updateItem(element);
 	}
 
 	/**
@@ -173,7 +173,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 		if (evicted % 100 == 0) {
 			System.out.println("evicted: " + evicted);
 		}
-		this.updateSlot(element);
+		this.updateItem(element);
    }
 
 	@Override
@@ -187,11 +187,11 @@ public class BfCacheRemoveListener implements CacheEventListener {
       }
    }
 	
-	private void updateSlot(net.sf.ehcache.Element cele) {
+	private void updateItem(net.sf.ehcache.Element cele) {
 		Item s = this.get(cele);
 		if (s.isModified()) {
 			try {
-	         BfPL.getInstance().insertOrUpdateSlot(s);
+	         BfPL.getInstance().insertOrUpdateItem(s);
          } catch (Exception e) {
 	         e.printStackTrace();
 	         logger.error(e.getMessage(), e);
