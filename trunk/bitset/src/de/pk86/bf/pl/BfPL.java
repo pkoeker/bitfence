@@ -479,9 +479,9 @@ public class BfPL {
 	 * @throws Exception
 	 */
 	public void repair() throws Exception {
-		// 1. Alle Itemss wegwerfen
-//		int cnt = pl.executeSql("DELETE FROM ITEM");
-//		System.out.println("Items delete: " + cnt);
+		// 1. Alle Items wegwerfen
+		int cnt = pl.executeSql("DELETE FROM ITEM");
+		System.out.println("Items delete: " + cnt);
 		// Items aus ObjectItems neu aufbauen
 		int STEP = 100000;
 		int start = 0;
@@ -633,7 +633,7 @@ public class BfPL {
 		return ds;
 	}
 	/**
-	 * Schreib veränderte (gelöscht, eingefügt, geänderter Content) Objekte in die Datenbasis zurück.
+	 * Schreibt veränderte (gelöscht, eingefügt, geänderter Content) Objekte in die Datenbasis zurück.
 	 * Der Bitzaun wird dabei aktualisiert.
 	 * @param ds Ein Dataset mit dem Namen "Objekt"
 	 * @return

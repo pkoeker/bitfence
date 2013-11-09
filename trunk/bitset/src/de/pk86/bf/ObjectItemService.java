@@ -139,8 +139,8 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * Für neue Sessions
 	 * @return
 	 */
-	public int getNewSessionId() {
-		return sessionCounter++;
+	public synchronized int getNewSessionId() {
+		return sessionCounter++;	      
 	}
 	public int countActiveSessions() {
 		return sessions.size();
@@ -329,6 +329,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		ret.duraAlg = end1-start;
 		ret.duraDB2 = end2-end1;
 		ret.trace = sel.getTrace();
+		boolean b = this.endSession(sessionId);
 		return ret;
 	}
 	/**
@@ -539,7 +540,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				res.missingItems = sb.toString();
 			}
 			res.duraDB1 = end1 - startTime;
-			logger.info(expression);
+			//##logger.info(expression);
 			
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
