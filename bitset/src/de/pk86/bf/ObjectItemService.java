@@ -137,6 +137,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	}
 	/** 
 	 * Für neue Sessions
+	 * Muß synchronized sein, damit keine doppelten SessionsIds erzeugt werden.
 	 * @return
 	 */
 	public synchronized int getNewSessionId() {
