@@ -35,7 +35,7 @@
     <DecimalFormat value='#0.00'/>
   </Format>
   <Options>
-    	<Debug value='true'/>
+    	<Debug value='false'/>
 		<!-- MaxOid value="212992"/-->
 		<MaxResultSet value="60000"/>
 		<ResultSetPage value="20"/>

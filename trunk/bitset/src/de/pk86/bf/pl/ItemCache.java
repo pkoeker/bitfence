@@ -12,7 +12,7 @@ import electric.xml.Element;
 class ItemCache {
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ItemCache.class);
 
-	private String cacheName = "SlotCache";
+	private String cacheName = "ItemCache";
 	private boolean enabled;
 
 	boolean isEnabled() {
@@ -106,7 +106,7 @@ class ItemCache {
 		if (isEmpty())
 			return null;
 		if (cele != null) {
-			Object val = cele.getValue();
+			Object val = cele.getObjectValue();
 			Item s = (Item) val;
 			return s;
 		} else {
@@ -125,7 +125,7 @@ class ItemCache {
 		Map<Object, net.sf.ehcache.Element> map = cache.getAll(keys);
 		List<Item> list = new ArrayList<Item>();
 		for (net.sf.ehcache.Element ele : map.values()) {
-			list.add((Item) ele.getValue());
+			list.add((Item) ele.getObjectValue());
 		}
 
 		return list;

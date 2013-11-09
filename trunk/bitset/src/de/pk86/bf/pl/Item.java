@@ -36,7 +36,7 @@ public class Item implements Serializable {
 		JDataValue val = row.getDataValue("bits");
 		Object oval = val.getObjectValue();
 		if (oval == null) {
-			throw new IllegalArgumentException("Slot bitfence null");
+			throw new IllegalArgumentException("Item BitSet null");
 		}
 		this.bitset = BitSet.valueOf((byte[]) oval);
 	}
@@ -94,12 +94,6 @@ public class Item implements Serializable {
 		return b;
 	}
 
-	/**
-	 * Wenn das letzte Bit gelöscht wird, dann auch den Slot löschen
-	 * 
-	 * @param l
-	 * @return boolean Wenn true, dann wurde das Bit wirklich gelöscht
-	 */
 	void removeBit(long l) {
 		synchronized(bitset) {
 			bitset.set((int)l, false);

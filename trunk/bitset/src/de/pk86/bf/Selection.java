@@ -20,7 +20,7 @@ public class Selection {
 	private Date created = new Date(); // Erzeugt
 	private Date timestamp = new Date(); // Zeitstempel
 	private BfPL pl = BfPL.getInstance();
-	private Item slot;
+	private Item item;
 	private int bitCount;
 	private int calls;
 	private long duration;
@@ -71,12 +71,12 @@ public class Selection {
 			}
 		} 
 		
-		this.slot = al.get(0).slot;
+		this.item = al.get(0).item;
 		int ret;
-		if (slot == null) {
+		if (item == null) {
 			ret = 0;
 		} else {
-			BitSet bs = slot.getBitset();
+			BitSet bs = item.getBitset();
 			ret = bs.cardinality();
 			this.bitCount = ret;
 		}
@@ -103,24 +103,24 @@ public class Selection {
 			return;
 		}
 		OperToken ot1 = al.get(startIndex);
-		addTraceElement(ot1.token, ot1.slot.getBitset().cardinality());
-		ot1.slot = ot1.slot.clone(); // HACK
+		addTraceElement(ot1.token, ot1.item.getBitset().cardinality());
+		ot1.item = ot1.item.clone(); // HACK
 		StringBuilder sbe = new StringBuilder();
 		for (int i = startIndex+1; i < startIndex + cnt; i++) {
 			OperToken ot2 = al.get(i);
 			//System.out.println(ot1+ "--" + ot2);
-			if (ot2.slot == null) {
+			if (ot2.item == null) {
 				logger.warn("Missing Slot: " + ot2.token);
 				missingItems += ot2.token + " ";
 			} else {
-				int bitCount = ot2.slot.getBitset().cardinality();
-				BitSet erg = performOper(ot1.slot.getBitset(), ot2.slot.getBitset(), ot2.oper);
+				int bitCount = ot2.item.getBitset().cardinality();
+				BitSet erg = performOper(ot1.item.getBitset(), ot2.item.getBitset(), ot2.oper);
 				sbe.append(ot2.oper);
 				sbe.append(" " + ot2.token);
 				ot1.token = "[" + getTraceSize() + "]";
-				ot1.slot.setBitset(erg); // TODO: gefährlich! Wenn der Cache diese Daten zurückschreibt! 
+				ot1.item.setBitset(erg); // TODO: gefährlich! Wenn der Cache diese Daten zurückschreibt! 
 				//sbe.append(" ");
-				addTraceElement(sbe.toString()+"{"+bitCount+"}", ot1.slot.getBitset().cardinality());
+				addTraceElement(sbe.toString()+"{"+bitCount+"}", ot1.item.getBitset().cardinality());
 				sbe = new StringBuilder();
 			}
 		}
@@ -140,22 +140,22 @@ public class Selection {
 	 * @throws Exception
 	 */
 	int performOper(OperToken ot) {
-		if (ot.slot == null) {
+		if (ot.item == null) {
 			logger.warn("Missing Slot: " + ot.token);
 			missingItems += ot.token + " ";
 			return 0;
 		}
 		items.add(ot.token);
 		if (ot.oper == Oper.NONE || calls == 0) { // Der Erste
-			this.slot = ot.slot.clone(); // Clone ist hier wichtig, sonst wird Cache vermüllt!
+			this.item = ot.item.clone(); // Clone ist hier wichtig, sonst wird Cache vermüllt!
 		} else {
-				BitSet b1 = this.slot.getBitset();
-				BitSet b2 = ot.slot.getBitset();
-				this.slot.setBitset(performOper(b1, b2, ot.oper));
+				BitSet b1 = this.item.getBitset();
+				BitSet b2 = ot.item.getBitset();
+				this.item.setBitset(performOper(b1, b2, ot.oper));
 		} 
 		this.calls++;
 		// Count bits
-		int ret = slot.countBits();
+		int ret = item.countBits();
 		this.bitCount = ret;
 		timestamp = new Date(); // Zeitstempel
 		return ret;	
@@ -217,10 +217,10 @@ public class Selection {
 			poi = cnt - 1;
 			index = indexTop;
 		}
-		if (slot == null) {
+		if (item == null) {
 			return null;
 		}
-		BitSet bs = slot.getBitset();
+		BitSet bs = item.getBitset();
 		for (int i = 0; i < cnt; i++) {
 			if (forward) {			
 				index++;
@@ -332,7 +332,7 @@ public class Selection {
 		this.bitCount = 0;
 		this.posi = 0;
 		this.duration = 0;
-		this.slot = null;
+		this.item = null;
 		this.items = new ArrayList<String>();
 		this.missingItems = "";
 	}

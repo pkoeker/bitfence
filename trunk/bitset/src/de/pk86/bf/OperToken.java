@@ -9,7 +9,7 @@ public class OperToken {
 	public Selection.Oper oper;
 	public Brace brace = Brace.NONE;
 	public int level; // Klammer-level
-	public Item slot;
+	public Item item;
 	
 	public OperToken(String token, Selection.Oper oper) {
 		this.token = token;

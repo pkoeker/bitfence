@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import de.jdataset.JDataColumn;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
-import de.jdataset.JDataValue;
 import de.jdataset.ParameterList;
 import de.pk86.bf.ObjectItemServiceIF;
 import de.pk86.bf.OperToken;
@@ -39,26 +37,24 @@ public class BfPL {
 	// Statements
 	// Object
 	private String insertObject = "INSERT INTO OBJEKT Values(?,?)";
+	private String findObject = "SELECT Content FROM Objekt WHERE oid = ?";
 	private String deleteObject = "DELETE FROM OBJEKT WHERE oid = ?";
 	//private String getMaxOid = "SELECT MAX(oid)+1 FROM OBJEKT";	
 	// Item
 	private String findItems = "SELECT Itemname FROM ITEM WHERE Itemname LIKE ? ORDER BY Itemname";
-	private String selectItem = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
-	private String selectItemBits = "SELECT Itemname,bits FROM ITEM WHERE Itemname = ?";
-	// Slot
-	private String selectSlot = "SELECT Bits FROM ITEM WHERE Itemname = ?";
-	private String getAllSlots = "SELECT Bits FROM ITEM WHERE Itemname = ?";
-	private String insertSlot = "INSERT INTO ITEM Values(?, ?)";
-	private String updateSlot = "UPDATE ITEM SET Bits = ? WHERE Itemname = ?";
-	private String deleteSlot = "Delete FROM ITEM WHERE Itemname = ?";
-	//private String deleteSlots = "Delete FROM ITEM WHERE Itemname = ?";
-	private String deleteSlotsLike = "Delete FROM ITEM WHERE Itemname LIKE ?";
+	private String findItemname = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
+
+	private String loadItem = "SELECT Itemname, Bits FROM ITEM WHERE Itemname = ?";
+	private String insertItem = "INSERT INTO ITEM Values(?, ?)";
+	private String updateItem = "UPDATE ITEM SET Bits = ? WHERE Itemname = ?";
+	private String deleteItem = "Delete FROM ITEM WHERE Itemname = ?";
+	private String deleteItemsLike = "Delete FROM ITEM WHERE Itemname LIKE ?";
 	
 	private Element webServiceConfig;
 	private Element spiderConfig;
 	
 	private PL pl;
-	private int missing;
+	private int missing; // #cache missings
 	
 	// Private Constructor
 	private BfPL(String configFilename) {
@@ -97,7 +93,7 @@ public class BfPL {
 		return cacheManager;
 	}
 	
-	private ItemCache sc;
+	private ItemCache iCache;
 
 	// Objects ###################################
 	public int importObjects(JDataSet ds) throws Exception {
@@ -119,7 +115,7 @@ public class BfPL {
 			ds.commitChanges();
 			// 3. Items
 			// 3.1 Cache vorher löschen
-			sc.removeAll();
+			iCache.removeAll();
 			Iterator<JDataRow> itc = ds.getChildRows();
 			while(itc.hasNext()) {
 				JDataRow row = itc.next();
@@ -136,7 +132,11 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	
+	public long createObject(String content) throws Exception {
+		long oid = pl.getOID();
+		this.createObject(oid, content);
+		return oid;
+	}	
 	public void createObject(long oid, String content) throws Exception {
 		IPLContext ipl = null;
 		try {
@@ -159,6 +159,40 @@ public class BfPL {
 			throw ex;
 		}
 	}
+	
+	public boolean deleteObject(long oid) throws Exception {
+		IPLContext ipl = null;
+		String transName = "deleteObjekt";
+		try {
+			ipl = pl.startNewTransaction(transName);
+			ParameterList list = new ParameterList();			
+			list.addParameter("oid", oid);
+			JDataSet ds = pl.getDatasetSql("Content", findObject, list);
+			if (ds.getRowCount() != 1) {
+				ipl.rollbackTransaction(transName);
+				return false;
+			}
+			int cnt = pl.executeSql(deleteObject, list);
+			if (cnt != 1) {
+				ipl.rollbackTransaction(transName);
+				return false;
+			}
+			// Items
+			String content = ds.getRow().getValue("content");
+			ArrayList<String> al = getObjectItems(content);
+			for (String itemname:al) {
+				removeBit(oid, itemname, ipl);
+			}			
+			ipl.commitTransaction(transName);
+			return true;
+		} catch (PLException ex) {
+			if (ipl != null) {
+				ipl.rollbackTransaction(transName);
+			}
+			throw ex;
+		}
+	}
+	
 	// ObjectItems ##########################################
 	private void createObjectItems(long oid, String content, IPLContext ipl) throws Exception {
 		ArrayList<String> al = getObjectItems(content);
@@ -235,7 +269,7 @@ public class BfPL {
 		try {
 			Item s = new Item(name);
 			ipl = pl.startNewTransaction(transname);			
-			this.insertSlot(s, ipl);
+			this.insertItem(s, ipl);
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
 			if (ipl != null) {
@@ -254,9 +288,9 @@ public class BfPL {
 			ipl = pl.startNewTransaction(transname);
 			int cnt2;
 			if (name.indexOf("%") != -1) {
-				cnt2 = ipl.executeSql(deleteSlotsLike, list);
+				cnt2 = ipl.executeSql(deleteItemsLike, list);
 			} else {
-				cnt2 = ipl.executeSql(deleteSlot, list);
+				cnt2 = ipl.executeSql(deleteItem, list);
 			}
 
 			ipl.commitTransaction(transname);	
@@ -297,8 +331,8 @@ public class BfPL {
 		boolean ret = false;
 		try {
 			ParameterList list = new ParameterList();
-			list.addParameter("itmname", itemname);
-			JDataSet ds = pl.getDatasetSql("hasItem", selectItem, list);
+			list.addParameter("itemname", itemname);
+			JDataSet ds = pl.getDatasetSql("hasItem", findItemname, list);
 			if (ds.getRowCount() == 1) 
 				return true;
 		} catch (PLException ex) {
@@ -310,67 +344,94 @@ public class BfPL {
 			boolean b = testBit(oid, itemname, pl);
 			return b;
 	}
+	/**
+	 * Liefert die Anzahl der Objekte, die mit diesem Item verknüpft sind.
+	 * Wenn das Item nicht existiert, wird 0 geliefert.
+	 * @see #hasItem(String)
+	 * @param itemname
+	 * @return
+	 * @throws Exception
+	 */
 	public int getItemCount(String itemname) throws Exception {
-		int ret = -1;
 		try {
-			ParameterList list = new ParameterList();
-			list.addParameter("itemname", itemname);
-			JDataSet ds = pl.getDatasetSql("countItemBits", selectItemBits, list);
-			JDataRow row = ds.getChildRow(0);
-			if (row == null) {
+			Item item = this.loadItem(itemname);
+			if (item == null) {
 				return 0;
+			} else {
+				int ret = item.countBits();
+				return ret;
 			}
-			Object oval = row.getDataValue("bits").getObjectValue();
-			BitSet bs = BitSet.valueOf((byte[])oval);
-			ret = bs.cardinality();
 		} catch (PLException ex) {
 			throw ex;
 		}
-		return ret;
 	}
-	// Slots ###########################################
-	private Item selectSlot(String itemname, IPLContext ipl) throws Exception {
-		Item ret = null;
+
+	public Item loadItem(String itemname) throws Exception {
+		IPLContext ipl = pl.startNewTransaction("loadItem");
+		try {
+			Item ret = this.loadItem(itemname, false, ipl);
+			ipl.commitTransaction("loadItem");
+			return ret;
+		} catch (PLException ex) {
+			logger.error(ex.getMessage(), ex);
+			System.out.println("SQL-Exception in PL#loadItem: " +ex.getMessage());
+			if (ipl != null) {
+				try {
+					ipl.rollbackTransaction("loadItem");
+				} catch (PLException pex) {
+					logger.warn("Unable to rollback Transaction: loadItem", pex);
+				}
+			}
+			throw ex;
+		}
+	}
+	
+	private Item loadItem(String itemname, IPLContext ipl) throws Exception {
+		Item item = null;
+		item = iCache.get(itemname); // Cache
+		if (item != null) 
+			return item;
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", itemname);
-			JDataSet ds = ipl.getDatasetSql("item", selectSlot, list);
+			JDataSet ds = ipl.getDatasetSql("loadItem", loadItem, list);
 			if (ds.getRowCount() != 1) {
 				return null;
 			}
 			JDataRow row = ds.getChildRow(0);
-			ret = new Item(itemname, row);
+			item = new Item(itemname, row);
 		} catch (PLException ex) {
-			System.out.println("SQL-Exception in PL#selectSlot: " +ex.getMessage());
+			logger.error(ex.getMessage(), ex);
+			System.out.println("SQL-Exception in PL#loadItem: " +ex.getMessage());
 			throw ex;
 		}
-
-		return ret;
+		return item;
 	}
-	public Item getSlot(String itemname) throws Exception {
-		Item ret = new Item(itemname);
-		try {
-			ParameterList list = new ParameterList();
-			list.addParameter("itemname", itemname);
-			JDataSet ds = pl.getDatasetSql("getAllSlots", getAllSlots, list);
-			Iterator<JDataRow> it = ds.getChildRows();
-			if (it != null && ds.getRowCount() == 1) {
-				JDataRow row = it.next();
-				JDataValue val = row.getDataValue("bits");
-				Object oval = val.getObjectValue();
-				ret = new Item(itemname, (byte[])oval);
-			}
-		} catch (PLException ex) {
-			System.out.println("SQL-Exception in PL#selectSlot: " +ex.getMessage());
-			throw ex;
+	
+	private Item loadItem(String itemname, boolean force, IPLContext ipl) throws Exception {
+		Item item = null;
+		item = iCache.get(itemname); // Cache
+		if (item != null) 
+			return item;
+		missing++;
+		if (missing % 100 == 0) {
+			System.out.println("loadItem/#Cache Missings: " + missing + " " + itemname);
 		}
-		return ret;
+		item = this.loadItem(itemname,  ipl); // DB
+		if (force == true && item == null) {
+			item = new Item(itemname);
+		}
+		if (item != null) {
+			iCache.put(item);
+		}
+		return item;		
 	}
-	void insertOrUpdateSlot(Item s) throws Exception {
-		String transname = "insertUpdateSlot";
+	
+	void insertOrUpdateItem(Item s) throws Exception {
+		String transname = "insertUpdateItem";
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
-			this.insertOrUpdateSlot(s, ipl);
+			this.insertOrUpdateItem(s, ipl);
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
 			if (ipl != null) {
@@ -379,45 +440,36 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	void insertOrUpdateSlot(Item s, IPLContext ipl) throws Exception {
+
+	private void insertOrUpdateItem(Item s, IPLContext ipl) throws Exception {
 		if (s.isInserted()) {
-			this.insertSlot(s, ipl);
+			this.insertItem(s, ipl);
 		} else if (s.isModified()) {
-			this.updateSlot(s, ipl);
+			this.updateItem(s, ipl);
 		}
 	}
 	
-	public int insertSlot(Item s, IPLContext ipl) throws Exception {
+	private int insertItem(Item s, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", s.itemname);
 			byte[] bts = s.getBytes();
 			list.addParameter("bts", bts);
-			int cnt = ipl.executeSql(insertSlot, list);
+			int cnt = ipl.executeSql(insertItem, list);
 			s.setUpdated(); // reset
 			return cnt;
 		} catch (PLException ex) {
 			throw ex;
 		}
 	}
-	public void updateSlot(Item s, IPLContext ipl) throws Exception {
+	private void updateItem(Item s, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
 			byte[] bts = s.getBytes();
 			list.addParameter("bts", bts);
 			list.addParameter("itemname", s.itemname);
-			int cnt = ipl.executeSql(updateSlot, list);
+			int cnt = ipl.executeSql(updateItem, list);
 			s.setUpdated(); // reset
-		} catch (PLException ex) {
-			throw ex;
-		}
-	}
-	public void removeSlot(Item s, IPLContext ipl) throws Exception {
-		try {
-			ParameterList list = new ParameterList();
-			list.addParameter("itemname", s.itemname);
-			int cnt = ipl.executeSql(deleteSlot, list);
-			// TODO: was tun, wenn cached? Eigenschaft "removed" beim Slot setzen?
 		} catch (PLException ex) {
 			throw ex;
 		}
@@ -427,11 +479,10 @@ public class BfPL {
 	 * @throws Exception
 	 */
 	public void repair() throws Exception {
-		// Slots aus den ObjectItems aufbauen.
-		// 1. Alle Slots wegwerfen
+		// 1. Alle Itemss wegwerfen
 //		int cnt = pl.executeSql("DELETE FROM ITEM");
 //		System.out.println("Items delete: " + cnt);
-		// Slots aus ObjectItems neu aufbauen
+		// Items aus ObjectItems neu aufbauen
 		int STEP = 100000;
 		int start = 0;
 		int anzo = 0;
@@ -482,22 +533,22 @@ public class BfPL {
 	}
 
 	/**
-	 * Die Liste mit den Tokens wird mit den Slots ergänzt;
+	 * Die Liste mit den Tokens wird mit den Items ergänzt;
 	 * entweder aus dem Cache oder aus der Datenbank frisch eingelesen.
 	 * Achtung! Wird ein Item angegeben, welches nicht existiert, bleibt slot null!
 	 * @param al
 	 * @throws Exception
 	 */
-	public void findSlots(ArrayList<OperToken> al) throws Exception {
-		/* Prüfen, ob Slot im Cache bereits vorhanden; 
-		 * ansonsten Slot aus der Datenbank einlesen und im Cache versenken. */
+	public void findItems(ArrayList<OperToken> al) throws Exception {
+		/* Prüfen, ob Item im Cache bereits vorhanden; 
+		 * ansonsten Item aus der Datenbank einlesen und im Cache versenken. */
 		ArrayList<String> alToks = new ArrayList<String>(al.size());
 		for(OperToken ot:al) {
 			boolean cached = false;		
-			if (sc != null) {
-				Item cs = sc.get(ot.token);
+			if (iCache != null) {
+				Item cs = iCache.get(ot.token);
 				if (cs != null) {
-					ot.slot = cs;
+					ot.item = cs;
 					cached = true;
 				}
 			}
@@ -507,13 +558,13 @@ public class BfPL {
 		}
 		if (alToks.size() > 0) { // Alles aus dem Cache?
 			/*
-			 * TODO: wenn itemname mit Wildcard, dann alle Slots dazu einlesen und mit AND verknüpfen
+			 * TODO: wenn itemname mit Wildcard, dann alle Items dazu einlesen und mit AND verknüpfen
 			 */
 			String sql = "SELECT Itemname, Bits FROM ITEM WHERE Itemname IN (?) ORDER BY Itemname";
 			ParameterList list = new ParameterList();
 			list.addParameter("Itemname", alToks);
 			try {
-		      JDataSet ds = pl.getDatasetSql("Slots", sql, list);
+		      JDataSet ds = pl.getDatasetSql("Items", sql, list);
 		      if (ds == null || ds.getRowCount() == 0)
 		      	return;
 		      for(OperToken ot:al) {
@@ -522,10 +573,10 @@ public class BfPL {
 			      	JDataRow row = it.next();
 			      	String itemname = row.getValue("itemname");
 			      	if (itemname.equals(ot.token)) {
-			      		Item slot = new Item(itemname, row);
-			      		ot.slot = slot;
-			      		if (sc != null) {
-			      			sc.put(slot);
+			      		Item item = new Item(itemname, row);
+			      		ot.item = item;
+			      		if (iCache != null) {
+			      			iCache.put(item);
 			      		}
 			      	}
 			      }
@@ -672,7 +723,7 @@ public class BfPL {
 			// Caches
 			Element scEle = optEle.getElement("SlotCache");
 			if (scEle != null) {
-				sc = new ItemCache(scEle);
+				iCache = new ItemCache(scEle);
 			}
 			Element ocEle = optEle.getElement("ObjektCache");
 			// TODO: ObjektCache
@@ -720,9 +771,6 @@ public class BfPL {
 	public Element getSpiderConfig() {
 		return spiderConfig;
 	}
-//	public int getMaxSlot() {
-//		return maxSlot;
-//	}
 //	public long getMaxOid() {
 //		return maxOid;
 //	}
@@ -736,45 +784,27 @@ public class BfPL {
 		resultSetPage = p;
 	}
 	
-	private Item findSlot(String itemname, boolean force, IPLContext ipl) throws Exception {
-		Item s = null;
-		s = sc.get(itemname); // Cache
-		if (s != null) 
-			return s;
-		missing++;
-		if (missing % 100 == 0) {
-			System.out.println("findSlot/Missing: " + missing + " " + itemname);
-		}
-		s = this.selectSlot(itemname,  ipl); // DB
-		if (force == true && s == null) {
-			s = new Item(itemname);
-		}
-		if (s != null) {
-			sc.put(s);
-		}
-		return s;		
-	}
-	private void writeSlot(Item s, IPLContext ipl) throws Exception {
-		if (sc != null) {
+	private void saveItem(Item s, IPLContext ipl) throws Exception {
+		if (iCache != null) {
 			return;
 		}
 		if (s.isInserted() == true) {
-			this.insertSlot(s, ipl);
+			this.insertItem(s, ipl);
 		} else {
-			this.updateSlot(s, ipl);
+			this.updateItem(s, ipl);
 		}
 	}
 	private void setBit(long l, String itemname, IPLContext ipl) throws Exception {
-		Item s = findSlot(itemname, true, ipl);
-		s.setBit(l);
-		if (sc == null) {
-			writeSlot(s, ipl);
+		Item item = loadItem(itemname, true, ipl);
+		item.setBit(l);
+		if (iCache == null) {
+			saveItem(item, ipl);
 		} else {
 			// Cached
 		}
 	}
 	private boolean testBit(long l, String itemname, IPLContext ipl) throws Exception {
-		Item s = findSlot(itemname, false, ipl);
+		Item s = loadItem(itemname, false, ipl);
 		if (s == null) {
 			return false;		
 		} else {
@@ -782,35 +812,44 @@ public class BfPL {
 		}
 	}
 	private void removeBit(long l, String itemname, IPLContext ipl) throws Exception {
-		Item s = findSlot(itemname, false, ipl);
-		if (s == null) {
+		Item item = loadItem(itemname, false, ipl);
+		if (item == null) {
 			return;		
 		} else {
-			s.removeBit(l);
-			this.updateSlot(s, ipl);
+			item.removeBit(l);
+			this.updateItem(item, ipl);
 		}		
 	}
 	
 	void writeAll(IPLContext ipl) throws Exception {
-		//sc.removeAll();
+		//iCache.removeAll();
 		boolean transStarted = false;
 		if (ipl == null) {
 			ipl = pl.startNewTransaction("writeAll");
 			transStarted = true;
 		}
-	   List<Item> list = sc.getAll();
-	   for (Item slot:list) {
-	   	this.insertOrUpdateSlot(slot, ipl);
+	   List<Item> list = iCache.getAll();
+	   for (Item item:list) {
+	   	this.insertOrUpdateItem(item, ipl);
 	   }
 	   if (transStarted) {
 	   	ipl.commitTransaction("writeAll");
 	   }
-
-//		Iterator<Map.Entry<String, Slot>> it = hash.entrySet().iterator();
-//		while(it.hasNext()) {
-//			Map.Entry<String, Slot> entry = it.next();
-//			writeSlot(entry.getValue(), ipl);
-//		}
 	}
-
+	
+	private Exception handleEx(Exception ex, IPLContext ipl, String transName) throws Exception {
+		if (ex == null) {
+			logger.warn("Missing Exception");
+			return null;
+		}
+		logger.error(ex.getMessage(), ex);
+		if (ipl != null && transName != null) {
+			try {
+				ipl.rollbackTransaction(transName);
+			} catch (PLException pex) {
+				logger.warn("Unable to rollback Transaction: "+ transName, pex);
+			}
+		}		
+		return ex;
+	}
 }

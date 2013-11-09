@@ -11,6 +11,19 @@ public interface ObjectItemServiceIF {
 	public static String DEFAULT_DELIM = " ;.,()/-";
 	public static int MAX_SESSIONS = 1000;
 	
+	/**
+	 * Erzeugt ein beliebiges Text-Objekt mit dem angegebenen Inhalt.
+	 * Die Objekt-Id wird vom System vergeben.
+	 * @param content
+	 * @return Die vergebene Objekt-Id
+	 */
+	public long createObject(String content);
+	/**
+	 * Erzeugt ein beliebiges Text-Objekt mit dem angegebenen Inhalt
+	 * unter der angegebenen Objekt-Id
+	 * @param oid Eindeutige Id für Objekte
+	 * @param content Mit White Space getrennter Inhalt
+	 */
 	public void createObject(long oid, String content);
 	/**
 	 * Erzeugt ein neues Schlüsselwort

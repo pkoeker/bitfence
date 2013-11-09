@@ -145,6 +145,17 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public int countActiveSessions() {
 		return sessions.size();
 	}
+	public long createObject(String content) {
+		try {
+			long oid = pl.createObject(content);
+			return oid;
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			ex.printStackTrace();
+			return -1;
+		}
+	}
+
 	/**
 	 * Erzeugt ein Objekt mit der angegebenen Nummer.<p>
 	 * Diese Objekt-ID ist nicht weiter als ein Identifier für
@@ -290,10 +301,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		int erg = 0;
       try {
       	OperToken ot = new OperToken(itemname, operand);
-      	// Slots
+      	// Items
       	ArrayList<OperToken> al = new ArrayList<OperToken>(1);
       	al.add(ot);
-      	pl.findSlots(al);
+      	pl.findItems(al);
 	      erg = sel.performOper(ot);
       } catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
@@ -514,10 +525,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				throw new RemoteException("Unterschiedliche Anzahl öffnender und schließender Klammern.");
 			}
 			StringBuilder sb = new StringBuilder();
-			pl.findSlots(al); // Reichert mit Slots aus der Datenbank/dem Cache an; wenn Slot null, dann gibts den Begriff nicht
+			pl.findItems(al); // Reichert mit Items aus der Datenbank/dem Cache an; wenn Item null, dann gibts den Begriff nicht
 			for (int i = al.size()-1; i>=0; i--) {
 				OperToken ot = al.get(i);
-				if (ot.slot == null) {
+				if (ot.item == null) {
 					sb.append(ot.token + " ");
 					al.remove(i);
 				}
