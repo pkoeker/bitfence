@@ -4,6 +4,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import de.pk86.bf.TestExecute;
 import de.pk86.bf.TestImport;
 import de.pk86.bf.TestOIS;
 
@@ -12,7 +13,9 @@ import de.pk86.bf.TestOIS;
 	TestImport.class,
 	TestObjekt.class,
 	TestPL.class,
-	TestOIS.class
+	TestOIS.class,
+	TestExecute.class,
+	TestRepair.class
 
 })
 
