@@ -439,9 +439,32 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @see #getNext
 	 */
 	public ExpressionResult execute(String expression) throws RemoteException {
-		if (expression.equals("repair()")) {
+		if (expression.startsWith("repair")) {
 			try {
-				pl.repair();
+				int start = 0, end = Integer.MAX_VALUE;
+				String s = expression;
+				if (s.endsWith("0")) {
+					start = 0;end=100000;
+				} else if (s.endsWith("1")) {					
+					start = 100000;end=200000;
+				} else if (s.endsWith("2")) {
+					start = 200000;end=300000;
+				} else if (s.endsWith("3")) {
+					start = 300000;end=400000;
+				} else if (s.endsWith("4")) {
+					start = 400000;end=500000;
+				} else if (s.endsWith("5")) {
+					start = 500000;end=600000;
+				} else if (s.endsWith("6")) {
+					start = 600000;end=700000;
+				} else if (s.endsWith("7")) {
+					start = 700000;end=800000;
+				} else if (s.endsWith("8")) {
+					start = 800000;end=900000;
+				} else if (s.endsWith("9")) {
+					start = 900000;end=1000000;
+				}
+				pl.repair(start,end);
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
 			}
@@ -711,7 +734,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 */
 	public void indexDatabase() {
 		try {
-			pl.repair();
+			pl.repair(0,Integer.MAX_VALUE);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
