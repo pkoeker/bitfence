@@ -76,11 +76,11 @@ class ItemCache {
 				cache = new Cache(cfg);
 				// add Cache
 				BfPL.getCacheManager().addCache(cache);
-				if (enabled) {
-					cache.setStatisticsEnabled(true);
-					// ManagementService.registerMBeans(BfPL.getCacheManager(),
-					// getMBeanServer(), true, true, true, true);
-				}
+//				if (enabled) { // nicht mehr 2.7.5
+//					cache.setStatisticsEnabled(true);
+//					// ManagementService.registerMBeans(BfPL.getCacheManager(),
+//					// getMBeanServer(), true, true, true, true);
+//				}
 				cache.getCacheEventNotificationService().registerListener(new BfCacheRemoveListener());
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);

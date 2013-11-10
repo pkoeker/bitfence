@@ -480,10 +480,10 @@ public class BfPL {
 	 */
 	public void repair() throws Exception {
 		// 1. Alle Items wegwerfen
-		int cnt = pl.executeSql("DELETE FROM ITEM");
-		System.out.println("Items delete: " + cnt);
+		//int cnt = pl.executeSql("DELETE FROM ITEM");
+		//System.out.println("Items delete: " + cnt);
 		// Items aus ObjectItems neu aufbauen
-		int STEP = 100000;
+		int STEP = 50000;
 		int start = 0;
 		int anzo = 0;
 		int anzoi = 0;
