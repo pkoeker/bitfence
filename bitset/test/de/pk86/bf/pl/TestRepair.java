@@ -7,7 +7,7 @@ public class TestRepair extends TestCase {
 
 	public void testIndex() {
 		try {
-	      pl.repair();
+	      pl.repair(0,Integer.MAX_VALUE);
       } catch (Exception e) {
 	      e.printStackTrace();
 	      fail(e.getMessage());

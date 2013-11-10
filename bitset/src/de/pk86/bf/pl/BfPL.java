@@ -478,25 +478,25 @@ public class BfPL {
 	 * maxEntriesLocalHeap anpassen: Bei 1 Mio 25000 für ca. 6GB
 	 * @throws Exception
 	 */
-	public void repair() throws Exception {
+	public void repair(int start, int stop) throws Exception {
 		// 1. Alle Items wegwerfen
 		//int cnt = pl.executeSql("DELETE FROM ITEM");
 		//System.out.println("Items delete: " + cnt);
 		// Items aus ObjectItems neu aufbauen
 		int STEP = 50000;
-		int start = 0;
+		//int start = 0;
 		int anzo = 0;
 		int anzoi = 0;
 		while (true) {
 			ParameterList list = new ParameterList();
 			list.addParameter("1", start);
 			list.addParameter("2", start+STEP);
-			start += STEP+1;
 			JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt WHERE OID between ? AND ?", list); 
 			System.out.println("Objekt rowCount: " + ds.getRowCount());
-			if (ds.getRowCount() == 0) {
+			if (ds.getRowCount() == 0 || start > stop) {
 				break;
 			}
+			start += STEP+1;
 			Iterator<JDataRow> it = ds.getChildRows();
 			if (it == null) return;
 			IPLContext ipl = pl.startNewTransaction("repair");
