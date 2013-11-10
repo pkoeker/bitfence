@@ -51,8 +51,8 @@ public class ThreadTest /*extends TestCase*/ {
    }
 
    @Test public void testThread() {
-      int maxThreads = 400;
-      int runCounts = 10; 
+      int maxThreads = 300;
+      int runCounts = 20; 
       //int totalRuns = runCounts * maxThreads;
       int totalRuns = maxThreads;
       
@@ -110,11 +110,11 @@ public class ThreadTest /*extends TestCase*/ {
          	// ACHTUNG! Logger ausschalten!
         	 try {
       		ExpressionResult res1 = srv.execute("w | m"); 
-      		//srv.endSession(res1.sessionId);
+      		srv.endSession(res1.sessionId);
       		ExpressionResult res2 = srv.execute("hans berlin münchen"); 
-      		//srv.endSession(res2.sessionId);
+      		srv.endSession(res2.sessionId);
       		ExpressionResult res3 = srv.execute("(hans | maria) hamburg köln"); 
-      		//srv.endSession(res3.sessionId);
+      		srv.endSession(res3.sessionId);
       		boolean b = srv.hasItem("Berlin"); // Postgres ? [7713]; MaxDB: 10272 [11621]
       		//int len = x.length;
       		int xxx = 0;
