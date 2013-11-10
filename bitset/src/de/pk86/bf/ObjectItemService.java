@@ -330,7 +330,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		ret.duraAlg = end1-start;
 		ret.duraDB2 = end2-end1;
 		ret.trace = sel.getTrace();
-		boolean b = this.endSession(sessionId);
 		return ret;
 	}
 	/**
