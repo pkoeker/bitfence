@@ -36,6 +36,7 @@ public class TestExecute /*extends TestCase*/ {
 		for (int i = 0; i < 1000; i++) {
 			try {
 	         x = srv.execute("marco freitag 01.07.1981 08297 zwönitz mertensheide 2");
+	         srv.endSession(x.sessionId);
          } catch (RemoteException e) {
 	         e.printStackTrace();
 		      fail(e.getMessage());
