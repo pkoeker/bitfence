@@ -1,6 +1,6 @@
 <ehcache> 
 	<defaultCache
-           maxEntriesLocalHeap="30000"
+           maxEntriesLocalHeap="25000"
            eternal="false"
            overflowToDisk="false"
            timeToIdleSeconds="1200"
