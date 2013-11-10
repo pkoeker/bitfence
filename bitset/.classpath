@@ -16,7 +16,6 @@
 	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/commons-logging-api-1.1.jar"/>
-	<classpathentry kind="lib" path="/home/peter/workspace/bitset/WebContent/WEB-INF/lib/ehcache-core-2.6.5.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-api.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-impl.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-xjc.jar"/>
@@ -31,5 +30,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tomcat-juli.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/EXML.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jxmlguibuilder"/>
+	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/ehcache-2.7.5.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
