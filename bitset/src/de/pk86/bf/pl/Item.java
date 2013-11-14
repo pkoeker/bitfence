@@ -104,7 +104,6 @@ public class Item implements Serializable {
 	public int countBits() {
 		return bitset.cardinality();
 	}
-
 	
 	public Item clone() {
 		Item clone = new Item(this.itemname);
@@ -113,5 +112,9 @@ public class Item implements Serializable {
 			clone.bitset = (BitSet)bitset.clone();
 		}		
 		return clone;
+	}
+	
+	public String toString() {
+		return itemname + "[" + countBits() + "]";
 	}
 }
