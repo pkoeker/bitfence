@@ -427,11 +427,11 @@ public class BfPL {
 		return item;		
 	}
 	
-	void insertOrUpdateItem(Item s) throws Exception {
+	void insertOrUpdateItem(Item item) throws Exception {
 		String transname = "insertUpdateItem";
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
-			this.insertOrUpdateItem(s, ipl);
+			this.insertOrUpdateItem(item, ipl);
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
 			if (ipl != null) {
@@ -449,14 +449,14 @@ public class BfPL {
 		}
 	}
 	
-	private int insertItem(Item s, IPLContext ipl) throws Exception {
+	private int insertItem(Item item, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
-			list.addParameter("itemname", s.itemname);
-			byte[] bts = s.getBytes();
+			list.addParameter("itemname", item.itemname);
+			byte[] bts = item.getBytes();
 			list.addParameter("bts", bts);
 			int cnt = ipl.executeSql(insertItem, list);
-			s.setUpdated(); // reset
+			item.setUpdated(); // reset
 			return cnt;
 		} catch (PLException ex) {
 			throw ex;
