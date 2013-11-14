@@ -21,11 +21,11 @@ class ItemCache {
 
 	private Cache cache;
 
-	boolean isEmpty() {
-		if (cache == null)
-			return true;
-		return cache.getMemoryStoreSize() == 0;
-	}
+//	boolean isEmpty() {
+//		if (cache == null)
+//			return true;
+//		return cache.getMemoryStoreSize() == 0;
+//	}
 
    ItemCache(Element ele) {
 		if (ele != null) {
@@ -96,15 +96,11 @@ class ItemCache {
 	}
 
 	Item get(String key) {
-		if (isEmpty())
-			return null;
 		net.sf.ehcache.Element cele = cache.get(key);
 		return this.get(cele);
 	}
 
 	private Item get(net.sf.ehcache.Element cele) {
-		if (isEmpty())
-			return null;
 		if (cele != null) {
 			Object val = cele.getObjectValue();
 			Item s = (Item) val;
@@ -115,8 +111,6 @@ class ItemCache {
 	}
 
 	void removeAll() {
-		if (isEmpty())
-			return;
 		cache.removeAll();
 	}
 
