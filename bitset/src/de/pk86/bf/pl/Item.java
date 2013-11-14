@@ -115,6 +115,6 @@ public class Item implements Serializable {
 	}
 	
 	public String toString() {
-		return itemname + "[" + countBits() + "]";
+		return itemname + " [" + countBits() + "]";
 	}
 }
