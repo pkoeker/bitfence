@@ -7,10 +7,13 @@ import java.rmi.RemoteException;
 import org.junit.Test;
 
 import de.guibuilder.framework.GuiUtil;
+import de.pk86.bf.pl.AllTest2;
 
-public class TestExecute /*extends TestCase*/ {
+
+public class TestExecute  {
+	private ObjectItemServiceIF srv = AllTest2.getService();
+	
 	@Test public void test1() {
-		ObjectItemService srv = new ObjectItemService();
 		//long[] x = srv.execute("\"§ 100 a II. WoBauG\" | \"§ 1021 BGB\"");
 		//boolean b = srv.hasItem("AGBG");
 		ExpressionResult x;
@@ -50,6 +53,15 @@ public class TestExecute /*extends TestCase*/ {
    	if (!GuiUtil.yesNoMessage(null, "Return to continue", "End")) {
    		return;
    	}
-
+	}
+	@Test public void test2() {
+		ExpressionResult x;
+      try {
+	      x = srv.execute("berlin");
+	      String p = x.getFirstPage();
+      } catch (RemoteException e) {
+	      e.printStackTrace();
+	      fail(e.getMessage());
+      }
 	}
 }
