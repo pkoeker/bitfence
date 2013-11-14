@@ -4,9 +4,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import de.pk86.bf.ObjectItemServiceIF;
 import de.pk86.bf.TestExecute;
 import de.pk86.bf.TestImport;
 import de.pk86.bf.TestOIS;
+import de.pk86.bf.TestSession;
+import de.pk86.bf.client.ServiceFactory;
 
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -15,6 +18,7 @@ import de.pk86.bf.TestOIS;
 	TestPL.class,
 	TestOIS.class,
 	TestExecute.class,
+	TestSession.class,
 	TestRepair.class
 
 })
@@ -29,6 +33,9 @@ public class AllTest2 {
 		}
 		return pl;
 	}
-	
+	public static ObjectItemServiceIF getService() {
+		ObjectItemServiceIF srv = ServiceFactory.getDirectService();
+		return srv;
+	}
 
 }

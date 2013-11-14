@@ -6,22 +6,9 @@ import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
-public class TestPL /*extends TestCase*/ {
+public class TestPL  {
 	private BfPL pl = AllTest2.getPL();
-	
-//	public static void main(String[] args) {
-//		TestPL me = new TestPL();
-//   	if (!ObjectItemGui.yesNoMessage(null, "Return to continue", "Start")) {
-//   		return;
-//   	}
-//		me.test0();
-//		me.test1();
-//		me.testItem1();
-//   	if (!ObjectItemGui.yesNoMessage(null, "Return to continue", "End")) {
-//   		return;
-//   	}
-//	}
-	
+		
 	/**
 	 * Item Anlegen, Item löschen
 	 */
@@ -80,7 +67,7 @@ public class TestPL /*extends TestCase*/ {
 	   	fail(e.getMessage());
 	   }
 	}
-	
+		
 	@Test public void testValid() {
 //		try {
 //			pl.validate();
