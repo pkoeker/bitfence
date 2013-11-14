@@ -46,7 +46,8 @@ public class Selection {
 	}
 	
 	int performOper(ArrayList<OperToken> al) {	
-		if (al == null || al.size() == 0) return 0;
+		if (al == null || al.size() == 0) 
+			return 0;
 		items = new ArrayList<String>();
 		// Sich alle items merken
 		for (OperToken ot:al) {
