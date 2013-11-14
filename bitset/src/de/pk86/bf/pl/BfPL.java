@@ -635,51 +635,33 @@ public class BfPL {
 	/**
 	 * Schreibt veränderte (gelöscht, eingefügt, geänderter Content) Objekte in die Datenbasis zurück.
 	 * Der Bitzaun wird dabei aktualisiert.
-	 * @param ds Ein Dataset mit dem Namen "Objekt"
+	 * @param ds Ein Dataset mit dem Namen "Objekt"; zuvor {@link JDataSet#getChanges()} ausführen
 	 * @return
 	 * @throws Exception
 	 */
 	public int updateObjects(JDataSet ds) throws Exception {
-		if (ds == null || ds.getRowCount() == 0) return 0;
+		if (ds == null || ds.getRowCount() == 0) 
+			return 0;
 		int cnt;
 		IPLContext ipl = null;
+		final String transname = "setObjectPage";
 		try {
-			 ipl = pl.startNewTransaction("setObjectPage");
+			 ipl = pl.startNewTransaction(transname);
       	 // 1. BitZaun aktualisieren
 			 Iterator<JDataRow> it = ds.getChildRows();
 			 while (it.hasNext()) {
 				 JDataRow row = it.next();
-				 long oid = row.getValueLong("oid");
-				 String oldContent = row.getDataValue("content").getOldValue();
-				 String content = row.getValue("content");
-				 ArrayList<String> olditems = getObjectItems(oldContent);
-				 ArrayList<String> items = getObjectItems(content);
-				 // 1.1 Alte Attribute austragen
-				 if (row.isInserted() == false) { // keine neuen austragen
-					 for(String itemname:olditems) {
-						 if (items.contains(itemname) == false) {
-							 this.removeBit(oid, itemname, ipl);
-						 }
-					 }
-				 }
-				 // 1.2 Neue Werte schreiben
-				 if (row.isDeleted() == false) { // keine gelöschten neu schreiben
-					 for(String itemname:items) {
-						 if (olditems.contains(itemname) == false) {
-							 this.setBit(oid, itemname, ipl);
-						 }
-					 }
-				 }
+				 this.updateRow(row, ipl);
 			 }
 			 // 2. Dataset schreiben
 	      cnt = ipl.setDataset(ds);
-	      ipl.commitTransaction("setObjectPage");
+	      ipl.commitTransaction(transname);
 	      return cnt;
       } catch (PLException e) {
       	logger.error(e.getMessage(), e);
       	if (ipl != null) {
       		try {
-	            ipl.rollbackTransaction("setObjectPage");
+	            ipl.rollbackTransaction(transname);
             } catch (PLException e1) {
 	            e1.printStackTrace();
             }
@@ -687,7 +669,34 @@ public class BfPL {
       	throw e;
       }
 	}
-
+	
+	private int updateRow(JDataRow row, IPLContext ipl) throws Exception {
+		int cnt = 0; 
+		long oid = row.getValueLong("oid");
+		 String oldContent = row.getDataValue("content").getOldValue();
+		 String content = row.getValue("content");
+		 ArrayList<String> olditems = getObjectItems(oldContent);
+		 ArrayList<String> items = getObjectItems(content);
+		 // 1.1 Alte Attribute austragen
+		 if (row.isInserted() == false) { // keine neuen austragen
+			 for(String itemname:olditems) {
+				 if (items.contains(itemname) == false) {
+					 this.removeBit(oid, itemname, ipl);
+					 cnt++;
+				 }
+			 }
+		 }
+		 // 1.2 Neue Werte schreiben
+		 if (row.isDeleted() == false) { // keine gelöschten neu schreiben
+			 for(String itemname:items) {
+				 if (olditems.contains(itemname) == false) {
+					 this.setBit(oid, itemname, ipl);
+					 cnt++;
+				 }
+			 }
+		 }
+		return cnt;
+	}
 	// INIT ################################
 	private void init(String configFilename) {
 		Document configDoc = null;
