@@ -548,19 +548,23 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			if (level != 0) {
 				throw new RemoteException("Unterschiedliche Anzahl öffnender und schließender Klammern.");
 			}
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sbMissing = new StringBuilder();
 			pl.findItems(al); // Reichert mit Items aus der Datenbank/dem Cache an; wenn Item null, dann gibts den Begriff nicht
-			for (int i = al.size()-1; i>=0; i--) {
-				OperToken ot = al.get(i);
-				if (ot.item == null) {
-					sb.append(ot.token + " ");
-					al.remove(i);
+			// Nicht existierende Begriffe aus der ItemMenge löschen
+			{
+				Iterator<OperToken> it = al.iterator();
+				while (it.hasNext()) {
+					OperToken ot = it.next();
+					if (ot.item == null) {
+						sbMissing.append(ot.token + " ");
+						it.remove();
+					}
 				}
 			}
 			long end1 = System.currentTimeMillis();
-			res = this.performOper(al);
-			if (sb.length() > 0) {
-				res.missingItems = sb.toString();
+			res = this.performOper(al); // Ergebnismenge bilden
+			if (sbMissing.length() > 0) {
+				res.missingItems = sbMissing.toString();
 			}
 			res.duraDB1 = end1 - startTime;
 			//##logger.info(expression);
