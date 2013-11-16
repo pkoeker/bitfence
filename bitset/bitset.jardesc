@@ -11,6 +11,11 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=bitset/src"/>
+        <file path="/bitset/src/BF_PLConfig.xml"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.client"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.util"/>
+        <file path="/bitset/src/log4j.xml"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.pl"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf"/>
     </selectedElements>
 </jardesc>
