@@ -188,10 +188,13 @@ public class BfCacheRemoveListener implements CacheEventListener {
    }
 	
 	private void updateItem(net.sf.ehcache.Element cele) {
-		Item s = this.get(cele);
-		if (s.isModified()) {
+		Item item = this.get(cele);
+		if (item == null) { // wie das?
+			return; 
+		}
+		if (item.isModified()) {
 			try {
-	         BfPL.getInstance().insertOrUpdateItem(s);
+	         BfPL.getInstance().insertOrUpdateItem(item);
          } catch (Exception e) {
 	         e.printStackTrace();
 	         logger.error(e.getMessage(), e);

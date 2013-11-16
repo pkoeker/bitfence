@@ -14,8 +14,8 @@
     <Username>bitfence</Username>
     <Password>bitfence</Password-->
     
-	<MaxActiveConnections value="45"/>
-	<MaxIdleConnections value="45"/>
+	<MaxActiveConnections value="400"/>
+	<MaxIdleConnections value="400"/>
 	<MinIdleConnections value="5"/>
 	<!-- MaxWait 5 Minuten -->
 	<ConnectionTimeOut value="300000"/>
@@ -36,11 +36,10 @@
   </Format>
   <Options>
     	<Debug value='false'/>
-		<!-- MaxOid value="212992"/-->
 		<MaxResultSet value="60000"/>
 		<ResultSetPage value="20"/>
-		<SlowQueryLogger loggerName="log_slow_queries" defaultMaxExecutionTime="50"></SlowQueryLogger>
-		<SlotCache enabled="true" maxEntriesLocalHeap="25000" overflowToDisk="false" />
+		<!-- SlowQueryLogger loggerName="log_slow_queries" defaultMaxExecutionTime="50"></SlowQueryLogger-->
+		<SlotCache enabled="true" maxEntriesLocalHeap="25000" overflowToDisk="false" timeToIdleSeconds="60" timeToLiveSeconds="60"/>
 		<ObjektCache enabled="false" />
   </Options>
 	<Spider>
