@@ -84,7 +84,8 @@ public class BfPL {
 			if (cacheManager == null) {
 				try {
 					URL url = PL.class.getResource("/ehcache.xml");
-					cacheManager = CacheManager.create(url);
+					//##cacheManager = CacheManager.create(url);
+					cacheManager = CacheManager.create();
 				} catch (Throwable ex) {
 					logger.error(ex.getMessage(), ex);
 				}
@@ -289,10 +290,11 @@ public class BfPL {
 			int cnt2;
 			if (name.indexOf("%") != -1) {
 				cnt2 = ipl.executeSql(deleteItemsLike, list);
+				// TODO: Items aus Cache löschen
 			} else {
 				cnt2 = ipl.executeSql(deleteItem, list);
+				boolean removed = iCache.remove(name);
 			}
-
 			ipl.commitTransaction(transname);	
 			return cnt2;
 		} catch (PLException ex) {
@@ -317,7 +319,7 @@ public class BfPL {
 			list.addParameter("newItemname", newItemname);
 			list.addParameter("oldItemname", oldItemname);
 			int anz2 = ipl.executeSql(upd2, list);
-
+			boolean removed = iCache.remove(oldItemname);
 			ipl.commitTransaction(transname);
 			return anz2;
 		} catch (PLException ex) {
@@ -484,14 +486,27 @@ public class BfPL {
 			throw ex;
 		}
 	}
+	
+	public boolean isCached(String itemname) {
+		if (iCache == null) {
+			return false;
+		}
+		String iName = itemname.toLowerCase();
+		Item item = iCache.get(iName);
+		if (item != null) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	/**
 	 * maxEntriesLocalHeap anpassen: Bei 1 Mio 25000 für ca. 6GB
 	 * @throws Exception
 	 */
 	public void repair(int start, int stop) throws Exception {
 		// 1. Alle Items wegwerfen
-		//int cnt = pl.executeSql("DELETE FROM ITEM");
-		//System.out.println("Items delete: " + cnt);
+		//##int cnt = pl.executeSql("DELETE FROM ITEM");
+		//##System.out.println("Items delete: " + cnt);
 		// Items aus ObjectItems neu aufbauen
 		int STEP = 50000;
 		//int start = 0;
@@ -582,8 +597,8 @@ public class BfPL {
 			      while(it.hasNext()) {
 			      	JDataRow row = it.next();
 			      	String itemname = row.getValue("itemname");
-			      	if (itemname.equals(ot.token)) {
-			      		Item item = new Item(itemname, row);
+			      	if (itemname.equalsIgnoreCase(ot.token)) {
+			      		Item item = new Item(itemname.toLowerCase(), row);
 			      		ot.item = item;
 			      		if (iCache != null) {
 			      			iCache.put(item);
@@ -691,10 +706,20 @@ public class BfPL {
 		long oid = row.getValueLong("oid");
 		 String oldContent = row.getDataValue("content").getOldValue();
 		 String content = row.getValue("content");
+		 if (row.isDeleted() && oldContent == null) { // gelöscht, aber nicht geändert
+			 oldContent = content;
+		 }
 		 ArrayList<String> olditems = getObjectItems(oldContent);
 		 ArrayList<String> items = getObjectItems(content);
-		 // 1.1 Alte Attribute austragen
-		 if (row.isInserted() == false) { // keine neuen austragen
+		 // 1.1 Wenn deleted, dann alte Werte löschen
+		 if (row.isDeleted()) {
+			 for(String itemname:olditems) {
+				 this.removeBit(oid, itemname, ipl);
+				 cnt++;
+			 }
+		 }
+		 // 1.2 Alte Attribute austragen
+		 else if (row.isInserted() == false) { // keine neuen austragen
 			 for(String itemname:olditems) {
 				 if (items.contains(itemname) == false) {
 					 this.removeBit(oid, itemname, ipl);
@@ -702,7 +727,7 @@ public class BfPL {
 				 }
 			 }
 		 }
-		 // 1.2 Neue Werte schreiben
+		 // 1.3 Neue Werte schreiben
 		 if (row.isDeleted() == false) { // keine gelöschten neu schreiben
 			 for(String itemname:items) {
 				 if (olditems.contains(itemname) == false) {

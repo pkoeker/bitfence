@@ -115,12 +115,13 @@ public class ThreadTest /*extends TestCase*/ {
          long start = System.currentTimeMillis();
          for (int i = 0; i < runCount; i++) {
          	// ACHTUNG! Logger ausschalten!
+         	// ACHTUNG! Hier nur Items befragen, die es in der DB auch wirklich gibt! Dauert sonst!
         	 try {
       		ExpressionResult res1 = srv.execute("w | m"); 
       		srv.endSession(res1.sessionId);
-      		ExpressionResult res2 = srv.execute("hans berlin münchen"); 
+      		ExpressionResult res2 = srv.execute("hans berlin straße"); 
       		srv.endSession(res2.sessionId);
-      		ExpressionResult res3 = srv.execute("(hans | maria) hamburg köln"); 
+      		ExpressionResult res3 = srv.execute("(hans | maria) berlin m"); 
       		srv.endSession(res3.sessionId);
       		boolean b = srv.hasItem("Berlin");
       		//int len = x.length;

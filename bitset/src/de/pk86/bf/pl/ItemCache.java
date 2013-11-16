@@ -73,9 +73,11 @@ class ItemCache {
 				}
 				cfg.setTimeToLiveSeconds(time2live);
 				// Create Cache
-				cache = new Cache(cfg);
+				//##cache = new Cache(cfg);
+				//##cache = new Cache();
 				// add Cache
-				BfPL.getCacheManager().addCache(cache);
+				BfPL.getCacheManager().addCache("bitzaun");
+				cache = BfPL.getCacheManager().getCache("bitzaun");
 //				if (enabled) { // nicht mehr 2.7.5
 //					cache.setStatisticsEnabled(true);
 //					// ManagementService.registerMBeans(BfPL.getCacheManager(),
@@ -108,6 +110,11 @@ class ItemCache {
 		} else {
 			return null;
 		}
+	}
+	
+	boolean remove(String itemname) {
+		boolean b = cache.remove(itemname);
+		return b;
 	}
 
 	void removeAll() {
