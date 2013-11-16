@@ -162,7 +162,7 @@ public class BfPL {
 	
 	public boolean deleteObject(long oid) throws Exception {
 		IPLContext ipl = null;
-		String transName = "deleteObjekt";
+		final String transName = "deleteObjekt";
 		try {
 			ipl = pl.startNewTransaction(transName);
 			ParameterList list = new ParameterList();			
@@ -265,7 +265,7 @@ public class BfPL {
 	}
 	public void createItem(String name) throws Exception{
 		IPLContext ipl = null;
-		String transname ="createItem";
+		final String transname ="createItem";
 		try {
 			Item s = new Item(name);
 			ipl = pl.startNewTransaction(transname);			
@@ -280,7 +280,7 @@ public class BfPL {
 	}
 	public int deleteItem(String name) throws Exception {
 		IPLContext ipl = null;
-		String transname = "deleteItem";
+		final String transname = "deleteItem";
 		try {
 			// Item
 			ParameterList list = new ParameterList();
@@ -310,7 +310,7 @@ public class BfPL {
 	public int renameItem(String oldItemname, String newItemname)  throws Exception {
 		// TODO: Content der Objekte ändern
 		String upd2 = "UPDATE Item set Itemname = ? WHERE Itemname = ?";
-		String transname = "renameItem";
+		final String transname = "renameItem";
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
 			ParameterList list = new ParameterList();
@@ -327,11 +327,21 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	public boolean hasItem(String itemname) throws Exception {
+	public boolean hasItem(final String itemname) throws Exception {
+		if (itemname == null || itemname.length() == 0) {
+			return false;
+		}
 		boolean ret = false;
+		String iName = itemname.toLowerCase();
+		if (iCache != null) {
+			Item item = iCache.get(iName);
+			if (item != null) {
+				return true;
+			}
+		}
 		try {
 			ParameterList list = new ParameterList();
-			list.addParameter("itemname", itemname);
+			list.addParameter("itemname", iName);
 			JDataSet ds = pl.getDatasetSql("hasItem", findItemname, list);
 			if (ds.getRowCount() == 1) 
 				return true;
@@ -340,7 +350,7 @@ public class BfPL {
 		}
 		return ret;
 	}
-	public boolean hasItem(long oid, String itemname) throws Exception {
+	public boolean hasItem(long oid, final String itemname) throws Exception {
 			boolean b = testBit(oid, itemname, pl);
 			return b;
 	}
@@ -428,7 +438,7 @@ public class BfPL {
 	}
 	
 	void insertOrUpdateItem(Item item) throws Exception {
-		String transname = "insertUpdateItem";
+		final String transname = "insertUpdateItem";
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
 			this.insertOrUpdateItem(item, ipl);
@@ -619,17 +629,23 @@ public class BfPL {
 		if (oids == null) {
 			return null;
 		}
-		ArrayList<Integer> al = new ArrayList<Integer>();
+		long[] loids = new long[oids.length];
 		for (int i = 0; i < oids.length; i++) {
-			al.add(oids[i]);
+			loids[i] = oids[i];
 		}
-		String sql = "SELECT * FROM OBJEKT WHERE OID IN(?)";
-		ParameterList list = new ParameterList();
-		list.addParameter("oids", al);
-		JDataSet ds = pl.getDatasetSql("objekt", sql, list);		
-		JDataTable tbl = ds.getDataTable(); 
-		JDataColumn colPK = tbl.getDataColumn("oid");
-		colPK.setPrimaryKey(true); // PK fürs zurückschreiben
+		JDataSet ds = pl.getDataset("objekt", loids);		
+		
+//		ArrayList<Integer> al = new ArrayList<Integer>();
+//		for (int i = 0; i < oids.length; i++) {
+//			al.add(oids[i]);
+//		}
+//		String sql = "SELECT * FROM OBJEKT WHERE OID IN(?)";
+//		ParameterList list = new ParameterList();
+//		list.addParameter("oids", al);
+//		JDataSet ds = pl.getDatasetSql("objekt", sql, list);		
+//		JDataTable tbl = ds.getDataTable(); 
+//		JDataColumn colPK = tbl.getDataColumn("oid");
+//		colPK.setPrimaryKey(true); // PK fürs zurückschreiben
 		return ds;
 	}
 	/**

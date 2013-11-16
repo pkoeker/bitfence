@@ -6,6 +6,7 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
+import de.guibuilder.framework.GuiUtil;
 import de.pk86.bf.client.ServiceFactory;
 
 //import de.pkjs.pltest.ConnectionPoolTest;
@@ -51,8 +52,11 @@ public class ThreadTest /*extends TestCase*/ {
    }
 
    @Test public void testThread() {
-      int maxThreads = 300;
-      int runCounts = 20; 
+		if (!GuiUtil.yesNoMessage(null, "Return to continue", "Start")) {
+			return;
+		}
+      int maxThreads = 300; // 300
+      int runCounts = 20; // 20 
       //int totalRuns = runCounts * maxThreads;
       int totalRuns = maxThreads;
       
@@ -89,6 +93,10 @@ public class ThreadTest /*extends TestCase*/ {
       System.out.println("Dauer: " + durSec);
       System.out.println("Je Sekunde: " + totalRuns * runCounts/durSec);
       int xxx = 0; xxx++;
+		if (!GuiUtil.yesNoMessage(null, "Return to continue", "End")) {
+			return;
+		}
+
    }
 
    class Worker implements Runnable {
@@ -102,8 +110,7 @@ public class ThreadTest /*extends TestCase*/ {
          name = "Worker " + workerNR;
       }
       
-      public void run() {
-   		//##ObjectItemService srv = new ObjectItemService();
+      public void run() {   		
          logger.debug("Worker started: "+name);
          long start = System.currentTimeMillis();
          for (int i = 0; i < runCount; i++) {
@@ -115,7 +122,7 @@ public class ThreadTest /*extends TestCase*/ {
       		srv.endSession(res2.sessionId);
       		ExpressionResult res3 = srv.execute("(hans | maria) hamburg köln"); 
       		srv.endSession(res3.sessionId);
-      		boolean b = srv.hasItem("Berlin"); // Postgres ? [7713]; MaxDB: 10272 [11621]
+      		boolean b = srv.hasItem("Berlin");
       		//int len = x.length;
       		int xxx = 0;
         	 } catch (Exception ex) {
@@ -130,10 +137,6 @@ public class ThreadTest /*extends TestCase*/ {
          fin++;
          System.out.println(name+" "+Thread.currentThread()+" Dauer: "+dauer + " / finished: "+fin);
       }
-   }
-   
-   public static void main(String[] argv) {
-      //TestRunner.run(ConnectionPoolTest.class);
    }
 
 }
