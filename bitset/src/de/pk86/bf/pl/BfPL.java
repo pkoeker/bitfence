@@ -206,7 +206,7 @@ public class BfPL {
 	 * 
 	 * @param oids
 	 * @param items
-	 * @return
+	 * @return Map<itemname,anzahlTreffer>
 	 * @throws Exception
 	 */
 	public Map<String,Integer> getOtherItems(int[] oids, ArrayList<String> items) throws Exception {

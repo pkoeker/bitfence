@@ -29,7 +29,7 @@ public class BitdemoBean {
 		if (param == null) {
 			return;
 		}
-		logger.debug("Parameter: " + param);
+		logger.debug("Parameter: " + param); 
 		logger.debug("Expression: " + expression);
 		//System.out.println("processRequest: " + param);
 		try {
@@ -71,7 +71,7 @@ public class BitdemoBean {
 		logger.debug("Expression: " + expression);
 		String param = request.getParameter("action");
 		logger.debug("Parameter: " + param);
-		//System.out.println("setSearchPattern: " + param);
+		System.out.println("setSearchPattern: " + pattern);
 	}
 		
 	public String getSearchPattern() {
