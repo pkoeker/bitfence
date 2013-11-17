@@ -36,19 +36,19 @@ public class BfPL {
 	private static int resultSetPage = 20;
 	// Statements
 	// Object
-	private String insertObject = "INSERT INTO OBJEKT Values(?,?)";
-	private String findObject = "SELECT Content FROM Objekt WHERE oid = ?";
-	private String deleteObject = "DELETE FROM OBJEKT WHERE oid = ?";
+	private final String insertObject = "INSERT INTO OBJEKT Values(?,?)";
+	private final String findObject 	= "SELECT Content FROM Objekt WHERE oid = ?";
+	private final String deleteObject = "DELETE FROM OBJEKT WHERE oid = ?";
 	//private String getMaxOid = "SELECT MAX(oid)+1 FROM OBJEKT";	
 	// Item
-	private String findItems = "SELECT Itemname FROM ITEM WHERE Itemname LIKE ? ORDER BY Itemname";
-	private String findItemname = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
-
-	private String loadItem = "SELECT Itemname, Bits FROM ITEM WHERE Itemname = ?";
-	private String insertItem = "INSERT INTO ITEM Values(?, ?)";
-	private String updateItem = "UPDATE ITEM SET Bits = ? WHERE Itemname = ?";
-	private String deleteItem = "Delete FROM ITEM WHERE Itemname = ?";
-	private String deleteItemsLike = "Delete FROM ITEM WHERE Itemname LIKE ?";
+	private final String findItems = "SELECT Itemname FROM ITEM WHERE Itemname LIKE ? ORDER BY Itemname";
+	// für hasItem
+	private final String findItemname = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
+	private final String loadItem 	= "SELECT Itemname, Bits FROM ITEM WHERE Itemname = ?";
+	private final String insertItem 	= "INSERT INTO ITEM Values(?, ?)";
+	private final String updateItem 	= "UPDATE ITEM SET Bits = ? WHERE Itemname = ?";
+	private final String deleteItem 	= "Delete FROM ITEM WHERE Itemname = ?";
+	private final String deleteItemsLike = "Delete FROM ITEM WHERE Itemname LIKE ?";
 	
 	private Element webServiceConfig;
 	private Element spiderConfig;
@@ -353,8 +353,8 @@ public class BfPL {
 		return ret;
 	}
 	public boolean hasItem(long oid, final String itemname) throws Exception {
-			boolean b = testBit(oid, itemname, pl);
-			return b;
+		boolean b = testBit(oid, itemname, pl);
+		return b;
 	}
 	/**
 	 * Liefert die Anzahl der Objekte, die mit diesem Item verknüpft sind.
@@ -546,10 +546,13 @@ public class BfPL {
 		iplc.commitTransaction("WriteCache");
 	}
 	
-	public static ArrayList<String> getObjectItems(String content) {
+	static ArrayList<String> getObjectItems(String content) {
+		ArrayList<String> al = new ArrayList<String>();
+		if (content == null) {
+			return al;
+		}
 		content = content.toLowerCase();
 		StringTokenizer toks = new StringTokenizer(content, ObjectItemServiceIF.DEFAULT_DELIM);
-		ArrayList<String> al = new ArrayList<String>();
 		while(toks.hasMoreTokens()) {
 			String itemname = toks.nextToken();
 			al.add(itemname);
@@ -612,17 +615,16 @@ public class BfPL {
 	      }
 		}
 	}
-	
-	public String getObjekts(long[] oids) throws Exception {
-		ArrayList<Long> al = new ArrayList<Long>(oids.length);
-		for (int i = 0; i < oids.length; i++) {
-			al.add(oids[i]);
+	public String getObjekts(int[] oids) throws Exception {
+		long[] l = new long[oids.length];
+		for(int i = 0; i < oids.length; i++) {
+			l[i] = oids[i];
 		}
-		String sql = "SELECT OID, CONTENT FROM OBJEKT WHERE OID IN(?)";
-		ParameterList list = new ParameterList();
-		list.addParameter("oids", al);
+		return getObjekts(l);
+	}	
+	public String getObjekts(long[] oids) throws Exception {
 		try {
-	      JDataSet ds = pl.getDatasetSql("objekts", sql, list);
+	      JDataSet ds = pl.getDataset("objekt", oids);
 	      if (ds == null || ds.getRowCount() == 0) {
 	      	return null;
 	      }

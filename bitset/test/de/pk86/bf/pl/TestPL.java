@@ -68,12 +68,14 @@ public class TestPL  {
 	   }
 	}
 		
-	@Test public void testValid() {
-//		try {
-//			pl.validate();
-//	   } catch (Exception e) {      	
-//	   	e.printStackTrace();
-//	   	fail(e.getMessage());
-//	   }
+	@Test public void testGetObject() {
+		try {
+	      Item item = pl.loadItem("berlin");
+	      int[] oids = item.getOids();
+	      String s = pl.getObjekts(oids);
+      } catch (Exception e) {
+	   	e.printStackTrace();
+	   	fail(e.getMessage());
+      }
 	}
 }
