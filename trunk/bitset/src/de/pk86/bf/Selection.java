@@ -10,7 +10,7 @@ import de.pk86.bf.pl.BfPL;
 import de.pk86.bf.pl.Item;
 
 /**
- * Hält den Zustand einer Schlagwortselektion
+ * Hält den Zustand einer Session
  */
 public class Selection {
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Selection.class);
