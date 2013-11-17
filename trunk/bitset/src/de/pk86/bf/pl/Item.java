@@ -105,6 +105,21 @@ public class Item implements Serializable {
 		return bitset.cardinality();
 	}
 	
+	/**
+	 * Liefert die Menge der aller Objekt-IDs zu diesem Item
+	 * @return
+	 */
+	public int[] getOids() {
+		int[] ret = new int[this.countBits()];
+		BitSet bs = this.getBitset();
+		int poi = 0;
+		for (int i = bs.nextSetBit(0); i >= 0; i = bs.nextSetBit(i+1)) {
+			ret[poi] = i;
+			poi++;
+		}
+		return ret;
+	}
+	
 	public Item clone() {
 		Item clone = new Item(this.itemname);
 		clone.inserted = true;

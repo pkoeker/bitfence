@@ -27,11 +27,10 @@ public interface ObjectItemServiceIF {
 	public void createObject(long oid, String content);
 	/**
 	 * Erzeugt ein neues Schlüsselwort
-	 * @param name
-	 * @return 1 = OK
+	 * @param itemname
 	 */
-	public void createItem(String name);
-	public void deleteItem(String name);
+	public void createItem(String itemname);
+	public void deleteItem(String itemname);
 	public boolean hasItem(String itemname);
 	public int getItemCount(String itemname);
 	public String[] findItems(String pattern);
@@ -40,6 +39,9 @@ public interface ObjectItemServiceIF {
 	 * @return
 	 */
 	public Selection startSession();
+	/**
+	 * Löscht alle Sessions
+	 */
 	public void resetAllSessions();
 	/** @deprecated @see #performOper(List)*/
 	public int performOper(int sessionId, String itemname, Selection.Oper operand);

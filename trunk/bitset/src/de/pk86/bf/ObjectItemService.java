@@ -247,8 +247,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	/**
-	 * Liefert alle Eigenschaften, die ähnlich dem angegebenen Pattern sind (SQL
-	 * LIKE).
+	 * Liefert alle Eigenschaften, die ähnlich dem angegebenen Pattern sind (SQL LIKE).
 	 * @param pattern
 	 * @return String[] Die Ergebnismenge aus der Datenbank sortiert nach
 	 * Alphabet.
@@ -347,11 +346,19 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		return ret;
 	}
 	
+	public String getObjekts(int[] oids) {
+		try {
+	      return pl.getObjekts(oids);
+      } catch (Exception e) {
+      	logger.error(e.getMessage(), e);
+	      return null;
+      }
+	}
 	public String getObjekts(long[] oids) {
 		try {
 	      return pl.getObjekts(oids);
       } catch (Exception e) {
-	      e.printStackTrace();
+      	logger.error(e.getMessage(), e);
 	      return null;
       }
 	}
