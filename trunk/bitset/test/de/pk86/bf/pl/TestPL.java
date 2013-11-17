@@ -70,8 +70,10 @@ public class TestPL  {
 		
 	@Test public void testGetObject() {
 		try {
+			int anzObject = pl.getItemCount("berlin");
 	      Item item = pl.loadItem("berlin");
 	      int[] oids = item.getOids();
+	      assertEquals(anzObject, oids.length);
 	      String s = pl.getObjekts(oids);
       } catch (Exception e) {
 	   	e.printStackTrace();
