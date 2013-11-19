@@ -73,14 +73,15 @@ public class Item implements Serializable {
 	 * Setzt ein Bit
 	 * 
 	 * @param l
-	 *           Eine Zahl zwischen 0 und 1024*8 -1
+	 *          
 	 * @return boolean Wenn true, dann wurde das Bit wirklich gesetzt
 	 */
 	void setBit(long l) {
+		int i = (int)l;
 		synchronized(bitset) {
-			bitset.set((int)l);
+			modified = !bitset.get(i);
+			bitset.set(i);
 		}
-		this.modified = true; // TODO: prüfen, ob Bit schon zuvor gesetzt war?
 	}
 
 	/**
@@ -95,10 +96,11 @@ public class Item implements Serializable {
 	}
 
 	void removeBit(long l) {
+		int i = (int)l;
 		synchronized(bitset) {
+			modified = bitset.get(i);
 			bitset.set((int)l, false);
 		}
-		this.modified = true; // TODO: prüfen, ob Bit schon zuvor gelöscht war?
 	}
 
 	public int countBits() {
