@@ -105,13 +105,13 @@ public class Selection {
 		}
 		OperToken ot1 = al.get(startIndex);
 		addTraceElement(ot1.token, ot1.item.getBitset().cardinality());
-		ot1.item = ot1.item.clone(); // HACK
+		//ot1.item = ot1.item.clone(); // HACK
 		StringBuilder sbe = new StringBuilder();
 		for (int i = startIndex+1; i < startIndex + cnt; i++) {
 			OperToken ot2 = al.get(i);
 			//System.out.println(ot1+ "--" + ot2);
 			if (ot2.item == null) {
-				logger.warn("Missing Slot: " + ot2.token);
+				logger.warn("Missing Item: " + ot2.token);
 				missingItems += ot2.token + " ";
 			} else {
 				int bitCount = ot2.item.getBitset().cardinality();
@@ -163,33 +163,21 @@ public class Selection {
 	}
 	
 	private static BitSet performOper(BitSet b1, BitSet b2, Oper oper) {
-		if (b2 == null) {
+		if (b1== null || b2 == null) {
 			throw new IllegalArgumentException("Argument null");
 		}
-		if (b1 == null) {
-			oper = Oper.NONE; // Kopieren
-		}
-		BitSet bErg = (BitSet)b1.clone();
+		BitSet bErg = (BitSet)b1.clone(); // default für NONE
 		switch (oper) {
-			case NONE: { 
-				bErg = (BitSet)b1.clone();
-			}
+			case NONE:  // Nix machen: Clone von b1 so wieder ausliefern
+				//bErg = (BitSet)b1.clone();
 				break;
-			case AND: {
-				bErg.and(b2);
-			}
+			case AND: bErg.and(b2); 
 				break;
-			case OR: {
-				bErg.or(b2);
-			}
+			case OR:  bErg.or(b2);
 				break;
-			case XOR: {
-				bErg.xor(b2);
-			}
+			case XOR: bErg.xor(b2);			
 				break;
-			case NOT: {
-				bErg.andNot(b2);
-			}
+			case NOT: bErg.andNot(b2);
 				break;
 		} // End Switch
 		return bErg;		
