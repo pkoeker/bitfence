@@ -77,8 +77,8 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           the element which was just put into the cache.
 	 */
 	public void notifyElementPut(final Ehcache cache, final Element element) throws CacheException {
-		Item s = get(element);
-		BitSet bs = s.getBitset();
+		Item item = get(element);
+		BitSet bs = item.getBitset();
 	}
 
 	/**
@@ -98,8 +98,8 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 *           the element which was just put into the cache.
 	 */
 	public void notifyElementUpdated(final Ehcache cache, final Element element) throws CacheException {
-		Item s = get(element);
-		BitSet bs = s.getBitset();
+		Item item = get(element);
+		BitSet bs = item.getBitset();
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 		if (item == null) { // wie das?
 			return; 
 		}
-		if (item.isModified()) {
+		if (item.isModified() || item.isInserted()) {
 			try {
 	         BfPL.getInstance().insertOrUpdateItem(item);
          } catch (Exception e) {

@@ -11,10 +11,8 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.sf.ehcache.CacheManager;
-import de.jdataset.JDataColumn;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
-import de.jdataset.JDataTable;
 import de.jdataset.ParameterList;
 import de.pk86.bf.ObjectItemServiceIF;
 import de.pk86.bf.OperToken;
@@ -43,8 +41,8 @@ public class BfPL {
 	// Item
 	private final String findItems = "SELECT Itemname FROM ITEM WHERE Itemname LIKE ? ORDER BY Itemname";
 	// für hasItem
-	private final String findItemname = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
-	private final String loadItem 	= "SELECT Itemname, Bits FROM ITEM WHERE Itemname = ?";
+	//private final String findItemname = "SELECT Itemname FROM ITEM WHERE Itemname = ?";
+	//private final String loadItem 	= "SELECT Itemname, Bits FROM ITEM WHERE Itemname = ?";
 	private final String insertItem 	= "INSERT INTO ITEM Values(?, ?)";
 	private final String updateItem 	= "UPDATE ITEM SET Bits = ? WHERE Itemname = ?";
 	private final String deleteItem 	= "Delete FROM ITEM WHERE Itemname = ?";
@@ -83,7 +81,7 @@ public class BfPL {
 		synchronized (CacheManager.class) {
 			if (cacheManager == null) {
 				try {
-					URL url = PL.class.getResource("/ehcache.xml");
+					//##URL url = PL.class.getResource("/ehcache.xml");
 					//##cacheManager = CacheManager.create(url);
 					cacheManager = CacheManager.create();
 				} catch (Throwable ex) {
@@ -133,11 +131,23 @@ public class BfPL {
 			throw ex;
 		}
 	}
+	/**
+	 * Erzeugt ein Objekt mit dem angegebenen inhalt
+	 * @param content
+	 * @return Die vom System vergebene oid
+	 * @throws Exception
+	 */
 	public long createObject(String content) throws Exception {
 		long oid = pl.getOID();
 		this.createObject(oid, content);
 		return oid;
-	}	
+	}
+	/**
+	 * Erzeugt ein Objekt mit der angebene oid und dem angegebenen Inhalt
+	 * @param oid
+	 * @param content
+	 * @throws Exception
+	 */
 	public void createObject(long oid, String content) throws Exception {
 		IPLContext ipl = null;
 		try {
@@ -161,6 +171,12 @@ public class BfPL {
 		}
 	}
 	
+	/**
+	 * Löscht das Objekt mit der angegebenen oid
+	 * @param oid
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean deleteObject(long oid) throws Exception {
 		IPLContext ipl = null;
 		final String transName = "deleteObjekt";
@@ -195,6 +211,13 @@ public class BfPL {
 	}
 	
 	// ObjectItems ##########################################
+	/**
+	 * Der Bitzaun zu dem angegebenen neuen Objekt wird versorgt
+	 * @param oid
+	 * @param content
+	 * @param ipl
+	 * @throws Exception
+	 */
 	private void createObjectItems(long oid, String content, IPLContext ipl) throws Exception {
 		ArrayList<String> al = getObjectItems(content);
 		for (String itemname:al) {
@@ -264,13 +287,13 @@ public class BfPL {
 		
 		return ret;
 	}
-	public void createItem(String name) throws Exception{
+	public void createItem(String itemname) throws Exception{
 		IPLContext ipl = null;
 		final String transname ="createItem";
 		try {
-			Item s = new Item(name);
+			Item item = new Item(itemname);
 			ipl = pl.startNewTransaction(transname);			
-			this.insertItem(s, ipl);
+			this.insertItem(item, ipl);
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
 			if (ipl != null) {
@@ -344,7 +367,7 @@ public class BfPL {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", iName);
-			JDataSet ds = pl.getDatasetSql("hasItem", findItemname, list);
+			JDataSet ds = pl.getDatasetStatement("hasItem", list); 
 			if (ds.getRowCount() == 1) 
 				return true;
 		} catch (PLException ex) {
@@ -373,25 +396,27 @@ public class BfPL {
 				int ret = item.countBits();
 				return ret;
 			}
-		} catch (PLException ex) {
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
 			throw ex;
 		}
 	}
 
 	public Item loadItem(String itemname) throws Exception {
-		IPLContext ipl = pl.startNewTransaction("loadItem");
+		final String transname = "loadItem";
+		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
 			Item ret = this.loadItem(itemname, false, ipl);
-			ipl.commitTransaction("loadItem");
+			ipl.commitTransaction(transname);
 			return ret;
 		} catch (PLException ex) {
 			logger.error(ex.getMessage(), ex);
 			System.out.println("SQL-Exception in PL#loadItem: " +ex.getMessage());
 			if (ipl != null) {
 				try {
-					ipl.rollbackTransaction("loadItem");
+					ipl.rollbackTransaction(transname);
 				} catch (PLException pex) {
-					logger.warn("Unable to rollback Transaction: loadItem", pex);
+					logger.warn("Unable to rollback Transaction: " + transname, pex);
 				}
 			}
 			throw ex;
@@ -399,30 +424,33 @@ public class BfPL {
 	}
 	
 	private Item loadItem(String itemname, IPLContext ipl) throws Exception {
-		Item item = null;
-		item = iCache.get(itemname); // Cache
-		if (item != null) 
-			return item;
 		try {
-			ParameterList list = new ParameterList();
-			list.addParameter("itemname", itemname);
-			JDataSet ds = ipl.getDatasetSql("loadItem", loadItem, list);
+			JDataSet ds = ipl.getDataset("item",  itemname);
 			if (ds.getRowCount() != 1) {
 				return null;
 			}
 			JDataRow row = ds.getChildRow(0);
-			item = new Item(itemname, row);
+			Item item = new Item(itemname, row);
+			return item;
 		} catch (PLException ex) {
 			logger.error(ex.getMessage(), ex);
 			System.out.println("SQL-Exception in PL#loadItem: " +ex.getMessage());
 			throw ex;
 		}
-		return item;
 	}
 	
+	/**
+	 * Lädt einem Item unter Angabe seines Namens.
+	 * Der Item wird entweder aus dem Cache entnommen, 
+	 * oder (falls dort nicht vorhanden) aus der Datenbank eingelesen und jetzt in den Cache geschrieben.
+	 * @param itemname
+	 * @param force wenn true wird die Neuanlage des Items in der Datenbank erzwungen
+	 * @param ipl
+	 * @return
+	 * @throws Exception
+	 */
 	private Item loadItem(String itemname, boolean force, IPLContext ipl) throws Exception {
-		Item item = null;
-		item = iCache.get(itemname); // Cache
+		Item item = iCache.get(itemname); // Cache
 		if (item != null) 
 			return item;
 		missing++;
@@ -453,11 +481,11 @@ public class BfPL {
 		}
 	}
 
-	private void insertOrUpdateItem(Item s, IPLContext ipl) throws Exception {
-		if (s.isInserted()) {
-			this.insertItem(s, ipl);
-		} else if (s.isModified()) {
-			this.updateItem(s, ipl);
+	private void insertOrUpdateItem(Item item, IPLContext ipl) throws Exception {
+		if (item.isInserted()) {
+			this.insertItem(item, ipl);
+		} else if (item.isModified()) {
+			this.updateItem(item, ipl);
 		}
 	}
 	
@@ -474,14 +502,14 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	private void updateItem(Item s, IPLContext ipl) throws Exception {
+	private void updateItem(Item item, IPLContext ipl) throws Exception {
 		try {
 			ParameterList list = new ParameterList();
-			byte[] bts = s.getBytes();
+			byte[] bts = item.getBytes();
 			list.addParameter("bts", bts);
-			list.addParameter("itemname", s.itemname);
+			list.addParameter("itemname", item.itemname);
 			int cnt = ipl.executeSql(updateItem, list);
-			s.setUpdated(); // reset
+			item.setUpdated(); // reset
 		} catch (PLException ex) {
 			throw ex;
 		}
@@ -544,6 +572,10 @@ public class BfPL {
 		IPLContext iplc = pl.startNewTransaction("WriteCache");
 		writeAll(iplc); // Cache durchschreiben erzwingen
 		iplc.commitTransaction("WriteCache");
+	}
+	
+	public void repair(ArrayList<String> itemnames) {
+		
 	}
 	
 	static ArrayList<String> getObjectItems(String content) {
@@ -836,6 +868,12 @@ public class BfPL {
 		resultSetPage = p;
 	}
 	
+	/**
+	 * Wird nur benutzt, wenn kein Cache definiert!
+	 * @param s
+	 * @param ipl
+	 * @throws Exception
+	 */
 	private void saveItem(Item s, IPLContext ipl) throws Exception {
 		if (iCache != null) {
 			return;
@@ -846,30 +884,56 @@ public class BfPL {
 			this.updateItem(s, ipl);
 		}
 	}
-	private void setBit(long l, String itemname, IPLContext ipl) throws Exception {
+	/**
+	 * Verknüpft ein Objekt mit einem Item
+	 * @param oid
+	 * @param itemname
+	 * @param ipl
+	 * @throws Exception
+	 */
+	private void setBit(long oid, String itemname, IPLContext ipl) throws Exception {
 		Item item = loadItem(itemname, true, ipl);
-		item.setBit(l);
+		item.setBit(oid);
 		if (iCache == null) {
 			saveItem(item, ipl);
 		} else {
 			// Cached
 		}
 	}
-	private boolean testBit(long l, String itemname, IPLContext ipl) throws Exception {
-		Item s = loadItem(itemname, false, ipl);
-		if (s == null) {
+	/**
+	 * Testet, ob das angegebene Objekt mit dem Item verknüpft ist
+	 * @param oid
+	 * @param itemname
+	 * @param ipl
+	 * @return
+	 * @throws Exception
+	 */
+	private boolean testBit(long oid, String itemname, IPLContext ipl) throws Exception {
+		Item item = loadItem(itemname, false, ipl);
+		if (item == null) {
 			return false;		
 		} else {
-			return s.testBit(l);
+			return item.testBit(oid);
 		}
 	}
-	private void removeBit(long l, String itemname, IPLContext ipl) throws Exception {
+	/**
+	 * Löscht die Verknüpfung zwischen Objekt und Item
+	 * @param oid
+	 * @param itemname
+	 * @param ipl
+	 * @throws Exception
+	 */
+	private void removeBit(long oid, String itemname, IPLContext ipl) throws Exception {
 		Item item = loadItem(itemname, false, ipl);
 		if (item == null) {
 			return;		
 		} else {
-			item.removeBit(l);
-			this.updateItem(item, ipl);
+			item.removeBit(oid);
+			if (iCache == null) {
+				saveItem(item, ipl);
+			} else {
+				// Cached
+			}
 		}		
 	}
 	
