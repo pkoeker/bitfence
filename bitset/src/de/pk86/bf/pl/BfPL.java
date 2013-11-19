@@ -608,7 +608,7 @@ public class BfPL {
 			if (iCache != null) {
 				Item cs = iCache.get(ot.token);
 				if (cs != null) {
-					ot.item = cs;
+					ot.item = cs.clone();
 					cached = true;
 				}
 			}
@@ -634,7 +634,7 @@ public class BfPL {
 			      	String itemname = row.getValue("itemname");
 			      	if (itemname.equalsIgnoreCase(ot.token)) {
 			      		Item item = new Item(itemname.toLowerCase(), row);
-			      		ot.item = item;
+			      		ot.item = item.clone();
 			      		if (iCache != null) {
 			      			iCache.put(item);
 			      		}
