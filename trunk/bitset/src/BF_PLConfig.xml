@@ -4,6 +4,7 @@
     <!-- POSTGRES -->
     <JDBC-Driver>org.postgresql.Driver</JDBC-Driver>
     <URL>jdbc:postgresql://localhost/bitsettest?prepareThreshold=3</URL>
+    <!--URL>jdbc:postgresql://10.8.0.1/bitset?prepareThreshold=3</URL-->
 	<Schema>public</Schema>
     <Username>bitset</Username>
     <Password>bitset</Password>
@@ -60,6 +61,9 @@
 			<Column name="*"/>
 		</RootTable>
 	</View>
+	<Statement name="hasItem">
+		<!-- SELECT Itemname FROM ITEM WHERE Itemname = ? -->
+	</Statement>
 	
 	<!--WebService>
 		<URL>http://pk86.de:8004</URL>
