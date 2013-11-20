@@ -40,7 +40,7 @@
 		<MaxResultSet value="60000"/>
 		<ResultSetPage value="20"/>
 		<!-- SlowQueryLogger loggerName="log_slow_queries" defaultMaxExecutionTime="50"></SlowQueryLogger-->
-		<SlotCache enabled="true" maxEntriesLocalHeap="25000" overflowToDisk="false" timeToIdleSeconds="60" timeToLiveSeconds="60"/>
+		<SlotCache enabled="true" maxBytesLocalHeap="2G" maxBytesLocalDisk="10G" timeToIdleSeconds="60" timeToLiveSeconds="1200"/>
 		<ObjektCache enabled="false" />
   </Options>
 	<Spider>
