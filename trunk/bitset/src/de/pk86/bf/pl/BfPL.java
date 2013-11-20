@@ -2,12 +2,13 @@ package de.pk86.bf.pl;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.sf.ehcache.CacheManager;
@@ -196,7 +197,7 @@ public class BfPL {
 			}
 			// Items
 			String content = ds.getRow().getValue("content");
-			ArrayList<String> al = getObjectItems(content);
+			Set<String> al = getObjectItems(content);
 			for (String itemname:al) {
 				removeBit(oid, itemname, ipl);
 			}			
@@ -219,7 +220,7 @@ public class BfPL {
 	 * @throws Exception
 	 */
 	private void createObjectItems(long oid, String content, IPLContext ipl) throws Exception {
-		ArrayList<String> al = getObjectItems(content);
+		Set<String> al = getObjectItems(content);
 		for (String itemname:al) {
 			setBit(oid, itemname, ipl);
 		}
@@ -248,7 +249,7 @@ public class BfPL {
 				while (it.hasNext()) {
 					JDataRow row = it.next();
 					String content = row.getValue("content");
-					ArrayList<String> cItems = getObjectItems(content);
+					Set<String> cItems = getObjectItems(content);
 					for(String item:cItems) {
 						Integer i = map.get(item);
 						if (i == null) {
@@ -557,7 +558,7 @@ public class BfPL {
 				JDataRow row = it.next();
 				long oid = row.getValueLong("oid");
 				String content = row.getValue("content");
-				ArrayList<String> al = getObjectItems(content);
+				Set<String> al = getObjectItems(content);
 				anzo++;
 				for(String itemname:al) {
 					setBit(oid, itemname, ipl); 
@@ -578,8 +579,9 @@ public class BfPL {
 		
 	}
 	
-	static ArrayList<String> getObjectItems(String content) {
-		ArrayList<String> al = new ArrayList<String>();
+	static Set<String> getObjectItems(String content) {
+		//ArrayList<String> al = new ArrayList<String>();
+		Set<String> al = new LinkedHashSet<String>();
 		if (content == null) {
 			return al;
 		}
@@ -587,7 +589,10 @@ public class BfPL {
 		StringTokenizer toks = new StringTokenizer(content, ObjectItemServiceIF.DEFAULT_DELIM);
 		while(toks.hasMoreTokens()) {
 			String itemname = toks.nextToken();
-			al.add(itemname);
+			boolean b = al.add(itemname);
+			if (!b) {
+				// duplicate!
+			}
 		}
 		return al;
 	}
@@ -743,8 +748,8 @@ public class BfPL {
 		 if (row.isDeleted() && oldContent == null) { // gelöscht, aber nicht geändert
 			 oldContent = content;
 		 }
-		 ArrayList<String> olditems = getObjectItems(oldContent);
-		 ArrayList<String> items = getObjectItems(content);
+		 Set<String> olditems = getObjectItems(oldContent);
+		 Set<String> items = getObjectItems(content);
 		 // 1.1 Wenn deleted, dann alte Werte löschen
 		 if (row.isDeleted()) {
 			 for(String itemname:olditems) {
