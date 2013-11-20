@@ -1,6 +1,6 @@
 package de.pk86.bf.pl;
 
-import java.util.ArrayList;
+import java.util.Set;
 
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
@@ -54,7 +54,7 @@ public class Content {
 		row.setValue("content", s);
 	}
 	
-	public ArrayList<String> getItems() {
+	public Set<String> getItems() {
 		String c = getContent();
 		return BfPL.getObjectItems(c);
 	}

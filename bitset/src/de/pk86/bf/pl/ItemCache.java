@@ -21,12 +21,6 @@ class ItemCache {
 
 	private Cache cache;
 
-//	boolean isEmpty() {
-//		if (cache == null)
-//			return true;
-//		return cache.getMemoryStoreSize() == 0;
-//	}
-
    ItemCache(Element ele) {
 		if (ele != null) {
 			String sEnabled = ele.getAttribute("enabled");
@@ -39,7 +33,6 @@ class ItemCache {
 				// CacheConfig
 				CacheConfiguration cfg = cache.getCacheConfiguration();
 				// Properties
-				//long maxElesMem = 20000;
 				String maxEntriesLocalHeap = ele.getAttribute("maxEntriesLocalHeap");
 				if (maxEntriesLocalHeap != null) {
 					long maxElesMem = Convert.toLong(maxEntriesLocalHeap);
@@ -55,11 +48,6 @@ class ItemCache {
 				if (maxBytesLocalDisk != null) {
 					cfg.setMaxBytesLocalDisk(maxBytesLocalDisk);
 				}
-//				//
-//				String eternal = ele.getAttribute("eternal");
-//				if (eternal != null) {
-//					cfg.setEternal(Convert.toBoolean(eternal));
-//				}
 				//
 				long time2idl = 300; // 5 Minuten
 				String timeToIdleSeconds = ele.getAttribute("timeToIdleSeconds");
@@ -80,10 +68,10 @@ class ItemCache {
 		}
 	}
 
-	void put(Item s) {
-		if (s == null || s.itemname == null)
+	void put(Item item) {
+		if (item == null || item.itemname == null)
 			return;
-		net.sf.ehcache.Element cele = new net.sf.ehcache.Element(s.itemname, s);
+		net.sf.ehcache.Element cele = new net.sf.ehcache.Element(item.itemname, item);
 		cache.put(cele);
 	}
 
@@ -95,8 +83,8 @@ class ItemCache {
 	private Item get(net.sf.ehcache.Element cele) {
 		if (cele != null) {
 			Object val = cele.getObjectValue();
-			Item s = (Item) val;
-			return s;
+			Item item = (Item) val;
+			return item;
 		} else {
 			return null;
 		}
