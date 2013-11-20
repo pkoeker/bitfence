@@ -1,9 +1,8 @@
 <ehcache> 
 	<defaultCache
-           maxEntriesLocalHeap="25000"
-           eternal="false"
-           overflowToDisk="false"
-           timeToIdleSeconds="600"
+           maxBytesLocalHeap="2G" 
+           maxBytesLocalDisk="10G"      
+           timeToIdleSeconds="300"
            timeToLiveSeconds="600">
      <!-- cacheEventListenerFactory class="de.pk86.bf.pl.BfCacheRemoveListener" properties="" listenFor="all"/-->
     </defaultCache>
