@@ -12,7 +12,7 @@ import electric.xml.Element;
 class ItemCache {
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ItemCache.class);
 
-	private String cacheName = "ItemCache";
+	private final String cacheName = "ItemCache";
 	private boolean enabled;
 
 	boolean isEnabled() {
@@ -32,58 +32,48 @@ class ItemCache {
 			String sEnabled = ele.getAttribute("enabled");
 			enabled = Convert.toBoolean(sEnabled);
 			try {
+				// Create Cache
+				BfPL.getCacheManager().addCache(cacheName);
+				cache = BfPL.getCacheManager().getCache(cacheName);
+				cache.getCacheEventNotificationService().registerListener(new BfCacheRemoveListener());
 				// CacheConfig
-				CacheConfiguration cfg = new CacheConfiguration();
-				cfg.setName(cacheName);
+				CacheConfiguration cfg = cache.getCacheConfiguration();
 				// Properties
-				long maxElesMem = 20000;
+				//long maxElesMem = 20000;
 				String maxEntriesLocalHeap = ele.getAttribute("maxEntriesLocalHeap");
 				if (maxEntriesLocalHeap != null) {
-					maxElesMem = Convert.toLong(maxEntriesLocalHeap);
+					long maxElesMem = Convert.toLong(maxEntriesLocalHeap);
+					cfg.setMaxEntriesLocalHeap(maxElesMem);
 				}
-				cfg.setMaxEntriesLocalHeap(maxElesMem);
-				//
-				String maxEntriesLocalDisk = ele.getAttribute("maxEntriesLocalDisk");
-				if (maxEntriesLocalDisk != null) {
-					cfg.setMaxEntriesLocalDisk(Convert.toLong(maxEntriesLocalDisk));
+				// HEAP
+				String maxBytesLocalHeap = ele.getAttribute("maxBytesLocalHeap");
+				if (maxBytesLocalHeap != null) {
+					cfg.setMaxBytesLocalHeap(maxBytesLocalHeap);
 				}
-				//
-				String overflowToDisk = ele.getAttribute("overflowToDisk");
-				if (overflowToDisk != null) {
-					cfg.setOverflowToDisk(Convert.toBoolean(overflowToDisk));
-					//cfg.setDiskStorePath("/tmp");
+				// Disk
+				String maxBytesLocalDisk = ele.getAttribute("maxBytesLocalDisk");
+				if (maxBytesLocalDisk != null) {
+					cfg.setMaxBytesLocalDisk(maxBytesLocalDisk);
 				}
+//				//
+//				String eternal = ele.getAttribute("eternal");
+//				if (eternal != null) {
+//					cfg.setEternal(Convert.toBoolean(eternal));
+//				}
 				//
-				String eternal = ele.getAttribute("eternal");
-				if (eternal != null) {
-					cfg.setEternal(Convert.toBoolean(eternal));
-				}
-				//
-				long time2idl = 12000;
+				long time2idl = 300; // 5 Minuten
 				String timeToIdleSeconds = ele.getAttribute("timeToIdleSeconds");
 				if (timeToIdleSeconds != null) {
 					time2idl = Convert.toLong(timeToIdleSeconds);
 				}
 				cfg.setTimeToIdleSeconds(time2idl);
 				//
-				long time2live = 12000;
+				long time2live = 1200; // 20 Minuten
 				String timeToLiveSeconds = ele.getAttribute("timeToLiveSeconds");
 				if (timeToLiveSeconds != null) {
 					time2live = Convert.toLong(timeToLiveSeconds);
 				}
 				cfg.setTimeToLiveSeconds(time2live);
-				// Create Cache
-				//##cache = new Cache(cfg);
-				//##cache = new Cache();
-				// add Cache
-				BfPL.getCacheManager().addCache("bitzaun");
-				cache = BfPL.getCacheManager().getCache("bitzaun");
-//				if (enabled) { // nicht mehr 2.7.5
-//					cache.setStatisticsEnabled(true);
-//					// ManagementService.registerMBeans(BfPL.getCacheManager(),
-//					// getMBeanServer(), true, true, true, true);
-//				}
-				cache.getCacheEventNotificationService().registerListener(new BfCacheRemoveListener());
 			} catch (Exception ex) {
 				logger.error(ex.getMessage(), ex);
 			}
