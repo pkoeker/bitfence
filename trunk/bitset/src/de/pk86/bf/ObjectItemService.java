@@ -125,7 +125,7 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
   portName = "bitset", 
   targetNamespace = "http://pk86.de/bitset", // Wie beim Client-Interface!
   endpointInterface = "de.pk86.bf.ObjectItemSOAPService"
-    )
+)
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
 public final class ObjectItemService implements ObjectItemServiceIF {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemService.class);
