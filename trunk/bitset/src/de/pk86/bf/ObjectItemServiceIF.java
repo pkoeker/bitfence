@@ -3,11 +3,14 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+
 import de.jdataset.JDataSet;
 /**
  * @author peter
  */
-public interface ObjectItemServiceIF {
+public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	/**
 	 * Default White Space (Sparatoren für Items im Content)
 	 */
@@ -72,7 +75,18 @@ public interface ObjectItemServiceIF {
 	public int performOper(int sessionId, String itemname, Selection.Oper operand);
 	public ExpressionResult performOper(ArrayList<OperToken> al);
 	public ExpressionResult getResultSet(int sessionId);
+	/**
+	 * Liefert einen String mit dem Inhalt der angegebenen Objekt; jeweils durch LF getrennt.
+	 * @param oids
+	 * @return
+	 */
 	public String getObjekts(long[] oids);
+	/**
+	 * Liefert true, wenn es unter der angegebenen SessionId weitere Ergebnisse gibt
+	 * @see #getNextPage(int)
+	 * @param sessionId
+	 * @return
+	 */
 	public boolean hasNext(int sessionId);
 	public Map<String,Integer> getOtherItems(int sessionId);
 	/**
@@ -83,6 +97,7 @@ public interface ObjectItemServiceIF {
 	 */
 	public boolean hasSession(int sessionId);
 	/**
+	 * Beendet die angegebene Session; die von ihr gehaltenen Ressourcen werden freigegeben.
 	 * @param sessionId
 	 * @return false, wenn die angegebene Session nicht (mehr) existiert.
 	 */
@@ -95,23 +110,34 @@ public interface ObjectItemServiceIF {
 	 */
 	public ExpressionResult execute(String expression) throws RemoteException;
 	/**
+	 * Erzeugt eine Session mit einer Ergebnismenge zu dem angegebenen Ausdruck.
+	 * Anschließend kann mit der gelieferten sessionId die Ergebnismenge angerufen werden.
+	 * @param expression
+	 * @return
+	 * @throws RemoteException
+	 */
+	public int createSession(String expression) throws RemoteException;
+	/**
 	 * Liefert die erste Seite der Ergebnismenge zu der angegebenen SessionId
 	 * @param sessionId
 	 * @return
 	 */
 	public JDataSet getFirstPage(int sessionId);
+	public String getFirstPageString(int sessionId);
 	/**
 	 * Blättert vorwärts in der Ergebnismenge
 	 * @param sessionId
 	 * @return
 	 */
 	public JDataSet getNextPage(int sessionId);
+	public String getNextPageString(int sessionId);
 	/**
-	 * Blättert rückwärts in der Regebnismenge
+	 * Blättert rückwärts in der Ergebnismenge
 	 * @param sessionId
 	 * @return
 	 */
 	public JDataSet getPrevPage(int sessionId);
+	public String getPrevPageString(int sessionId);
 	/**
 	 * Speichert den übergebenen Content
 	 * @param ds
@@ -120,7 +146,7 @@ public interface ObjectItemServiceIF {
 	public int updateObjects(JDataSet ds);
 	/**
 	 * Importiert durch White Space getrennte Eigenschaften.<p> 
-	 * Hierbei können die Eigenschaften auch in Anführungszeichen eingeschlossen
+	 * Hierbei können die Items auch in Anführungszeichen eingeschlossen
 	 * sein: "Meine Eigenschaft".
 	 * @param text
 	 * @param lowercase Wenn true wird Rudi zu rudi.

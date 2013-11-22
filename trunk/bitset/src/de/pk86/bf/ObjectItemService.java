@@ -12,11 +12,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+
 import de.jdataset.JDataColumn;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
 import de.pk86.bf.pl.BfPL;
+//import electric.registry.Registry;
+//import electric.server.http.HTTP;
+//import electric.util.Context;
 import electric.xml.Element;
 
 /**
@@ -113,9 +119,17 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
 </ul>
  * @author Peter Köker
  */
+@WebService
+(    
+  serviceName = "bitset",
+  portName = "bitset", 
+  targetNamespace = "http://pk86.de/bitset", // Wie beim Client-Interface!
+  endpointInterface = "de.pk86.bf.ObjectItemSOAPService"
+    )
+@SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
 public final class ObjectItemService implements ObjectItemServiceIF {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemService.class);
-
+	private boolean webserviceCreated;
 	private BfPL pl = BfPL.getInstance();
 	private Spider spider;
 	/**
@@ -431,6 +445,14 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public void resetAllSessions() {
 		sessions = new Hashtable<Integer, Selection>();
 	}
+	public int createSession(String expression) throws RemoteException {
+		ExpressionResult res = this.execute(expression);
+		if (res == null) {
+			return -1;
+		} else {
+			return res.sessionId;
+		}
+	}
 	/**
 	 * Startet eine Session und erstellt eine Ergebnismenge aus einem Ausdruck.<p> 
 	 * Eigenschaften können selbst auch White Space enthalten; dann sind sie in
@@ -592,6 +614,12 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		if (sel == null) return null;
 		return sel.getFirstPage();
 	}
+	public String getFirstPageString(int sessionId) {
+		JDataSet ds = this.getFirstPage(sessionId);	
+		String s = ExpressionResult.pageToString(ds);
+		return s;
+	}
+	
 	public JDataSet getNextPage(int sessionId) {
 		Selection sel = sessions.get(sessionId);
 		if (sel == null) return null;
@@ -601,6 +629,11 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		} catch (IllegalStateException ex) {
 			throw ex;
 		}
+	}
+	public String getNextPageString(int sessionId) {
+		JDataSet ds = this.getNextPage(sessionId);	
+		String s = ExpressionResult.pageToString(ds);
+		return s;
 	}
 	public JDataSet getPrevPage(int sessionId) {
 		Selection sel = sessions.get(sessionId);
@@ -612,6 +645,12 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 			throw ex;
 		}
 	}
+	public String getPrevPageString(int sessionId) {
+		JDataSet ds = this.getPrevPage(sessionId);	
+		String s = ExpressionResult.pageToString(ds);
+		return s;
+	}
+
 	public int updateObjects(JDataSet ds) {
 		int cnt;
       try {
@@ -774,12 +813,12 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}
 	}
 	public int importDatabaseDataset(JDataSet data) {
-		
-		
+				
 		return 0;
 	}
 	private void initWebservice() {
-//		if (webserviceCreated) return;
+//		if (webserviceCreated) 
+//			return;
 //		Element ele = pl.getWebServiceConfig();
 //		if (ele == null)
 //			return;
@@ -797,7 +836,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 //			//context.addProperty( "activation", "session" );
 //			context.addProperty( "description", "Object Item Web Service" );
 //			HTTP.startup(url);
-//			Registry.publish(srv, this, ObjectItemServiceIF.class, context);
+//			Registry.publish(srv, this, ObjectItemSOAPService.class, context);
 //			webserviceCreated = true;
 //		} catch (Exception ex) {
 //			logger.error(ex.getMessage(), ex);
