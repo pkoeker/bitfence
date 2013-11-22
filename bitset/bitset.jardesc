@@ -10,12 +10,10 @@
             <packagesToUnSeal/>
         </sealing>
     </manifest>
-    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <file path="/bitset/src/BF_PLConfig.xml"/>
-        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.client"/>
-        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.util"/>
-        <file path="/bitset/src/log4j.xml"/>
+    <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
         <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.pl"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.client"/>
         <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.util"/>
     </selectedElements>
 </jardesc>
