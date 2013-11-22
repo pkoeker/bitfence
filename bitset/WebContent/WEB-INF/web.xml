@@ -3,19 +3,19 @@
 	"http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
 	<display-name>BitSet Demo</display-name>
-	<!--listener>
+	<listener>
 		<listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener
 			</listener-class>
-	</listener-->
-	<!--servlet>
-		<servlet-name>bitdemo</servlet-name>
+	</listener>
+	<servlet>
+		<servlet-name>bitset</servlet-name>
 		<servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-	</servlet-->
-	<!--servlet-mapping>
-		<servlet-name>bitdemo</servlet-name>
-		<url-pattern>/bitdemo</url-pattern>
-	</servlet-mapping-->
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>bitset</servlet-name>
+		<url-pattern>/soap</url-pattern>
+	</servlet-mapping>
 	<session-config>
 		<session-timeout>60</session-timeout>
 	</session-config>
