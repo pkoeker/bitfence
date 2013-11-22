@@ -1,6 +1,6 @@
 <ehcache> 
 	<defaultCache
-           maxBytesLocalHeap="2G" 
+           maxBytesLocalHeap="500M" 
            maxBytesLocalDisk="10G"      
            timeToIdleSeconds="300"
            timeToLiveSeconds="600">
