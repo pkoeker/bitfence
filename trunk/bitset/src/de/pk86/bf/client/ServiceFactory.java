@@ -1,18 +1,22 @@
 package de.pk86.bf.client;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.springframework.context.ApplicationContext;
 
 import de.pk86.bf.ObjectItemService;
 import de.pk86.bf.ObjectItemServiceIF;
+import de.pk86.bf.soap.Bitset;
+import de.pk86.bf.soap.ObjectItemSOAPService;
 
 /**
  * Erzeugt einen ObjectItemService auf Basis von SOAP oder Spring-RMI
  * @author peter
- *
  */
-public class ServiceFactory {
-	
+public class ServiceFactory {	
 	private static ObjectItemService srv;
+	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServiceFactory.class);
 
 	public static ObjectItemServiceIF getDirectService() {
 		if (srv == null) {
@@ -24,19 +28,10 @@ public class ServiceFactory {
 		}
 		return srv;	      
 	}
-//	public static ObjectItemServiceIF getSOAP_Service(String url) {
-//		try {
-//			ObjectItemServiceIF sv = (ObjectItemServiceIF) Registry.bind(url,
-//			      ObjectItemServiceIF.class);
-//			return sv;
-//		} catch (Exception ex) {
-//			System.err.println("Error Binding Service: " + ex.getMessage());
-//			return null;
-//		}
-//	}
-//	public static ObjectItemServiceIF getSOAP_Service() {
-//		return getSOAP_Service("http://localhost:8004/bitdemo.wsdl");
-//	}
+	/**
+	 * localhost:1098
+	 * @return
+	 */
 	public static ObjectItemServiceIF getSpringService() {
 		return getRmiService("localhost:1098");
 	}
@@ -47,6 +42,19 @@ public class ServiceFactory {
 		ApplicationContext context = BfClientConfig.getContext(host); // Erzwingt init
 		ObjectItemServiceIF srv = context.getBean(ObjectItemServiceIF.class);		
 		return srv;
+	}
+	// http://pk86.de/bitdemo/soap?wsdl
+	public static ObjectItemSOAPService getSOAPService(String host) {
+		Bitset bs;
+      try {
+	      bs = new Bitset(new URL(host));
+	      ObjectItemSOAPService srv = bs.getBitset();
+	      return srv;
+      } catch (MalformedURLException e) {
+	      e.printStackTrace();
+	      logger.error(e.getMessage(), e);
+	      throw new IllegalStateException("Unable to create service: " + e.getMessage(), e);
+      }
 	}
 	
 }

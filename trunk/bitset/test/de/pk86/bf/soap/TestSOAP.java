@@ -2,10 +2,11 @@ package de.pk86.bf.soap;
 
 import org.junit.Test;
 
+import de.pk86.bf.client.ServiceFactory;
+
 public class TestSOAP {
 	@Test public void getService() {
-		Bitset bs = new Bitset();
-		ObjectItemSOAPService srv = bs.getBitset();
+		ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://pk86.de/bitdemo/soap?wsdl");
 		long start = System.currentTimeMillis();
 		int sid = srv.createSession("berlin | münchen");
 		System.out.println(sid);
