@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import de.guibuilder.framework.GuiUtil;
 import de.pk86.bf.client.ServiceFactory;
+import de.pk86.bf.soap.ObjectItemSOAPService;
 
 //import de.pkjs.pltest.ConnectionPoolTest;
 
@@ -28,6 +29,7 @@ public class ThreadTest /*extends TestCase*/ {
    private long endTime;
    //private static ObjectItemServiceIF srv = ServiceFactory.getSpringService("10.8.0.1");
    private static ObjectItemServiceIF srv = ServiceFactory.getDirectService();
+   //private static ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://10.8.0.1:8080/bitdemo/soap?wsdl");
 
    public ThreadTest() {
    }
@@ -117,12 +119,12 @@ public class ThreadTest /*extends TestCase*/ {
          	// ACHTUNG! Logger ausschalten!
          	// ACHTUNG! Hier nur Items befragen, die es in der DB auch wirklich gibt! Dauert sonst!
         	 try {
-      		ExpressionResult res1 = srv.execute("w | m"); 
-      		srv.endSession(res1.sessionId);
-      		ExpressionResult res2 = srv.execute("hans berlin straße"); 
-      		srv.endSession(res2.sessionId);
-      		ExpressionResult res3 = srv.execute("(hans | maria) berlin m"); 
-      		srv.endSession(res3.sessionId);
+      		int sessionId1 = srv.createSession("w | m"); 
+      		srv.endSession(sessionId1);
+      		int sessionId2 = srv.createSession("hans berlin straße"); 
+      		srv.endSession(sessionId2);
+      		int sessionId3= srv.createSession("(hans | maria) berlin m"); 
+      		srv.endSession(sessionId3);
       		boolean b = srv.hasItem("Berlin");
       		//int len = x.length;
       		int xxx = 0;
