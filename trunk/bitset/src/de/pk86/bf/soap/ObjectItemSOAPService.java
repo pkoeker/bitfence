@@ -1,6 +1,8 @@
 
 package de.pk86.bf.soap;
 
+import java.rmi.RemoteException;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -105,6 +107,6 @@ public interface ObjectItemSOAPService {
     @ResponseWrapper(localName = "createSessionResponse", targetNamespace = "http://pk86.de/bitset", className = "de.pk86.bf.soap.CreateSessionResponse")
     public int createSession(
         @WebParam(name = "arg0", targetNamespace = "")
-        String arg0);
+        String arg0) throws RemoteException;
 
 }
