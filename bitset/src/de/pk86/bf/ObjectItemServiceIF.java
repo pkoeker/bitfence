@@ -3,10 +3,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-
 import de.jdataset.JDataSet;
+import de.pk86.bf.soap.ObjectItemSOAPService;
 /**
  * @author peter
  */
