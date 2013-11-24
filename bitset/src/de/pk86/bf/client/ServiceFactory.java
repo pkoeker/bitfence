@@ -45,6 +45,9 @@ public class ServiceFactory {
 	}
 	// http://pk86.de/bitdemo/soap?wsdl
 	public static ObjectItemSOAPService getSOAPService(String host) {
+		if (host == null) {
+			host = "http://pk86.de/bitdemo/soap?wsdl";
+		}
 		Bitset bs;
       try {
 	      bs = new Bitset(new URL(host));
