@@ -22,6 +22,9 @@ public interface ObjectItemSOAPService {
 	public String getNextPageString(int sessionId);
 	public String getPrevPageString(int sessionId);
 	public boolean hasNext(int sessionId);
+	public boolean hasItem(String itemname);
+	public String sayHello();
+	public String echo(String s);
 	/**
 	 * Liefert true, wenn eine Session mit der angegebenen Id existiert
 	 * vor {@link #endSession(int)} aufrufen.

@@ -129,7 +129,6 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
 public final class ObjectItemService implements ObjectItemServiceIF {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemService.class);
-	private boolean webserviceCreated;
 	private BfPL pl = BfPL.getInstance();
 	private Spider spider;
 	/**
@@ -143,7 +142,6 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * Erzeugt einen neuen Dienst.
 	 */
 	public ObjectItemService() {
-		this.initWebservice();
 		this.initSpider();
 		SessionRemover remover = new SessionRemover(this);
 		remover.setDaemon(true);
@@ -816,34 +814,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				
 		return 0;
 	}
-	private void initWebservice() {
-//		if (webserviceCreated) 
-//			return;
-//		Element ele = pl.getWebServiceConfig();
-//		if (ele == null)
-//			return;
-//		Element urlEle = ele.getElement("URL");
-//		Element srvEle = ele.getElement("Service");
-//		if (urlEle == null || srvEle == null)
-//			return;
-//		String url = urlEle.getTextString();
-//		String srv = srvEle.getTextString();
-//		System.out.println("*** Starting WebService ***\nURL: "+url+"\nService: "+srv);
-//		try {
-//			Context context = new Context();
-//			// Geht nicht ???
-//			// session has expired. cannot create new session object
-//			//context.addProperty( "activation", "session" );
-//			context.addProperty( "description", "Object Item Web Service" );
-//			HTTP.startup(url);
-//			Registry.publish(srv, this, ObjectItemSOAPService.class, context);
-//			webserviceCreated = true;
-//		} catch (Exception ex) {
-//			logger.error(ex.getMessage(), ex);
-//			System.err.println(
-//				"Unable to start WebService:\n" + ex.getMessage());
-//		}
-	}
+
 	private void initSpider() {
 		Element ele = pl.getSpiderConfig();
 		if (ele != null) {
@@ -870,6 +841,14 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		}		
 		return cnt;
 	}
+	
+	public String sayHello() {
+		return "Hello World";
+	}
+	public String echo(String s) {
+		return s;
+	}
+
 	
 	//########################################################
 	private static final class SessionRemover extends Thread {
