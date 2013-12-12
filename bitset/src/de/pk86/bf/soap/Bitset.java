@@ -68,8 +68,8 @@ public class Bitset
      *     returns ObjectItemSOAPService
      */
     @WebEndpoint(name = "bitset")
-    public ObjectItemSOAPService getBitset() {
-        return super.getPort(new QName("http://pk86.de/bitset", "bitset"), ObjectItemSOAPService.class);
+    public de.pk86.bf.ObjectItemSOAPService getBitset() {
+        return super.getPort(new QName("http://pk86.de/bitset", "bitset"), de.pk86.bf.ObjectItemSOAPService.class);
     }
 
     /**
