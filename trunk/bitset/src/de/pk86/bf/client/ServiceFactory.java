@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 import de.pk86.bf.ObjectItemService;
 import de.pk86.bf.ObjectItemServiceIF;
 import de.pk86.bf.soap.Bitset;
-import de.pk86.bf.soap.ObjectItemSOAPService;
+import de.pk86.bf.ObjectItemSOAPService;
 
 /**
  * Erzeugt einen ObjectItemService auf Basis von SOAP oder Spring-RMI
@@ -51,7 +51,7 @@ public class ServiceFactory {
 		Bitset bs;
       try {
 	      bs = new Bitset(new URL(host));
-	      ObjectItemSOAPService srv = bs.getBitset();
+	      de.pk86.bf.ObjectItemSOAPService srv = bs.getBitset();
 	      return srv;
       } catch (MalformedURLException e) {
 	      e.printStackTrace();
