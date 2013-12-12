@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import de.jdataset.JDataSet;
-import de.pk86.bf.soap.ObjectItemSOAPService;
 /**
  * @author peter
  */
@@ -187,5 +186,7 @@ public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	 * Indiziert die Datenbasis; der Index (BitZaun) wird aus den Objekten neu aufgebaut
 	 */
 	public void indexDatabase();
+	public String sayHello();
+	public String echo(String s);
 
 }

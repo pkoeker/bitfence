@@ -197,6 +197,7 @@ public class Selection {
 		if (start + cnt > bitCount) {
 			cnt = bitCount - start;
 		}
+		if (cnt == 0) return null;
 		int[] ret = new int[cnt];
 		int poi;
 		if (forward) {
@@ -269,6 +270,9 @@ public class Selection {
 			int[] oids = this.getNext();
 	      try {
 		      JDataSet ds = pl.getObjectPage(oids);
+		      if (ds == null) {
+					throw new IllegalStateException("End of ResultSet reached");
+		      }
 		      ds.setOid(posi);
 		      return ds;
 	      } catch (Exception e) {
