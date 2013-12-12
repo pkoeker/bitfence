@@ -10,7 +10,8 @@ import de.pk86.bf.client.ServiceFactory;
 
 public class TestSOAP {
 	@Test public void getService() {
-		ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://pk86.de/bitdemo/soap?wsdl");
+		//de.pk86.bf.ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://pk86.de/bitdemo/soap?wsdl");
+		de.pk86.bf.ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://localhost:8080/bitset/soap?wsdl");
 		long start = System.currentTimeMillis();
 		int sid;
       try {
