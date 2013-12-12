@@ -11,9 +11,11 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.pl"/>
         <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.client"/>
-        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf"/>
         <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.util"/>
+        <javaElement handleIdentifier="=bitset/test"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.pl"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.soap"/>
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf"/>
     </selectedElements>
 </jardesc>
