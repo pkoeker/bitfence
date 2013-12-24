@@ -1,9 +1,13 @@
 <ehcache> 
 	<defaultCache
            maxBytesLocalHeap="500M" 
-           maxBytesLocalDisk="10G"      
-           timeToIdleSeconds="300"
-           timeToLiveSeconds="600">
-     <!-- cacheEventListenerFactory class="de.pk86.bf.pl.BfCacheRemoveListener" properties="" listenFor="all"/-->
+           maxBytesLocalDisk="10G"
+           eternal="false"      
+           timeToIdleSeconds="30"
+           timeToLiveSeconds="60"
+           >
+           <!--timeToIdleSeconds="300"
+           timeToLiveSeconds="600"-->
+     <cacheEventListenerFactory class="de.pk86.bf.pl.BfCacheEventListenerFactory" properties="" listenFor="all"/>
     </defaultCache>
 </ehcache>
