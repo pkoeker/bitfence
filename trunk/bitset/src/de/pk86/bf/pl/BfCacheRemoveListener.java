@@ -39,6 +39,9 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	  private int expired;
 	  private int evicted;
 	
+	  public BfCacheRemoveListener() {
+		  super();
+	  }
 	/**
 	 * Called immediately after an element has been removed. The remove method
 	 * will block until this method returns.
@@ -164,7 +167,8 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	 */
 	public Object clone() throws CloneNotSupportedException {
 		
-		throw new CloneNotSupportedException();
+		//throw new CloneNotSupportedException();
+		return new BfCacheRemoveListener();
 	}
 
 	@Override
@@ -190,15 +194,19 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	private void updateItem(net.sf.ehcache.Element cele) {
 		Item item = this.get(cele);
 		if (item == null) { // wie das?
+			logger.warn("item is null?");
 			return; 
 		}
 		if (item.isModified() || item.isInserted()) {
 			try {
 	         BfPL.getInstance().insertOrUpdateItem(item);
+	         logger.debug("Item updated: " + item.itemname + "/" + item.countBits());
          } catch (Exception e) {
 	         e.printStackTrace();
 	         logger.error(e.getMessage(), e);
          }
+		} else {
+         logger.debug("Item removed from cache; not modified/inserted: " + item.itemname + "/" + item.countBits());
 		}
 	}
 

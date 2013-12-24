@@ -50,7 +50,8 @@ public class ServiceFactory {
 		}
 		Bitset bs;
       try {
-	      bs = new Bitset(new URL(host));
+      	URL url = new URL(host);
+	      bs = new Bitset(url);
 	      de.pk86.bf.ObjectItemSOAPService srv = bs.getBitset();
 	      return srv;
       } catch (MalformedURLException e) {
