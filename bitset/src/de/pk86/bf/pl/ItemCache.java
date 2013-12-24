@@ -29,40 +29,54 @@ class ItemCache {
 				// Create Cache
 				BfPL.getCacheManager().addCache(cacheName);
 				cache = BfPL.getCacheManager().getCache(cacheName);
-				cache.getCacheEventNotificationService().registerListener(new BfCacheRemoveListener());
-				// CacheConfig
 				CacheConfiguration cfg = cache.getCacheConfiguration();
-				// Properties
-				String maxEntriesLocalHeap = ele.getAttribute("maxEntriesLocalHeap");
-				if (maxEntriesLocalHeap != null) {
-					long maxElesMem = Convert.toLong(maxEntriesLocalHeap);
-					cfg.setMaxEntriesLocalHeap(maxElesMem);
-				}
-				// HEAP
-				String maxBytesLocalHeap = ele.getAttribute("maxBytesLocalHeap");
-				if (maxBytesLocalHeap != null) {
-					cfg.setMaxBytesLocalHeap(maxBytesLocalHeap);
-				}
-				// Disk
-				String maxBytesLocalDisk = ele.getAttribute("maxBytesLocalDisk");
-				if (maxBytesLocalDisk != null) {
-					cfg.setMaxBytesLocalDisk(maxBytesLocalDisk);
-				}
-				//
-				long time2idl = 300; // 5 Minuten
-				String timeToIdleSeconds = ele.getAttribute("timeToIdleSeconds");
-				if (timeToIdleSeconds != null) {
-					time2idl = Convert.toLong(timeToIdleSeconds);
-				}
-				cfg.setTimeToIdleSeconds(time2idl);
-				//
-				long time2live = 1200; // 20 Minuten
-				String timeToLiveSeconds = ele.getAttribute("timeToLiveSeconds");
-				if (timeToLiveSeconds != null) {
-					time2live = Convert.toLong(timeToLiveSeconds);
-				}
-				cfg.setTimeToLiveSeconds(time2live);
+				int xxx =0;
+//				cache.getCacheEventNotificationService().registerListener(new BfCacheRemoveListener());
+//				// CacheConfig
+//				CacheConfiguration cfg = cache.getCacheConfiguration();
+//				// Properties
+//				// HEAP
+//				try {
+//					String maxEntriesLocalHeap = ele.getAttribute("maxEntriesLocalHeap");
+//					if (maxEntriesLocalHeap != null) {
+//						long maxElesMem = Convert.toLong(maxEntriesLocalHeap);
+//						cfg.setMaxEntriesLocalHeap(maxElesMem);
+//					} else {
+//						String maxBytesLocalHeap = ele.getAttribute("maxBytesLocalHeap");
+//						if (maxBytesLocalHeap != null) {
+//							cfg.setMaxBytesLocalHeap(maxBytesLocalHeap);
+//						}
+//					}
+//				} catch (Exception ex) {
+//					ex.printStackTrace();
+//					logger.error(ex.getMessage(), ex);
+//				}
+//				// Disk
+//				try {
+//					String maxBytesLocalDisk = ele.getAttribute("maxBytesLocalDisk");
+//					if (maxBytesLocalDisk != null) {
+//						cfg.setMaxBytesLocalDisk(maxBytesLocalDisk);
+//					}
+//				} catch (Exception ex) {
+//					ex.printStackTrace();
+//					logger.error(ex.getMessage(), ex);
+//				}
+//				//
+//				long time2idl = 300; // 5 Minuten
+//				String timeToIdleSeconds = ele.getAttribute("timeToIdleSeconds");
+//				if (timeToIdleSeconds != null) {
+//					time2idl = Convert.toLong(timeToIdleSeconds);
+//				}
+//				cfg.setTimeToIdleSeconds(time2idl);
+//				//
+//				long time2live = 1200; // 20 Minuten
+//				String timeToLiveSeconds = ele.getAttribute("timeToLiveSeconds");
+//				if (timeToLiveSeconds != null) {
+//					time2live = Convert.toLong(timeToLiveSeconds);
+//				}
+//				cfg.setTimeToLiveSeconds(time2live);
 			} catch (Exception ex) {
+				ex.printStackTrace();
 				logger.error(ex.getMessage(), ex);
 			}
 		}

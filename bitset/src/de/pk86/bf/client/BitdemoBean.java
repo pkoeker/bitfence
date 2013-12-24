@@ -60,7 +60,7 @@ public class BitdemoBean {
 					this.dispResult(currentPage, null);
 				}
 			}
-		} catch (RemoteException ex) {
+		} catch (Exception ex) {
 			page = ex.getMessage();
 		}
 	}

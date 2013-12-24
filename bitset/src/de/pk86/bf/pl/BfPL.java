@@ -424,14 +424,16 @@ public class BfPL {
 		}
 	}
 	
-	private Item loadItem(String itemname, IPLContext ipl) throws Exception {
+	private Item loadItemDB(String itemname, IPLContext ipl) throws Exception {
 		try {
-			JDataSet ds = ipl.getDataset("item",  itemname);
+			JDataSet ds = ipl.getDataset("item", itemname);
 			if (ds.getRowCount() != 1) {
+				logger.debug("Missing item in DB: " + itemname);
 				return null;
 			}
 			JDataRow row = ds.getChildRow(0);
 			Item item = new Item(itemname, row);
+			logger.debug("Load item from DB: " + itemname);
 			return item;
 		} catch (PLException ex) {
 			logger.error(ex.getMessage(), ex);
@@ -452,17 +454,20 @@ public class BfPL {
 	 */
 	private Item loadItem(String itemname, boolean force, IPLContext ipl) throws Exception {
 		Item item = iCache.get(itemname); // Cache
-		if (item != null) 
+		if (item != null) {
+			logger.debug("Load item from cache: " + itemname + "/" + item.countBits());
 			return item;
+		}
 		missing++;
 		if (missing % 100 == 0) {
 			System.out.println("loadItem/#Cache Missings: " + missing + " " + itemname);
 		}
-		item = this.loadItem(itemname,  ipl); // DB
+		item = this.loadItemDB(itemname, ipl); // DB
 		if (force == true && item == null) {
 			item = new Item(itemname);
 		}
 		if (item != null) {
+			logger.debug("Put item into cache: " + itemname + "/" + item.countBits());
 			iCache.put(item);
 		}
 		return item;		
@@ -757,7 +762,7 @@ public class BfPL {
 				 cnt++;
 			 }
 		 }
-		 // 1.2 Alte Attribute austragen
+		 // 1.2 Alte Attribute austragen, wenn in der neuen Attributliste nicht mehr enthalten
 		 else if (row.isInserted() == false) { // keine neuen austragen
 			 for(String itemname:olditems) {
 				 if (items.contains(itemname) == false) {
