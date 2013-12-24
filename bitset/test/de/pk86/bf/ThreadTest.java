@@ -1,18 +1,14 @@
 package de.pk86.bf;
 
-import static org.junit.Assert.*;
-import junit.framework.TestCase;
+import static org.junit.Assert.fail;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import de.guibuilder.framework.GuiUtil;
 import de.pk86.bf.client.ServiceFactory;
-import de.pk86.bf.soap.ObjectItemSOAPService;
 
-//import de.pkjs.pltest.ConnectionPoolTest;
-
-public class ThreadTest /*extends TestCase*/ {
+public class ThreadTest {
    /**
     * Logger for this class
     */
@@ -24,27 +20,26 @@ public class ThreadTest /*extends TestCase*/ {
    private Object errSema = "y";
    private int fin;
    private String error;
+   private static boolean gui = true;
 
    private long startTime;
    private long endTime;
-   //private static ObjectItemServiceIF srv = ServiceFactory.getSpringService("10.8.0.1");
-   private static ObjectItemServiceIF srv = ServiceFactory.getDirectService();
+   //private static ObjectItemServiceIF srv = ServiceFactory.getSpringService("10.8.0.1:1098");
+   //private static ObjectItemServiceIF srv = ServiceFactory.getDirectService();
    //private static ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://10.8.0.1:8080/bitdemo/soap?wsdl");
+   //private static ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://pk86.de/bitdemo/soap?wsdl");
+   //private static ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://localhost:8080/bitset/soap?wsdl");
+   private static ObjectItemSOAPService srv = ServiceFactory.getSOAPService("file:///home/peter/workspace/bitset/soap.wsdl");
 
+   public static void main(String[] args) {
+   	ThreadTest me = new ThreadTest();
+   	gui = false;
+   	me.testThread();
+   }
    public ThreadTest() {
+   	
    }
    
-   public void setUp() throws Exception {
-      logger.info("setUp");
-      //srv = ServiceFactory.getSpringService("10.8.0.1");
-   }
-
-   public void tearDown() throws Exception {
-      logger.info("tearDown");
-      //p.shutdown();
-      // p.reset();
-   }
-
    private void addError(String errorText) {
       if (error == null) {
          error = errorText + "\n";
@@ -54,11 +49,11 @@ public class ThreadTest /*extends TestCase*/ {
    }
 
    @Test public void testThread() {
-		if (!GuiUtil.yesNoMessage(null, "Return to continue", "Start")) {
+		if (gui && !GuiUtil.yesNoMessage(null, "Return to continue", "Start")) {
 			return;
 		}
       int maxThreads = 300; // 300
-      int runCounts = 20; // 20 
+      int runCounts = 5; // 20 
       //int totalRuns = runCounts * maxThreads;
       int totalRuns = maxThreads;
       
@@ -95,7 +90,7 @@ public class ThreadTest /*extends TestCase*/ {
       System.out.println("Dauer: " + durSec);
       System.out.println("Je Sekunde: " + totalRuns * runCounts/durSec);
       int xxx = 0; xxx++;
-		if (!GuiUtil.yesNoMessage(null, "Return to continue", "End")) {
+		if (gui && !GuiUtil.yesNoMessage(null, "Return to continue", "End")) {
 			return;
 		}
 
@@ -119,13 +114,15 @@ public class ThreadTest /*extends TestCase*/ {
          	// ACHTUNG! Logger ausschalten!
          	// ACHTUNG! Hier nur Items befragen, die es in der DB auch wirklich gibt! Dauert sonst!
         	 try {
+//        		 String h = srv.sayHello();
+//        		 String e = srv.echo("äöüÄÖÜß");
       		int sessionId1 = srv.createSession("w | m"); 
       		srv.endSession(sessionId1);
       		int sessionId2 = srv.createSession("hans berlin straße"); 
       		srv.endSession(sessionId2);
       		int sessionId3= srv.createSession("(hans | maria) berlin m"); 
       		srv.endSession(sessionId3);
-      		boolean b = srv.hasItem("Berlin");
+      		//boolean b = srv.hasItem("Berlin");
       		//int len = x.length;
       		int xxx = 0;
         	 } catch (Exception ex) {
