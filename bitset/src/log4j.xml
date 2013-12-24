@@ -35,7 +35,7 @@
         <appender-ref ref="SlowQueryAppender"/>
 	</logger>
     <root>
-        <priority value="info"/>
+        <priority value="debug"/>
         <appender-ref ref="ReadableFileAppender"/>
         <appender-ref ref="console"/>
     </root>
