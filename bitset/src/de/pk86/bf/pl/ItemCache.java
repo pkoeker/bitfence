@@ -27,7 +27,7 @@ class ItemCache {
 			enabled = Convert.toBoolean(sEnabled);
 			try {
 				// Create Cache
-				BfPL.getCacheManager().addCache(cacheName);
+				//BfPL.getCacheManager().addCache(cacheName);
 				cache = BfPL.getCacheManager().getCache(cacheName);
 				CacheConfiguration cfg = cache.getCacheConfiguration();
 				int xxx =0;
