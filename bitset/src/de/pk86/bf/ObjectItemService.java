@@ -131,6 +131,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemService.class);
 	private BfPL pl = BfPL.getInstance();
 	private Spider spider;
+	private SessionRemover remover;
 	/**
 	 * Session werden nach 15 Minuten timeout gelöscht
 	 */
@@ -143,6 +144,9 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 */
 	public ObjectItemService() {
 		this.initSpider();
+		this.initRemover();
+	}
+	private void initRemover() {
 		SessionRemover remover = new SessionRemover(this);
 		remover.setDaemon(true);
 		remover.start();
