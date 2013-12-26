@@ -114,8 +114,8 @@ public class BfPL {
 			int cnt = ipl.setDataset(ds);
 			ds.commitChanges();
 			// 3. Items
-			// 3.1 Cache vorher löschen
-			iCache.removeAll();
+			// 3.1 Cache vorher löschen ??? Wieso? Dann sind alle Änderungen weg??
+			//iCache.removeAll();
 			Iterator<JDataRow> itc = ds.getChildRows();
 			while(itc.hasNext()) {
 				JDataRow row = itc.next();
@@ -344,6 +344,9 @@ public class BfPL {
 			list.addParameter("oldItemname", oldItemname);
 			int anz2 = ipl.executeSql(upd2, list);
 			boolean removed = iCache.remove(oldItemname);
+			if (iCache != null) {
+				iCache.remove(oldItemname);
+			}
 			ipl.commitTransaction(transname);
 			return anz2;
 		} catch (PLException ex) {
@@ -839,20 +842,20 @@ public class BfPL {
 	private Document loadFile(String fileName) throws Exception {
 		Document doc = null;
 		try {
-		// ClassLoader cl = this.getClass().getClassLoader();
-		InputStream inp = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
-		if (inp != null) {
-			doc = new Document(inp);
-			logger.debug("PLConfig File Loaded: " + fileName);
-			return doc;
-		} else {
-			File f = new File(fileName);
-			if (f.canRead() == false) {
-				f = new File("../" + fileName);
+			// ClassLoader cl = this.getClass().getClassLoader();
+			InputStream inp = Thread.currentThread().getContextClassLoader().getResourceAsStream(fileName);
+			if (inp != null) {
+				doc = new Document(inp);
+				logger.debug("PLConfig File Loaded: " + fileName);
+				return doc;
+			} else {
+				File f = new File(fileName);
+				if (f.canRead() == false) {
+					f = new File("../" + fileName);
+				}
+				doc = new Document(f);
+				return doc;
 			}
-			doc = new Document(f);
-			return doc;
-		}
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
 			throw ex;
@@ -904,10 +907,13 @@ public class BfPL {
 	private void setBit(long oid, String itemname, IPLContext ipl) throws Exception {
 		Item item = loadItem(itemname, true, ipl);
 		item.setBit(oid);
-		if (iCache == null) {
+		if (iCache == null) { // kein Cache
 			saveItem(item, ipl);
 		} else {
 			// Cached
+			if (item.isModified()) {
+				iCache.put(item);
+			}
 		}
 	}
 	/**
@@ -942,13 +948,14 @@ public class BfPL {
 			if (iCache == null) {
 				saveItem(item, ipl);
 			} else {
-				// Cached
+				if (item.isModified()) {
+					iCache.put(item);
+				}
 			}
 		}		
 	}
 	
 	void writeAll(IPLContext ipl) throws Exception {
-		//iCache.removeAll();
 		boolean transStarted = false;
 		if (ipl == null) {
 			ipl = pl.startNewTransaction("writeAll");
@@ -961,6 +968,15 @@ public class BfPL {
 	   if (transStarted) {
 	   	ipl.commitTransaction("writeAll");
 	   }
+	}
+	
+	public void finalize() {
+		try {
+			this.writeAll(null);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error(ex.getMessage(), ex);
+		}
 	}
 	
 	private Exception handleEx(Exception ex, IPLContext ipl, String transName) throws Exception {
