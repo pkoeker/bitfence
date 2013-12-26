@@ -481,6 +481,7 @@ public class BfPL {
 		IPLContext ipl = pl.startNewTransaction(transname);
 		try {
 			this.insertOrUpdateItem(item, ipl);
+			iCache.put(item);// in Cache zurückschreiben, damit modified/inserted zurückgesetzt wird
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
 			if (ipl != null) {
