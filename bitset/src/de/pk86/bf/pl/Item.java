@@ -26,10 +26,10 @@ public class Item implements Serializable {
 		this.inserted = true;
 	}
 
-	public Item(String itemname, byte[] bitFence) {
-		this.itemname = itemname;
-		this.bitset = BitSet.valueOf(bitFence);
-	}
+//	public Item(String itemname, byte[] bitFence) {
+//		this.itemname = itemname;
+//		this.bitset = BitSet.valueOf(bitFence);
+//	}
 
 	public Item(String itemname, JDataRow row) {
 		this.itemname = itemname;
@@ -124,7 +124,9 @@ public class Item implements Serializable {
 	
 	public Item clone() {
 		Item clone = new Item(this.itemname);
-		clone.inserted = true;
+		//clone.inserted = true;
+		clone.inserted = this.inserted;
+		clone.modified = this.modified;
 		synchronized(bitset) {
 			clone.bitset = (BitSet)bitset.clone();
 		}		
