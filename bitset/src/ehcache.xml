@@ -14,9 +14,9 @@
            maxBytesLocalHeap="500M" 
            maxBytesLocalDisk="10G"
            >
-     	 <cacheEventListenerFactory class="de.pk86.bf.pl.BfCacheEventListenerFactory" properties="" listenFor="all"/>
-	     <cacheWriter writeMode="write-behind" maxWriteDelay="5" rateLimitPerSecond="5"
-    	    writeCoalescing="false" writeBatching="true" writeBatchSize="50"
+     	 <!-- cacheEventListenerFactory class="de.pk86.bf.pl.BfCacheEventListenerFactory" properties="" listenFor="all"/-->
+		 <cacheWriter writeMode="write-behind" maxWriteDelay="10" rateLimitPerSecond="20"
+    	    	writeCoalescing="true" writeBatching="true" writeBatchSize="50"
         	retryAttempts="2" retryAttemptDelaySeconds="10"  >
          	<cacheWriterFactory class="de.pk86.bf.pl.BfCacheWriterFactory"  />
       	</cacheWriter>
