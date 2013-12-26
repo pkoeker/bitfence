@@ -25,13 +25,21 @@ public class BfCacheWriter implements CacheWriter {
 	@Override
    public void delete(CacheEntry arg0) throws CacheException {
 		System.out.println(arg0);
-	   
+	   Item item = this.get(arg0.getElement());
+	   try {
+	      BfPL.getInstance().deleteItem(item.itemname);
+      } catch (Exception e) {
+         e.printStackTrace();
+         logger.error(e.getMessage(), e);
+      }
    }
 
 	@Override
    public void deleteAll(Collection<CacheEntry> arg0) throws CacheException {
 		System.out.println(arg0);
-	   
+	   for (CacheEntry entry: arg0) {
+	   	this.delete(entry);
+	   }
    }
 
 	@Override
@@ -54,7 +62,7 @@ public class BfCacheWriter implements CacheWriter {
 	   Item item = this.get(cele);
 		if (item.isModified() || item.isInserted()) {
 			try {
-	         BfPL.getInstance().insertOrUpdateItem(item);
+	         BfPL.getInstance().insertOrUpdateItem(item); // Schreibt auch in den Cache zurück
 	         logger.debug("Item updated: " + item.itemname + "/" + item.countBits());
          } catch (Exception e) {
 	         e.printStackTrace();
@@ -67,7 +75,10 @@ public class BfCacheWriter implements CacheWriter {
 
 	@Override
    public void writeAll(Collection<Element> arg0) throws CacheException {
-		System.out.println(arg0);	   
+		//System.out.println(arg0);	   
+		for (Element cele:arg0) { // TODO: Transaktion, batch; inserted/modified
+			this.write(cele);
+		}
    }
 	
 	private Item get(net.sf.ehcache.Element cele) {

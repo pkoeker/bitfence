@@ -86,7 +86,11 @@ class ItemCache {
 		if (item == null || item.itemname == null)
 			return;
 		net.sf.ehcache.Element cele = new net.sf.ehcache.Element(item.itemname, item);
-		cache.put(cele);
+		if (item.isModified()) {
+			cache.putWithWriter(cele);				
+		} else {
+			cache.put(cele);				
+		}
 	}
 
 	Item get(String key) {
