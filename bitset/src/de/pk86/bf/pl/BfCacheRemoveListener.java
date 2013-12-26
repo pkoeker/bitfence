@@ -186,8 +186,8 @@ public class BfCacheRemoveListener implements CacheEventListener {
 		try {
 	      BfPL.getInstance().writeAll(null);
       } catch (Exception e) {
-	      // TODO Auto-generated catch block
 	      e.printStackTrace();
+         logger.error(e.getMessage(), e);
       }
    }
 	
@@ -213,8 +213,8 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	private Item get(net.sf.ehcache.Element cele) {
 		if (cele != null) {
 			Object val = cele.getObjectValue();
-			Item s = (Item) val;
-			return s;
+			Item item = (Item) val;
+			return item;
 		} else {
 			return null;
 		}
