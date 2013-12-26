@@ -1,7 +1,5 @@
 package de.pk86.bf.client;
 
-import java.rmi.RemoteException;
-
 import javax.servlet.http.HttpServletRequest;
 
 import de.jdataset.JDataSet;
