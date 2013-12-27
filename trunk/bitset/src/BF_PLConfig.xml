@@ -24,9 +24,9 @@
 	<TransactionIsolationLevel value="TRANSACTION_READ_COMMITTED"/>
     <DetectDatabaseSessionID value="false" />	
     <Sequence>
-      <!--get>SELECT counter FROM counter WHERE oid = 1</get>
-      <set>UPDATE counter SET counter = ? WHERE oid = 1</set-->
-      <get>SELECT MAX(oid)+1 FROM OBJEKT</get>
+      <!--get>SELECT counter FROM counter WHERE obid = 1</get>
+      <set>UPDATE counter SET counter = ? WHERE obid = 1</set-->
+      <get>SELECT MAX(obid)+1 FROM OBJEKT</get>
     </Sequence>
   </Database>
   <Format>
@@ -57,7 +57,7 @@
 		</RootTable>
 	</View>
 	<View name="objekt">
-		<RootTable pk="oid" tablename="objekt">
+		<RootTable pk="obid" tablename="objekt" orderby="obid">
 			<Column name="*"/>
 		</RootTable>
 	</View>
