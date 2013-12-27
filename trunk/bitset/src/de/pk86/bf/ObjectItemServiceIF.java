@@ -182,6 +182,7 @@ public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	 */
 	public int importDatabaseCSV(String content);
 	public int importDatabaseDataset(JDataSet data);
+	public String getItemCacheStatistics();
 	/**
 	 * Indiziert die Datenbasis; der Index (BitZaun) wird aus den Objekten neu aufgebaut
 	 */

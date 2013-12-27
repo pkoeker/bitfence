@@ -164,7 +164,7 @@ public class ImportObjects extends TestCase {
 			//sb.append(" ");
 			
 			JDataRow row = ds.createChildRow();
-			row.setValue("oid", i);
+			row.setValue("obid", i);
 			String s = sb.toString();
 			s = s.replaceAll(";", " ");
 			row.setValue("content", s);

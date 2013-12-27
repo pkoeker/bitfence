@@ -6,6 +6,7 @@ import java.util.Map;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.config.CacheConfiguration;
+import net.sf.ehcache.management.CacheStatistics;
 import de.pkjs.util.Convert;
 import electric.xml.Element;
 
@@ -26,61 +27,21 @@ class ItemCache {
 			String sEnabled = ele.getAttribute("enabled");
 			enabled = Convert.toBoolean(sEnabled);
 			try {
-				// Create Cache
-				//BfPL.getCacheManager().addCache(cacheName);
+				// get Cache (Voraussetzung: Cache mit diesem Namen ist in ehcache.xml definiert
 				cache = BfPL.getCacheManager().getCache(cacheName);
 				CacheConfiguration cfg = cache.getCacheConfiguration();
-				int xxx =0;
-//				cache.getCacheEventNotificationService().registerListener(new BfCacheRemoveListener());
-//				// CacheConfig
-//				CacheConfiguration cfg = cache.getCacheConfiguration();
-//				// Properties
-//				// HEAP
-//				try {
-//					String maxEntriesLocalHeap = ele.getAttribute("maxEntriesLocalHeap");
-//					if (maxEntriesLocalHeap != null) {
-//						long maxElesMem = Convert.toLong(maxEntriesLocalHeap);
-//						cfg.setMaxEntriesLocalHeap(maxElesMem);
-//					} else {
-//						String maxBytesLocalHeap = ele.getAttribute("maxBytesLocalHeap");
-//						if (maxBytesLocalHeap != null) {
-//							cfg.setMaxBytesLocalHeap(maxBytesLocalHeap);
-//						}
-//					}
-//				} catch (Exception ex) {
-//					ex.printStackTrace();
-//					logger.error(ex.getMessage(), ex);
-//				}
-//				// Disk
-//				try {
-//					String maxBytesLocalDisk = ele.getAttribute("maxBytesLocalDisk");
-//					if (maxBytesLocalDisk != null) {
-//						cfg.setMaxBytesLocalDisk(maxBytesLocalDisk);
-//					}
-//				} catch (Exception ex) {
-//					ex.printStackTrace();
-//					logger.error(ex.getMessage(), ex);
-//				}
-//				//
-//				long time2idl = 300; // 5 Minuten
-//				String timeToIdleSeconds = ele.getAttribute("timeToIdleSeconds");
-//				if (timeToIdleSeconds != null) {
-//					time2idl = Convert.toLong(timeToIdleSeconds);
-//				}
-//				cfg.setTimeToIdleSeconds(time2idl);
-//				//
-//				long time2live = 1200; // 20 Minuten
-//				String timeToLiveSeconds = ele.getAttribute("timeToLiveSeconds");
-//				if (timeToLiveSeconds != null) {
-//					time2live = Convert.toLong(timeToLiveSeconds);
-//				}
-//				cfg.setTimeToLiveSeconds(time2live);
+				logger.debug(cfg);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				logger.error(ex.getMessage(), ex);
 			}
 		}
 	}
+   
+   public CacheStatistics getStatistics() {
+   	CacheStatistics cs = new CacheStatistics(cache);
+   	return cs;
+   }
 
 	void put(Item item) {
 		if (item == null || item.itemname == null)
