@@ -5,12 +5,14 @@
 	<defaultCache
            eternal="false"      
            timeToIdleSeconds="300"
-           timeToLiveSeconds="600">      
+           timeToLiveSeconds="600"
+           
+           >      
     </defaultCache>
     <cache name="ItemCache"
            eternal="false"      
-           timeToIdleSeconds="60"
-           timeToLiveSeconds="60"
+           timeToIdleSeconds="120"
+           timeToLiveSeconds="120"
            maxBytesLocalHeap="500M" 
            maxBytesLocalDisk="10G"
            >
