@@ -22,7 +22,7 @@ table.myTable td, table.myTable th { border:1px solid black; }
 		<% for(int i = 0; i < edit.getPage().getRowCount(); i++) { %>
 		<tr>
 			<td align="center"> <input type="checkbox" name="checked<%="["+ i +"]"%>"/> </td>
-			<td align="center"> <%= edit.getPage().getChildRow(i).getValue("oid")+"["+ i +"]" %> </td>
+			<td align="center"> <%= edit.getPage().getChildRow(i).getValue("obid")+"["+ i +"]" %> </td>
 			<td><input type ="text" name="content<%="["+ i +"]"%>" size="100" value='<%= edit.getPage().getChildRow(i).getValue("content") %>' /></td>
 		</tr>
 		<% } %>
