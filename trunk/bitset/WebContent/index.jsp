@@ -18,6 +18,7 @@
   
   <form method="post" style="display:inline"><input type="submit" name="action" value="zur&uuml;ck"/> <%=bitdemo.getPointer() %></form> 
   <form method="post" style="display:inline"><input type="submit" name="action" value="weiter"/></form>
+  <form method="post" style="display:inline"><input type="submit" name="action" value="statistic"/></form>
   <p/>
   <sup>[1]</sup> Operatoren: | ! ^ ( )<p/>
   <hr />
