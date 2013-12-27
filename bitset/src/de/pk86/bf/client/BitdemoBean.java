@@ -56,6 +56,9 @@ public class BitdemoBean {
 					request.getSession().setAttribute("currentPage", currentPage);
 					this.res.pointer = (int)currentPage.getOid();
 					this.dispResult(currentPage, null);
+				} else if ("statistic".equalsIgnoreCase(param)) {
+					String cs = sv.getItemCacheStatistics();
+					page = cs;
 				}
 			}
 		} catch (Exception ex) {

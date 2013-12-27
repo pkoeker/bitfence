@@ -15,6 +15,7 @@ import java.util.StringTokenizer;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 
+import net.sf.ehcache.management.CacheStatistics;
 import de.jdataset.JDataColumn;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
@@ -797,7 +798,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		JDataSet ds = new JDataSet("objekt");
 		JDataTable tbl = new JDataTable("objekt");
 		ds.addRootTable(tbl);
-		JDataColumn colId = tbl.addColumn("oid", Types.INTEGER);
+		JDataColumn colId = tbl.addColumn("obid", Types.INTEGER);
 		colId.setPrimaryKey(true);
 		tbl.addColumn("content", Types.VARCHAR);
 		while (toks.hasMoreTokens()) {
@@ -818,6 +819,24 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 				
 		return 0;
 	}
+	
+	public String getItemCacheStatistics() {
+		CacheStatistics cs = pl.getItemCacheStatistics();
+		StringBuilder sb = new StringBuilder();
+		sb.append("Object Count: " + cs.getObjectCount());
+		sb.append('\n');
+		sb.append("Cache Hits: " + cs.getCacheHits());
+		sb.append(" Cache Hits%: " + cs.getCacheHitPercentage());
+		sb.append('\n');
+		sb.append("Cache Miss: " + cs.getCacheMisses());
+		sb.append(" Cache Miss%: " + cs.getCacheMissPercentage());
+		sb.append('\n');
+		sb.append("WriterMaxQueueSize: " + cs.getWriterMaxQueueSize());
+		sb.append(" Length: " + cs.getWriterQueueLength());
+		sb.append('\n');
+		return sb.toString();
+	}
+
 
 	private void initSpider() {
 		Element ele = pl.getSpiderConfig();

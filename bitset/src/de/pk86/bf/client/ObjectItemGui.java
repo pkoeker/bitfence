@@ -108,7 +108,7 @@ public class ObjectItemGui {
 		if (it != null) {
 			while (it.hasNext()) {
 				JDataRow row = it.next();
-				b.append(row.getValue("oid"));
+				b.append(row.getValue("obid"));
 				b.append(" ");
 			}
 		}

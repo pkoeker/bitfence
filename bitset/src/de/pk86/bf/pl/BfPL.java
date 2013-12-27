@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.management.CacheStatistics;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.ParameterList;
@@ -36,8 +37,8 @@ public class BfPL {
 	// Statements
 	// Object
 	private final String insertObject = "INSERT INTO OBJEKT Values(?,?)";
-	private final String findObject 	= "SELECT Content FROM Objekt WHERE oid = ?";
-	private final String deleteObject = "DELETE FROM OBJEKT WHERE oid = ?";
+	private final String findObject 	= "SELECT Content FROM Objekt WHERE obid = ?";
+	private final String deleteObject = "DELETE FROM OBJEKT WHERE obid = ?";
 	//private String getMaxOid = "SELECT MAX(oid)+1 FROM OBJEKT";	
 	// Item
 	private final String findItems = "SELECT Itemname FROM ITEM WHERE Itemname LIKE ? ORDER BY Itemname";
@@ -84,7 +85,7 @@ public class BfPL {
 				try {
 					//##URL url = PL.class.getResource("/ehcache.xml");
 					//##cacheManager = CacheManager.create(url);
-					cacheManager = CacheManager.create();
+					cacheManager = CacheManager.getInstance();
 				} catch (Throwable ex) {
 					logger.error(ex.getMessage(), ex);
 				}
@@ -105,7 +106,7 @@ public class BfPL {
 			Iterator<JDataRow> ito = ds.getChildRows();
 			while(ito.hasNext()) {
 				JDataRow row = ito.next();
-				row.setValue("oid", oid);
+				row.setValue("obid", oid);
 				oid++;
 			}
 		}
@@ -120,7 +121,7 @@ public class BfPL {
 			while(itc.hasNext()) {
 				JDataRow row = itc.next();
 				String content = row.getValue("content");
-				long oid = row.getValueLong("oid");
+				long oid = row.getValueLong("obid");
 				this.createObjectItems(oid, content, ipl);
 			}		
 			// 4. Cache durchschreiben
@@ -154,7 +155,7 @@ public class BfPL {
 		try {
 			ipl = pl.startNewTransaction("createObject");
 			ParameterList list = new ParameterList();
-			list.addParameter("oid", oid);
+			list.addParameter("obid", oid);
 			list.addParameter("content", content);
 			int cnt = ipl.executeSql(insertObject, list);
 			if (cnt != 1) {
@@ -184,7 +185,7 @@ public class BfPL {
 		try {
 			ipl = pl.startNewTransaction(transName);
 			ParameterList list = new ParameterList();			
-			list.addParameter("oid", oid);
+			list.addParameter("obid", oid);
 			JDataSet ds = pl.getDatasetSql("Content", findObject, list);
 			if (ds.getRowCount() != 1) {
 				ipl.rollbackTransaction(transName);
@@ -565,7 +566,7 @@ public class BfPL {
 			IPLContext ipl = pl.startNewTransaction("repair");
 			while(it.hasNext()) {
 				JDataRow row = it.next();
-				long oid = row.getValueLong("oid");
+				long oid = row.getValueLong("obid");
 				String content = row.getValue("content");
 				Set<String> al = getObjectItems(content);
 				anzo++;
@@ -707,7 +708,7 @@ public class BfPL {
 //		list.addParameter("oids", al);
 //		JDataSet ds = pl.getDatasetSql("objekt", sql, list);		
 //		JDataTable tbl = ds.getDataTable(); 
-//		JDataColumn colPK = tbl.getDataColumn("oid");
+//		JDataColumn colPK = tbl.getDataColumn("obid");
 //		colPK.setPrimaryKey(true); // PK fürs zurückschreiben
 		return ds;
 	}
@@ -751,7 +752,7 @@ public class BfPL {
 	
 	private int updateRow(JDataRow row, IPLContext ipl) throws Exception {
 		int cnt = 0; 
-		long oid = row.getValueLong("oid");
+		long oid = row.getValueLong("obid");
 		 String oldContent = row.getDataValue("content").getOldValue();
 		 String content = row.getValue("content");
 		 if (row.isDeleted() && oldContent == null) { // gelöscht, aber nicht geändert
@@ -994,5 +995,9 @@ public class BfPL {
 			}
 		}		
 		return ex;
+	}
+	
+	public CacheStatistics getItemCacheStatistics() {
+		return iCache.getStatistics();
 	}
 }

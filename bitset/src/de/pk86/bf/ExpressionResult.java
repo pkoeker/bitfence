@@ -49,7 +49,7 @@ public class ExpressionResult implements Serializable {
    	StringBuilder sb = new StringBuilder();
    	while (it.hasNext()) {
    		JDataRow row = it.next();
-   		sb.append("[" + row.getValue("oid") +"] ");
+   		sb.append("[" + row.getValue("obid") +"] ");
    		sb.append(row.getValue("content"));
    		sb.append('\n');
    	}
