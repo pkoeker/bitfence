@@ -1,8 +1,9 @@
 package de.pk86.bf;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import java.rmi.RemoteException;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -18,14 +19,14 @@ public class TestExecute  {
 		//boolean b = srv.hasItem("AGBG");
 		ExpressionResult x;
       try {
-	      x = srv.execute("marco");
-	      x = srv.execute("freitag");
-	      x = srv.execute("marco freitag");
-	      x = srv.execute("marco freitag 01.07.1981");
-	      x = srv.execute("marco freitag  01.07.1981  08297");
-	      x = srv.execute("zwönitz marco freitag  01.07.1981  08297  ");
-	      x = srv.execute("marco freitag  01.07.1981  08297  zwönitz  mertensheide");
-	      x = srv.execute("marco freitag  01.07.1981  08297  zwönitz  mertensheide  2");
+	      x = srv.execute("hans");
+	      x = srv.execute("müller");
+	      x = srv.execute("Hans Müller");
+	      x = srv.execute("Hans Müller 21.12.1966");
+	      x = srv.execute("Hans Müller m 21.12.1966");
+	      x = srv.execute("Hans Müller m 21.12.1966 Müllerstraße 13");
+	      x = srv.execute("Hans Müller m 21.12.1966 Müllerstraße 13 10999 Berlin");
+	      x = srv.execute("Maria Meier w 22.11.1977");
       } catch (RemoteException e) {
 	      e.printStackTrace();
 	      fail(e.getMessage());
@@ -38,7 +39,7 @@ public class TestExecute  {
 		long start = System.currentTimeMillis();
 		for (int i = 0; i < 1000; i++) {
 			try {
-	         x = srv.execute("marco freitag 01.07.1981 08297 zwönitz mertensheide 2");
+	         x = srv.execute("Hans Müller m 21.12.1966 Müllerstraße 13 10999 Berlin");
 	         srv.endSession(x.sessionId);
          } catch (RemoteException e) {
 	         e.printStackTrace();
@@ -49,7 +50,7 @@ public class TestExecute  {
 			//System.out.println(oid.length);
 		}
 		long end = System.currentTimeMillis();
-		System.out.println(end-start);
+		System.out.println("Execute duration: " + (end-start));
    	if (!GuiUtil.yesNoMessage(null, "Return to continue", "End")) {
    		return;
    	}
@@ -59,6 +60,18 @@ public class TestExecute  {
       try {
 	      x = srv.execute("berlin");
 	      String p = x.getFirstPage();
+      } catch (RemoteException e) {
+	      e.printStackTrace();
+	      fail(e.getMessage());
+      }
+	}
+	@Test public void test3() {
+		ExpressionResult x;
+      try {
+	      x = srv.execute("(berlin | münchen) hans");
+	      String p = x.getFirstPage();
+	      Map<String,Integer> map = srv.getOtherItems(x.sessionId);
+	      System.out.println("OtherItems:" + map.size());
       } catch (RemoteException e) {
 	      e.printStackTrace();
 	      fail(e.getMessage());
