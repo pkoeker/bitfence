@@ -24,7 +24,6 @@ public class BfCacheWriter implements CacheWriter {
 
 	@Override
    public void delete(CacheEntry arg0) throws CacheException {
-		System.out.println(arg0);
 	   Item item = this.get(arg0.getElement());
 	   try {
 	      BfPL.getInstance().deleteItem(item.itemname);
@@ -36,7 +35,6 @@ public class BfCacheWriter implements CacheWriter {
 
 	@Override
    public void deleteAll(Collection<CacheEntry> arg0) throws CacheException {
-		System.out.println(arg0);
 	   for (CacheEntry entry: arg0) {
 	   	this.delete(entry);
 	   }
@@ -75,7 +73,6 @@ public class BfCacheWriter implements CacheWriter {
 
 	@Override
    public void writeAll(Collection<Element> arg0) throws CacheException {
-		//System.out.println(arg0);	   
 		for (Element cele:arg0) { // TODO: Transaktion, batch; inserted/modified
 			this.write(cele);
 		}

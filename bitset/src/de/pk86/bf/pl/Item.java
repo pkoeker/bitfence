@@ -26,11 +26,6 @@ public class Item implements Serializable {
 		this.inserted = true;
 	}
 
-//	public Item(String itemname, byte[] bitFence) {
-//		this.itemname = itemname;
-//		this.bitset = BitSet.valueOf(bitFence);
-//	}
-
 	public Item(String itemname, JDataRow row) {
 		this.itemname = itemname;
 		JDataValue val = row.getDataValue("bits");
@@ -72,12 +67,9 @@ public class Item implements Serializable {
 	/**
 	 * Setzt ein Bit
 	 * 
-	 * @param l
-	 *          
-	 * @return boolean Wenn true, dann wurde das Bit wirklich gesetzt
+	 * @param i
 	 */
-	void setBit(long l) {
-		int i = (int)l;
+	void setBit(int i) {
 		synchronized(bitset) {
 			modified = !bitset.get(i);
 			bitset.set(i);
@@ -87,19 +79,18 @@ public class Item implements Serializable {
 	/**
 	 * Testet ob ein Bit gesetzt ist.
 	 * 
-	 * @param l
+	 * @param i
 	 * @return boolean
 	 */
-	boolean testBit(long l) {
-		boolean b = bitset.get((int)l);
+	boolean testBit(int i) {
+		boolean b = bitset.get(i);
 		return b;
 	}
 
-	void removeBit(long l) {
-		int i = (int)l;
+	void removeBit(int i) {
 		synchronized(bitset) {
 			modified = bitset.get(i);
-			bitset.set((int)l, false);
+			bitset.set(i, false);
 		}
 	}
 

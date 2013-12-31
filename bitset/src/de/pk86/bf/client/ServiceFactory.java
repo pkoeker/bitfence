@@ -43,7 +43,7 @@ public class ServiceFactory {
 		ObjectItemServiceIF srv = context.getBean(ObjectItemServiceIF.class);		
 		return srv;
 	}
-	// http://pk86.de/bitdemo/soap?wsdl
+	
 	public static ObjectItemSOAPService getSOAPService(String host) {
 		if (host == null) {
 			host = "http://pk86.de/bitdemo/soap?wsdl";

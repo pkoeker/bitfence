@@ -72,8 +72,13 @@ public class TestPL  {
 		try {
 			int anzObject = pl.getItemCount("berlin");
 	      Item item = pl.loadItem("berlin");
+	      String str = item.toString();
 	      int[] oids = item.getOids();
 	      assertEquals(anzObject, oids.length);
+	      for (int i = 0; i < oids.length; i++) {
+	      	boolean b = item.testBit(oids[i]);
+	      	assertEquals(true, b);
+	      }
 	      String s = pl.getObjekts(oids);
       } catch (Exception e) {
 	   	e.printStackTrace();

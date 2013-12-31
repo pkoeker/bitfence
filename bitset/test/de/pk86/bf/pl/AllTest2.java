@@ -18,8 +18,8 @@ import de.pk86.bf.client.ServiceFactory;
 	TestPL.class,
 	TestOIS.class,
 	TestExecute.class,
-	TestSession.class,
-	TestRepair.class
+	TestSession.class
+	//TestRepair.class
 
 })
 

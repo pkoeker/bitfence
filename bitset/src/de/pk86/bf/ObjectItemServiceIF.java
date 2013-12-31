@@ -23,14 +23,14 @@ public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	 * @param content
 	 * @return Die vergebene Objekt-Id
 	 */
-	public long createObject(String content);
+	public int createObject(String content);
 	/**
 	 * Erzeugt ein beliebiges Text-Objekt mit dem angegebenen Inhalt
 	 * unter der angegebenen Objekt-Id
 	 * @param oid Eindeutige Id für Objekte
 	 * @param content Mit White Space getrennter Inhalt
 	 */
-	public void createObject(long oid, String content);
+	public void createObject(int oid, String content);
 	/**
 	 * Erzeugt ein neues Schlüsselwort
 	 * @param itemname
@@ -72,6 +72,7 @@ public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	public int performOper(int sessionId, String itemname, Selection.Oper operand);
 	public ExpressionResult performOper(ArrayList<OperToken> al);
 	public ExpressionResult getResultSet(int sessionId);
+	public String getObjekts(int[] oids);
 	/**
 	 * Liefert einen String mit dem Inhalt der angegebenen Objekt; jeweils durch LF getrennt.
 	 * @param oids
@@ -165,7 +166,7 @@ public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	 * @param createItems wenn true, dann werden auch neue Eigenschaften erzeugt.
 	 * @param lowercase Wenn true wird Rudi zu rudi.
 	 */
-	public void indexObject(long oid,String text,boolean createItems,boolean lowercase);
+	public void indexObject(int oid,String text,boolean createItems,boolean lowercase);
 	/**
 	 * Startet den experimentelle Spider.<br>
 	 * In der Konfigurationsdatei ist festgelegt, 

@@ -163,9 +163,9 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public int countActiveSessions() {
 		return sessions.size();
 	}
-	public long createObject(String content) {
+	public int createObject(String content) {
 		try {
-			long oid = pl.createObject(content);
+			int oid = pl.createObject(content);
 			return oid;
 		} catch (Exception ex) {
 			logger.error(ex.getMessage(), ex);
@@ -184,7 +184,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @param content
 	 * @throws IllegalArgumentException wenn oid < 0 oder größer MAX_OID
 	 */
-	public void createObject(long oid, String content) {
+	public void createObject(int oid, String content) {
 		try {
 			pl.createObject(oid, content);
 		} catch (Exception ex) {
@@ -225,7 +225,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @param itemname
 	 * @return boolean true, wenn das Objekt die angegebene Eigenschaft hat.
 	 */
-	public boolean hasItem(long oid, String itemname) {
+	public boolean hasItem(int oid, String itemname) {
 		try {
 	      return pl.hasItem(oid, itemname);
       } catch (Exception ex) {
@@ -717,10 +717,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	 * @param createItems wenn true, dann werden auch neue Eigenschaften erzeugt.
 	 * @param lowercase Wenn true wird Rudi zu rudi.
 	 */
-	public void indexObject(long oid, String text, boolean createItems, boolean lowercase) {
+	public void indexObject(int oid, String text, boolean createItems, boolean lowercase) {
 		this.indexObject(oid, new StringReader(text), createItems, lowercase);
 	}
-	void indexObject(long oid, Reader reader, boolean createItems, boolean lowercase) {
+	void indexObject(int oid, Reader reader, boolean createItems, boolean lowercase) {
 		HashSet<String> hs = new HashSet<String>(200);
 		try {
 			StreamTokenizer stoks = new StreamTokenizer(reader);
