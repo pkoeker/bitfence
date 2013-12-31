@@ -102,7 +102,7 @@ public class BfPL {
 		IPLContext ipl = pl.startNewTransaction("importObjects");
 		// 1. Primary keys
 		{
-			long oid = pl.getOID(); 
+			int oid = (int)pl.getOID(); 
 			Iterator<JDataRow> ito = ds.getChildRows();
 			while(ito.hasNext()) {
 				JDataRow row = ito.next();
@@ -121,7 +121,7 @@ public class BfPL {
 			while(itc.hasNext()) {
 				JDataRow row = itc.next();
 				String content = row.getValue("content");
-				long oid = row.getValueLong("obid");
+				int oid = row.getValueInt("obid");
 				this.createObjectItems(oid, content, ipl);
 			}		
 			// 4. Cache durchschreiben
@@ -134,13 +134,13 @@ public class BfPL {
 		}
 	}
 	/**
-	 * Erzeugt ein Objekt mit dem angegebenen inhalt
+	 * Erzeugt ein Objekt mit dem angegebenen Inhalt
 	 * @param content
 	 * @return Die vom System vergebene oid
 	 * @throws Exception
 	 */
-	public long createObject(String content) throws Exception {
-		long oid = pl.getOID();
+	public int createObject(String content) throws Exception {
+		int oid = (int)pl.getOID();
 		this.createObject(oid, content);
 		return oid;
 	}
@@ -150,7 +150,7 @@ public class BfPL {
 	 * @param content
 	 * @throws Exception
 	 */
-	public void createObject(long oid, String content) throws Exception {
+	public void createObject(int oid, String content) throws Exception {
 		IPLContext ipl = null;
 		try {
 			ipl = pl.startNewTransaction("createObject");
@@ -179,7 +179,7 @@ public class BfPL {
 	 * @return
 	 * @throws Exception
 	 */
-	public boolean deleteObject(long oid) throws Exception {
+	public boolean deleteObject(int oid) throws Exception {
 		IPLContext ipl = null;
 		final String transName = "deleteObjekt";
 		try {
@@ -220,7 +220,7 @@ public class BfPL {
 	 * @param ipl
 	 * @throws Exception
 	 */
-	private void createObjectItems(long oid, String content, IPLContext ipl) throws Exception {
+	private void createObjectItems(int oid, String content, IPLContext ipl) throws Exception {
 		Set<String> al = getObjectItems(content);
 		for (String itemname:al) {
 			setBit(oid, itemname, ipl);
@@ -237,7 +237,7 @@ public class BfPL {
 	public Map<String,Integer> getOtherItems(int[] oids, ArrayList<String> items) throws Exception {
 		LinkedHashMap<String,Integer> map = new LinkedHashMap<String,Integer>();
 		try {
-			String sql = "SELECT oid, content FROM Objekt WHERE oid IN(?)";
+			String sql = "SELECT obid, content FROM Objekt WHERE obid IN(?)";
 			ParameterList list = new ParameterList();
 			ArrayList<Integer> al = new ArrayList<Integer>(oids.length);
 			for(int i = 0; i < oids.length; i++) {
@@ -380,7 +380,7 @@ public class BfPL {
 		}
 		return ret;
 	}
-	public boolean hasItem(long oid, final String itemname) throws Exception {
+	public boolean hasItem(int oid, final String itemname) throws Exception {
 		boolean b = testBit(oid, itemname, pl);
 		return b;
 	}
@@ -485,6 +485,7 @@ public class BfPL {
 			iCache.put(item);// in Cache zurückschreiben, damit modified/inserted zurückgesetzt wird
 			ipl.commitTransaction(transname);
 		} catch (PLException ex) {
+			logger.error(ex.getMessage(), ex);
 			if (ipl != null) {
 				ipl.rollbackTransaction(transname);
 			}
@@ -492,7 +493,7 @@ public class BfPL {
 		}
 	}
 
-	private void insertOrUpdateItem(Item item, IPLContext ipl) throws Exception {
+	private void insertOrUpdateItem(Item item, IPLContext ipl) throws PLException {
 		if (item.isInserted()) {
 			this.insertItem(item, ipl);
 		} else if (item.isModified()) {
@@ -500,7 +501,7 @@ public class BfPL {
 		}
 	}
 	
-	private int insertItem(Item item, IPLContext ipl) throws Exception {
+	private int insertItem(Item item, IPLContext ipl) throws PLException {
 		try {
 			ParameterList list = new ParameterList();
 			list.addParameter("itemname", item.itemname);
@@ -513,7 +514,7 @@ public class BfPL {
 			throw ex;
 		}
 	}
-	private void updateItem(Item item, IPLContext ipl) throws Exception {
+	private int updateItem(Item item, IPLContext ipl) throws PLException {
 		try {
 			ParameterList list = new ParameterList();
 			byte[] bts = item.getBytes();
@@ -521,6 +522,7 @@ public class BfPL {
 			list.addParameter("itemname", item.itemname);
 			int cnt = ipl.executeSql(updateItem, list);
 			item.setUpdated(); // reset
+			return cnt;
 		} catch (PLException ex) {
 			throw ex;
 		}
@@ -544,8 +546,8 @@ public class BfPL {
 	 */
 	public void repair(int start, int stop) throws Exception {
 		// 1. Alle Items wegwerfen
-		//##int cnt = pl.executeSql("DELETE FROM ITEM");
-		//##System.out.println("Items delete: " + cnt);
+		int cnt = pl.executeSql("DELETE FROM ITEM");
+		System.out.println("Items delete: " + cnt);
 		// Items aus ObjectItems neu aufbauen
 		int STEP = 50000;
 		//int start = 0;
@@ -555,7 +557,7 @@ public class BfPL {
 			ParameterList list = new ParameterList();
 			list.addParameter("1", start);
 			list.addParameter("2", start+STEP);
-			JDataSet ds = pl.getDatasetSql("objekt", "SELECT OID, Content FROM Objekt WHERE OID between ? AND ?", list); 
+			JDataSet ds = pl.getDatasetSql("objekt", "SELECT OBID, Content FROM Objekt WHERE OBID between ? AND ?", list); 
 			System.out.println("Objekt rowCount: " + ds.getRowCount());
 			if (ds.getRowCount() == 0 || start > stop) {
 				break;
@@ -566,7 +568,7 @@ public class BfPL {
 			IPLContext ipl = pl.startNewTransaction("repair");
 			while(it.hasNext()) {
 				JDataRow row = it.next();
-				long oid = row.getValueLong("obid");
+				int oid = row.getValueInt("obid");
 				String content = row.getValue("content");
 				Set<String> al = getObjectItems(content);
 				anzo++;
@@ -699,17 +701,6 @@ public class BfPL {
 		}
 		JDataSet ds = pl.getDataset("objekt", loids);		
 		
-//		ArrayList<Integer> al = new ArrayList<Integer>();
-//		for (int i = 0; i < oids.length; i++) {
-//			al.add(oids[i]);
-//		}
-//		String sql = "SELECT * FROM OBJEKT WHERE OID IN(?)";
-//		ParameterList list = new ParameterList();
-//		list.addParameter("oids", al);
-//		JDataSet ds = pl.getDatasetSql("objekt", sql, list);		
-//		JDataTable tbl = ds.getDataTable(); 
-//		JDataColumn colPK = tbl.getDataColumn("obid");
-//		colPK.setPrimaryKey(true); // PK fürs zurückschreiben
 		return ds;
 	}
 	/**
@@ -752,7 +743,7 @@ public class BfPL {
 	
 	private int updateRow(JDataRow row, IPLContext ipl) throws Exception {
 		int cnt = 0; 
-		long oid = row.getValueLong("obid");
+		int oid = row.getValueInt("obid");
 		 String oldContent = row.getDataValue("content").getOldValue();
 		 String content = row.getValue("content");
 		 if (row.isDeleted() && oldContent == null) { // gelöscht, aber nicht geändert
@@ -889,14 +880,14 @@ public class BfPL {
 	 * @param ipl
 	 * @throws Exception
 	 */
-	private void saveItem(Item s, IPLContext ipl) throws Exception {
+	private int saveItem(Item s, IPLContext ipl) throws Exception {
 		if (iCache != null) {
-			return;
+			return 0;
 		}
 		if (s.isInserted() == true) {
-			this.insertItem(s, ipl);
+			return this.insertItem(s, ipl);
 		} else {
-			this.updateItem(s, ipl);
+			return this.updateItem(s, ipl);
 		}
 	}
 	/**
@@ -906,7 +897,7 @@ public class BfPL {
 	 * @param ipl
 	 * @throws Exception
 	 */
-	private void setBit(long oid, String itemname, IPLContext ipl) throws Exception {
+	private void setBit(int oid, String itemname, IPLContext ipl) throws Exception {
 		Item item = loadItem(itemname, true, ipl);
 		item.setBit(oid);
 		if (iCache == null) { // kein Cache
@@ -926,7 +917,7 @@ public class BfPL {
 	 * @return
 	 * @throws Exception
 	 */
-	private boolean testBit(long oid, String itemname, IPLContext ipl) throws Exception {
+	private boolean testBit(int oid, String itemname, IPLContext ipl) throws Exception {
 		Item item = loadItem(itemname, false, ipl);
 		if (item == null) {
 			return false;		
@@ -941,12 +932,12 @@ public class BfPL {
 	 * @param ipl
 	 * @throws Exception
 	 */
-	private void removeBit(long oid, String itemname, IPLContext ipl) throws Exception {
+	private void removeBit(int oid, String itemname, IPLContext ipl) throws Exception {
 		Item item = loadItem(itemname, false, ipl);
 		if (item == null) {
 			return;		
 		} else {
-			item.removeBit(oid);
+			item.removeBit(oid); // TODO: Wenn das letzte bit gelöscht, dann item wegwerfen?
 			if (iCache == null) {
 				saveItem(item, ipl);
 			} else {

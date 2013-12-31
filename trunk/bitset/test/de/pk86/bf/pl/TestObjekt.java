@@ -10,7 +10,7 @@ public class TestObjekt {
 	@Test public void createObjekt() {
 		try {
 	      int anzHans0 = pl.getItemCount("hans");
-	      long oid = pl.createObject("Hans Müller m Müllerstraße 13 10123 Berlin");
+	      int oid = pl.createObject("Hans Müller m Müllerstraße 13 10123 Berlin");
 	      if (oid <= 0) {
 	      	fail("oid <= 0");
 	      }
