@@ -16,11 +16,11 @@ import de.pkjs.pl.PLException;
  */
 public class ImportObjects extends TestCase {
 	private static PL pl;
-	static String FIRSTNAMES_DELIM = " -/.";
-	static String LASTNAME_DELIM = " -/.";
+	static String FIRSTNAMES_DELIM = " -/.'";
+	static String LASTNAME_DELIM = " -/.'";
 	static String BIRTHDATE_DELIM = " ";
 	static String ZIP_CITY_DELIM = " ;()/-";
-	static String STREET_NUMBER_DELIM = " ;()/-";
+	static String STREET_NUMBER_DELIM = " ;()/-'";
 
 	static PL getPL() {
 		if (pl == null) {
