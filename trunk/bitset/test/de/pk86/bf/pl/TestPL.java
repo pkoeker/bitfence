@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.Set;
+
 import org.junit.Test;
 
 public class TestPL  {
@@ -29,6 +31,9 @@ public class TestPL  {
 	      // ist jetzt vorhanden
 	      b = pl.hasItem(itemName);
 	      assertEquals(true, b);
+	      Item it = pl.loadItem(itemName);
+	      pl.insertOrUpdateItem(it);
+	      boolean bc = pl.isCached(itemName);
 	      //
 	      String[] its = pl.findItems("xxx.xxx");
 	      assertEquals(1, its.length);
@@ -76,10 +81,27 @@ public class TestPL  {
 	      int[] oids = item.getOids();
 	      assertEquals(anzObject, oids.length);
 	      for (int i = 0; i < oids.length; i++) {
-	      	boolean b = item.testBit(oids[i]);
+	      	int oid = oids[i];
+	      	boolean b = item.testBit(oid);
 	      	assertEquals(true, b);
-	      }
+	      	String content = pl.getObjekt(oid);
+	      	Set<String> items = BfPL.getObjectItems(content);
+	      	for(String s:items) {
+	      		boolean h = pl.hasItem(oid, s);
+		      	assertEquals(true, h);
+	      	}
+	      }	      
 	      String s = pl.getObjekts(oids);
+      } catch (Exception e) {
+	   	e.printStackTrace();
+	   	fail(e.getMessage());
+      }
+	}
+	
+	@Test public void testDelete() {
+		try {
+			boolean b = pl.deleteObject(-1); // gibts nicht
+      	assertEquals(false, b);
       } catch (Exception e) {
 	   	e.printStackTrace();
 	   	fail(e.getMessage());
