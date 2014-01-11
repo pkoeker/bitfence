@@ -9,7 +9,7 @@ public class BfCacheEventListenerFactory extends CacheEventListenerFactory {
 
 	@Override
    public CacheEventListener createCacheEventListener(Properties arg0) {
-		return new BfCacheRemoveListener();
+		return new BfCacheEventListener();
    }
 
 }

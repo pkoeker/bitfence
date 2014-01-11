@@ -33,13 +33,13 @@ import net.sf.ehcache.event.CacheManagerEventListener;
  * @see CacheManagerEventListener
  * @since 1.2
  */
-public class BfCacheRemoveListener implements CacheEventListener {
-	  private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BfCacheRemoveListener.class);
+public class BfCacheEventListener implements CacheEventListener {
+	  private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BfCacheEventListener.class);
 	  private int removed;
 	  private int expired;
 	  private int evicted;
 	
-	  public BfCacheRemoveListener() {
+	  public BfCacheEventListener() {
 		  super();
 	  }
 	/**
@@ -168,7 +168,7 @@ public class BfCacheRemoveListener implements CacheEventListener {
 	public Object clone() throws CloneNotSupportedException {
 		
 		//throw new CloneNotSupportedException();
-		return new BfCacheRemoveListener();
+		return new BfCacheEventListener();
 	}
 
 	@Override
