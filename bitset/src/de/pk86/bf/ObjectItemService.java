@@ -14,6 +14,9 @@ import java.util.StringTokenizer;
 
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import net.sf.ehcache.management.CacheStatistics;
 import de.jdataset.JDataColumn;
@@ -128,7 +131,8 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
   endpointInterface = "de.pk86.bf.ObjectItemSOAPService"
 )
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
-public final class ObjectItemService implements ObjectItemServiceIF {
+@WebListener
+public final class ObjectItemService implements ObjectItemServiceIF, ServletContextListener {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemService.class);
 	private BfPL pl = BfPL.getInstance();
 	private Spider spider;
@@ -148,7 +152,7 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 		this.initRemover();
 	}
 	private void initRemover() {
-		SessionRemover remover = new SessionRemover(this);
+		remover = new SessionRemover(this);
 		remover.setDaemon(true);
 		remover.start();
 	}
@@ -871,6 +875,16 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 	public String echo(String s) {
 		return s;
 	}
+	// WebListener
+	@Override
+   public void contextDestroyed(ServletContextEvent arg0) {
+      remover.setWorking(false);
+      BfPL.getInstance().finalize();
+   }
+	@Override
+   public void contextInitialized(ServletContextEvent arg0) {
+      //initRemover();      
+   }
 
 	
 	//########################################################
@@ -908,6 +922,10 @@ public final class ObjectItemService implements ObjectItemServiceIF {
 					// nix
 				}
 			}
+		}
+		
+		void setWorking(boolean b) {
+			brun = b;
 		}
 	}
 }
