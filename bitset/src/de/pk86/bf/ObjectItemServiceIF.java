@@ -11,7 +11,7 @@ public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	/**
 	 * Default White Space (Sparatoren für Items im Content)
 	 */
-	public static String DEFAULT_DELIM = " ;.,()/-";
+	public static String DEFAULT_DELIM = " ;.,()/-'";
 	/**
 	 * Maximale Anzahl der gleichzeitig angemeldeten User
 	 */
