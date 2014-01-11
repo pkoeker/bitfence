@@ -919,13 +919,16 @@ public final class ObjectItemService implements ObjectItemServiceIF, ServletCont
 				try {
 					sleep(sleep);
 				} catch (InterruptedException e) {
-					// nix
+					logger.info("Thread interrupted: " + e.getMessage());
 				}
 			}
 		}
 		
 		void setWorking(boolean b) {
 			brun = b;
+			if (!b) {
+				this.interrupt();
+			}
 		}
 	}
 }
