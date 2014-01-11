@@ -978,6 +978,7 @@ public class BfPL {
 	public void finalize() {
 		try {
 			this.writeAll(null);
+			cacheManager.shutdown();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error(ex.getMessage(), ex);
