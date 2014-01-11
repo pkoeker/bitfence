@@ -664,6 +664,18 @@ public class BfPL {
 	      }
 		}
 	}
+	
+	public String getObjekt(int oid) throws Exception {
+		ParameterList list = new ParameterList();			
+		list.addParameter("obid", oid);
+		JDataSet ds = pl.getDatasetSql("Content", findObject, list);
+		if (ds == null || ds.getRowCount() != 1) {
+			return null;
+		}
+		String content = ds.getRow().getValue("content");
+		return content;
+	}
+	
 	public String getObjekts(int[] oids) throws Exception {
 		long[] l = new long[oids.length];
 		for(int i = 0; i < oids.length; i++) {
