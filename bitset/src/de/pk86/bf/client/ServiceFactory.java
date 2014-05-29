@@ -5,7 +5,7 @@ import java.net.URL;
 
 import org.springframework.context.ApplicationContext;
 
-import de.pk86.bf.ObjectItemService;
+import de.pk86.bf.ObjectItemServiceImpl;
 import de.pk86.bf.ObjectItemServiceIF;
 import de.pk86.bf.soap.Bitset;
 import de.pk86.bf.ObjectItemSOAPService;
@@ -15,14 +15,14 @@ import de.pk86.bf.ObjectItemSOAPService;
  * @author peter
  */
 public class ServiceFactory {	
-	private static ObjectItemService srv;
+	private static ObjectItemServiceImpl srv;
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServiceFactory.class);
 
 	public static ObjectItemServiceIF getDirectService() {
 		if (srv == null) {
 			synchronized (ServiceFactory.class) {
 				if (srv == null) {
-					srv = new ObjectItemService();
+					srv = new ObjectItemServiceImpl();
 				}
 			}
 		}
@@ -46,7 +46,7 @@ public class ServiceFactory {
 	
 	public static ObjectItemSOAPService getSOAPService(String host) {
 		if (host == null) {
-			host = "http://pk86.de/bitdemo/soap?wsdl";
+			host = "https://pk86.de/bitdemo/soap?wsdl";
 		}
 		Bitset bs;
       try {
