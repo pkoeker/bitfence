@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContext;
 public class Startup {
 
 	public static void main(String[] args) {
-		ObjectItemService sv = new ObjectItemService();
+		ObjectItemServiceImpl sv = new ObjectItemServiceImpl();
 		try {
 			ApplicationContext actx = BfServerConfig.getContext();
 		} catch (Throwable t) {

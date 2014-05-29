@@ -7,10 +7,10 @@ import java.rmi.RemoteException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
@@ -24,9 +24,6 @@ import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
 import de.pk86.bf.pl.BfPL;
-//import electric.registry.Registry;
-//import electric.server.http.HTTP;
-//import electric.util.Context;
 import electric.xml.Element;
 
 /**
@@ -132,24 +129,35 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
 )
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
 @WebListener
-public final class ObjectItemService implements ObjectItemServiceIF, ServletContextListener {
-	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemService.class);
+public final class ObjectItemServiceImpl implements ObjectItemServiceIF, ServletContextListener {
+	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemServiceImpl.class);
 	private BfPL pl = BfPL.getInstance();
 	private Spider spider;
 	private SessionRemover remover;
+	private static ObjectItemServiceImpl me;
 	/**
 	 * Session werden nach 15 Minuten timeout gelöscht
 	 */
-	private Hashtable<Integer, Selection> sessions = new Hashtable<Integer, Selection>();
+	private ConcurrentHashMap<Integer, Selection> sessions = new ConcurrentHashMap<Integer, Selection>();
 	
 	private int sessionCounter; // TODO: Beim runterfahren persistent machen
 	// Constructor
 	/**
 	 * Erzeugt einen neuen Dienst.
 	 */
-	public ObjectItemService() {
+	public ObjectItemServiceImpl() { // TODO: wird doppelt aufgerufen :-( [JAX-WS-SOAP (sun-jaxws.xml) + Spring (BfServerConfig) ]
 		this.initSpider();
 		this.initRemover();
+	}
+	public static ObjectItemServiceIF getInstance() {
+		if (me == null) {
+			synchronized (ObjectItemServiceImpl.class) {
+	         if (me == null) {
+	         	me = new ObjectItemServiceImpl();
+	         }
+         }
+		}
+		return me;
 	}
 	private void initRemover() {
 		remover = new SessionRemover(this);
@@ -450,7 +458,7 @@ public final class ObjectItemService implements ObjectItemServiceIF, ServletCont
 	 * Löscht alle Sessions
 	 */
 	public void resetAllSessions() {
-		sessions = new Hashtable<Integer, Selection>();
+		sessions = new ConcurrentHashMap<Integer, Selection>();
 	}
 	public int createSession(String expression) throws RemoteException {
 		ExpressionResult res = this.execute(expression);
@@ -890,11 +898,11 @@ public final class ObjectItemService implements ObjectItemServiceIF, ServletCont
 	//########################################################
 	private static final class SessionRemover extends Thread {
 		private static int sleep = 60 * 1000; // Eine Minute
-		private ObjectItemService srv;
+		private ObjectItemServiceImpl srv;
 		private static boolean brun = true;
 
 		// Constructor
-		private SessionRemover(ObjectItemService srv) {
+		private SessionRemover(ObjectItemServiceImpl srv) {
 			logger.info("SessionRemover created");
 			this.srv = srv;
 			this.setPriority(MIN_PRIORITY);
