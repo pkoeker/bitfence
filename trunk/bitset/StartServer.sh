@@ -1,1 +1,1 @@
-java -Xmx64M -cp .:pk86_bf.jar:lib/*:lib/spring/* de.pk86.bf.Startup
+java -Xmx2G -cp .:bitset.jar:WebContent/WEB-INF/classes:WebContent/WEB-INF/lib/* de.pk86.bf.Startup

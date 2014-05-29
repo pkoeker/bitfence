@@ -11,6 +11,7 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
+        <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.servlet"/>
         <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.client"/>
         <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.util"/>
         <javaElement handleIdentifier="=bitset/src&lt;de.pk86.bf.pl"/>
