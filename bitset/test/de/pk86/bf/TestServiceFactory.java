@@ -11,7 +11,7 @@ public class TestServiceFactory {
 	
 	
 	@Test public void testSOAP() {
-		ObjectItemSOAPService srv = ServiceFactory.getSOAPService(null);
+		ObjectItemSOAPService srv = ServiceFactory.getSOAPService("http://localhost:8080/bitset/soap?wsdl");
 		srv.echo("äöüÄÖÜß");
 	}
 	@Test public void testRMI() {

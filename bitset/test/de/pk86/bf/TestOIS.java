@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 public class TestOIS /*extends TestCase*/ {
-	private ObjectItemService sv = new ObjectItemService();
+	private ObjectItemServiceImpl sv = new ObjectItemServiceImpl();
 	
 	@Test public void testItem1() {
 		String itemname = "xxx.zzz";
