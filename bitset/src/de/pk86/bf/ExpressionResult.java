@@ -3,6 +3,10 @@ package de.pk86.bf;
 import java.io.Serializable;
 import java.util.Iterator;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import de.jdataset.DataSetFactory;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 
@@ -63,6 +67,19 @@ public class ExpressionResult implements Serializable {
    	}
    	s += " = " + (duraDB1 + duraAlg + duraDB2 + duraNet);
    	return s;
+   }
+   
+   public JSONObject getJSONResult() {
+   	JSONObject jo = new JSONObject();
+   	jo.put("SessionId", sessionId);
+   	jo.put("ResultSetSize", resultsetSize);
+   	jo.put("ElapsedTime", getDuration());
+   	if (missingItems != null) {
+   		jo.put("MissingItems", missingItems);
+   	}
+   	JSONArray ja = DataSetFactory.toJSONArray(firstPage.getChildRows());
+   	jo.put("ResultSetFirstPage", ja);
+   	return jo;   	
    }
    
 }

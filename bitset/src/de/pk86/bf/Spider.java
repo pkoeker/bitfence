@@ -14,12 +14,12 @@ class Spider {
 	// Attributes
 	private ArrayList<String> extensions = new ArrayList<String>();
 	private ArrayList<String> directories = new ArrayList<String>();
-	private ObjectItemService sv;
-	Spider (ObjectItemService sv, ArrayList<String> ext) {
+	private ObjectItemServiceImpl sv;
+	Spider (ObjectItemServiceImpl sv, ArrayList<String> ext) {
 		this.sv = sv;
 		this.extensions = ext;
 	}
-	Spider(ObjectItemService sv, Element spiderEle) {
+	Spider(ObjectItemServiceImpl sv, Element spiderEle) {
 		this.sv = sv;
 		Elements eles = spiderEle.getElements("FileExtension");
 		while (eles.hasMoreElements()) {
