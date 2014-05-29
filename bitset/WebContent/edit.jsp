@@ -1,4 +1,5 @@
-<%@ page import = "de.pk86.bf.client.*, de.pk86.bf.*" %>
+<%@ page import = "de.pk86.bf.client.*, de.pk86.bf.*" contentType="text/html; charset=UTF-8" %>
+
 <jsp:useBean id="edit" class="de.pk86.bf.client.EditBean" scope="session"/>
 <jsp:setProperty name="edit" property="*"/>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -15,7 +16,7 @@ table.myTable td, table.myTable th { border:1px solid black; }
   <form method="get">
 	<table class="myTable">		
 		<tr>
-			<th>löschen</th>
+			<th>lÃ¶schen</th>
 			<th>ID</th>
 			<th>Content</th>
 		</tr>
