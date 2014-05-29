@@ -1,5 +1,7 @@
 package de.pk86.bf.client;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import de.jdataset.JDataRow;
