@@ -39,6 +39,7 @@ public class JSONServlet extends HttpServlet {
 		String expression = request.getParameter("expr");
 		String next = request.getParameter("next");
 		String prev = request.getParameter("prev");
+		String add = request.getParameter("add");
 		if (expression != null) {
 			ExpressionResult res = sv.execute(expression);
 			JSONObject jo = res.getJSONResult();
@@ -55,7 +56,14 @@ public class JSONServlet extends HttpServlet {
 			JDataSet ds = sv.getNextPage(sessionId);
 			JSONArray ja = DataSetFactory.toJSONArray(ds);
 			doResponse(response, ja);
-		}		
+		} else if (add != null) {
+			JSONObject jp = new JSONObject(add);
+			String content = jp.getString("content");
+			int oid = sv.createObject(content);
+			JSONObject jo = new JSONObject();
+			jo.put("ObjectId", oid);
+			doResponse(response, jo);
+		}
 	}
 	
 	private void doResponse(HttpServletResponse response, Object o) throws IOException {
