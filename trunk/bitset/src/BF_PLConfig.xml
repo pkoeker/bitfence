@@ -3,7 +3,7 @@
 	<Database name='bitfence' enabled='true'>
     <!-- POSTGRES -->
     <JDBC-Driver>org.postgresql.Driver</JDBC-Driver>
-    <URL>jdbc:postgresql://localhost/bitsettest?prepareThreshold=3</URL>
+    <URL>jdbc:postgresql://localhost/bitset?prepareThreshold=3</URL>
     <!--URL>jdbc:postgresql://10.8.0.1/bitset?prepareThreshold=3</URL-->
 	<Schema>public</Schema>
     <Username>bitset</Username>
