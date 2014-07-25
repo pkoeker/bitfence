@@ -108,6 +108,13 @@ public interface ObjectItemServiceIF extends ObjectItemSOAPService {
 	 */
 	public ExpressionResult execute(String expression) throws RemoteException;
 	/**
+	 * Liest den Content per SQL
+	 * @param expression
+	 * @return
+	 * @throws RemoteException
+	 */
+	public ExpressionResult select(String expression) throws RemoteException;
+	/**
 	 * Erzeugt eine Session mit einer Ergebnismenge zu dem angegebenen Ausdruck.
 	 * Anschließend kann mit der gelieferten sessionId die Ergebnismenge angerufen werden.
 	 * @param expression

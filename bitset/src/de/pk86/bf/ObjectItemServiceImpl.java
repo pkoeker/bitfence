@@ -624,6 +624,33 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 		return res;
 	}
 	
+	public ExpressionResult select(String expression) throws RemoteException {
+		try {
+			long start = System.currentTimeMillis();
+			int sessionId = this.startSession().getSessionId(); // Hier wird die neue Session erzeugt
+			JDataSet ds = pl.getObjekts(expression);
+			Selection sel = sessions.get(sessionId);
+			long end1 = System.currentTimeMillis();
+			ExpressionResult ret = new ExpressionResult(sessionId);
+			//int anz = pl.getResultSetPage();
+			ret.firstPage = ds;
+			ret.resultsetSize = sel.getResultSetSize();
+			ret.missingItems = sel.getMissingItems();
+			long end2 = System.currentTimeMillis();
+			ret.duraAlg = end1-start;
+			ret.duraDB2 = end2-end1;
+			ret.trace = sel.getTrace();
+			return ret;
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			if (ex instanceof RemoteException) {
+				throw (RemoteException)ex;
+			} else {
+				throw new RemoteException(ex.getMessage(), ex);
+			}
+		}
+	}
+	
 	public JDataSet getFirstPage(int sessionId) {
 		Selection sel = sessions.get(sessionId);
 		if (sel == null) return null;
