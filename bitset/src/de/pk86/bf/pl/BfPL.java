@@ -592,7 +592,6 @@ public class BfPL {
 	}
 	
 	static Set<String> getObjectItems(String content) {
-		//ArrayList<String> al = new ArrayList<String>();
 		Set<String> al = new LinkedHashSet<String>();
 		if (content == null) {
 			return al;
@@ -703,6 +702,20 @@ public class BfPL {
       }		
 	}
 	
+	public JDataSet getObjekts(String pattern) throws Exception {
+		ParameterList list = new ParameterList();
+		list.addParameter("pattern", "%" + pattern + "%");
+		String sql = "SELECT * FROM OBJEKT where lower(content) like ?";
+		list.setMaxRows(1000);
+      try {
+      	JDataSet ds = pl.getDatasetSql("content", sql, list);
+	      return ds;
+      } catch (PLException e) {
+      	logger.error(e.getMessage(), e);
+      	throw e;
+      }		
+	}
+	
 	public JDataSet getObjectPage(int[] oids) throws Exception {
 		if (oids == null) {
 			return null;
@@ -756,38 +769,38 @@ public class BfPL {
 	private int updateRow(JDataRow row, IPLContext ipl) throws Exception {
 		int cnt = 0; 
 		int oid = row.getValueInt("obid");
-		 String oldContent = row.getDataValue("content").getOldValue();
-		 String content = row.getValue("content");
-		 if (row.isDeleted() && oldContent == null) { // gelöscht, aber nicht geändert
+		String oldContent = row.getDataValue("content").getOldValue();
+		String content = row.getValue("content");
+		if (row.isDeleted() && oldContent == null) { // gelöscht, aber nicht geändert
 			 oldContent = content;
-		 }
-		 Set<String> olditems = getObjectItems(oldContent);
-		 Set<String> items = getObjectItems(content);
-		 // 1.1 Wenn deleted, dann alte Werte löschen
-		 if (row.isDeleted()) {
+		}
+		Set<String> olditems = getObjectItems(oldContent);
+		Set<String> items = getObjectItems(content);
+		// 1.1 deleted: Alle alten Werte löschen
+		if (row.isDeleted()) {
 			 for(String itemname:olditems) {
 				 this.removeBit(oid, itemname, ipl);
 				 cnt++;
 			 }
-		 }
-		 // 1.2 Alte Attribute austragen, wenn in der neuen Attributliste nicht mehr enthalten
-		 else if (row.isInserted() == false) { // keine neuen austragen
+		}
+		// 1.2 modified: Alte Werte austragen, wenn in der neuen Attributliste nicht mehr enthalten
+		else if (row.isInserted() == false) { // keine neuen austragen
 			 for(String itemname:olditems) {
 				 if (items.contains(itemname) == false) {
 					 this.removeBit(oid, itemname, ipl);
 					 cnt++;
 				 }
 			 }
-		 }
-		 // 1.3 Neue Werte schreiben
-		 if (row.isDeleted() == false) { // keine gelöschten neu schreiben
+		}
+		// 1.3 modified/inserted: Neue Werte schreiben, wenn nicht in alten Werten enthalten
+		if (row.isDeleted() == false) { // keine gelöschten neu schreiben
 			 for(String itemname:items) {
 				 if (olditems.contains(itemname) == false) {
 					 this.setBit(oid, itemname, ipl);
 					 cnt++;
 				 }
 			 }
-		 }
+		}
 		return cnt;
 	}
 	// INIT ################################
