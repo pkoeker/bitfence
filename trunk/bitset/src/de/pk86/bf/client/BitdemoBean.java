@@ -1,5 +1,7 @@
 package de.pk86.bf.client;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import de.jdataset.JDataSet;
@@ -14,15 +16,24 @@ public class BitdemoBean {
 	private ExpressionResult res;
 	private String page = "";
 	private JDataSet currentPage;
-	private HttpServletRequest request;
 	
 	public BitdemoBean() {
 		sv = ServiceFactory.getDirectService();
 		logger.debug("new BitDemoBean created");
 	}
 	
+//	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws Exception {
+//			   request.setCharacterEncoding("UTF-8");
+//			   chain.doFilter(request, response);
+//	}
+
+	
 	public void processRequest(HttpServletRequest request) {
-		this.request = request;
+		try {
+	      request.setCharacterEncoding("UTF-8");
+      } catch (UnsupportedEncodingException e) {
+	      e.printStackTrace();
+      }
 		String param = request.getParameter("action");
 		if (param == null) {
 			return;
@@ -59,6 +70,16 @@ public class BitdemoBean {
 				} else if ("statistic".equalsIgnoreCase(param)) {
 					String cs = sv.getItemCacheStatistics();
 					page = cs;
+				} else if ("select".equalsIgnoreCase(param)) {
+					res = sv.select(expression);
+					if (res != null) {
+						currentPage = res.firstPage;
+						request.getSession().setAttribute("currentPage", currentPage);
+						this.dispResult(currentPage, res.trace);
+					} else {
+						currentPage = null;
+						request.getSession().setAttribute("currentPage", currentPage);
+					}
 				}
 			}
 		} catch (Exception ex) {
@@ -68,14 +89,11 @@ public class BitdemoBean {
 		
 	public void setSearchPattern(String pattern) {
 		this.expression = pattern.trim();
-		if (request == null) return;
-		logger.debug("Expression: " + expression);
-		String param = request.getParameter("action");
-		logger.debug("Parameter: " + param);
 		System.out.println("setSearchPattern: " + pattern);
 	}
 		
 	public String getSearchPattern() {
+		logger.debug(expression);
 		return expression;
 	}
 	
