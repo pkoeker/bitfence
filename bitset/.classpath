@@ -19,9 +19,6 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-api.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-impl.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxb-xjc.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxws-api.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxws-rt.jar"/>
-	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/jaxws-tools.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/log4j-1.2.16.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-api-1.6.1.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/slf4j-log4j12-1.6.1.jar"/>
@@ -29,7 +26,7 @@
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/streambuffer.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/tomcat-juli.jar"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/EXML.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jxmlguibuilder"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/ehcache-2.7.5.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jxmlguibuilder"/>
 	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>
