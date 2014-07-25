@@ -199,4 +199,9 @@ public class ObjectItemSpringService implements ObjectItemServiceIF {
    public String echo(String s) {
 	   return me.echo(s);
    }
+
+	@Override
+   public ExpressionResult select(String expression) throws RemoteException {
+	   return me.select(expression);
+   }
 }
