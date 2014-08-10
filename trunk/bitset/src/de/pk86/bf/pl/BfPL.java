@@ -980,8 +980,10 @@ public class BfPL {
 			transStarted = true;
 		}
 	   List<Item> list = iCache.getAll();
-	   for (Item item:list) {
-	   	this.insertOrUpdateItem(item, ipl);
+	   if (list != null) {
+		   for (Item item:list) {
+		   	this.insertOrUpdateItem(item, ipl);
+		   }
 	   }
 	   if (transStarted) {
 	   	ipl.commitTransaction("writeAll");
