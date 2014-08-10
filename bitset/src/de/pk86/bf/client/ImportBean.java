@@ -1,10 +1,14 @@
 package de.pk86.bf.client;
 
+import java.io.Serializable;
+
 import javax.servlet.http.HttpServletRequest;
 
 import de.pk86.bf.ObjectItemServiceIF;
 
-public class ImportBean {
+public class ImportBean implements Serializable {
+   private static final long serialVersionUID = 1L;
+
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ImportBean.class);
 	
 	private transient ObjectItemServiceIF sv;

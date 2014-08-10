@@ -1,12 +1,16 @@
 package de.pk86.bf.client;
 
+import java.io.Serializable;
+
 import javax.servlet.http.HttpServletRequest;
 
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.pk86.bf.ObjectItemServiceIF;
 
-public class EditBean {
+public class EditBean implements Serializable {
+   private static final long serialVersionUID = 1L;
+
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(EditBean.class);
 	
 	private transient ObjectItemServiceIF sv;
