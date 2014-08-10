@@ -9,16 +9,15 @@ import de.pk86.bf.ObjectItemServiceIF;
 public class EditBean {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(EditBean.class);
 	
-	private ObjectItemServiceIF sv;
-	//private HttpServletRequest request;
+	private transient ObjectItemServiceIF sv;
 	private JDataSet page;
 	private long dura;
 	private int anzahl;
 
 	public EditBean() {
-		sv = ServiceFactory.getDirectService();
-		
+		sv = ServiceFactory.getDirectService();		
 	}
+	
 	public void processRequest(HttpServletRequest request) {
 		anzahl = 0; dura = 0;
 		//this.request = request;
@@ -42,6 +41,9 @@ public class EditBean {
 			long start = System.currentTimeMillis();
 			if (page.hasChanges()) {
 				JDataSet dsChanges = page.getChanges();
+				if (sv == null) {
+					sv = ServiceFactory.getDirectService();
+				}
 				anzahl = sv.updateObjects(dsChanges);
 				page.commitChanges();
 			}
