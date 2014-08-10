@@ -79,6 +79,9 @@ class ItemCache {
 	}
 
 	List<Item> getAll() {
+		if (cache == null) {
+			return null;
+		}
 		List<String> keys = cache.getKeys();
 		Map<Object, net.sf.ehcache.Element> map = cache.getAll(keys);
 		List<Item> list = new ArrayList<Item>();
