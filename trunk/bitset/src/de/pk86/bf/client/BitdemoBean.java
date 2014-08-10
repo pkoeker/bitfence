@@ -1,5 +1,6 @@
 package de.pk86.bf.client;
 
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -8,10 +9,12 @@ import de.jdataset.JDataSet;
 import de.pk86.bf.ExpressionResult;
 import de.pk86.bf.ObjectItemServiceIF;
 
-public class BitdemoBean {
+public class BitdemoBean implements Serializable {
+   private static final long serialVersionUID = 1L;
+
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(BitdemoBean.class);
 	
-	private ObjectItemServiceIF sv;
+	private transient ObjectItemServiceIF sv;
 	private String expression = "";
 	private ExpressionResult res;
 	private String page = "";
@@ -42,6 +45,9 @@ public class BitdemoBean {
 		logger.debug("Expression: " + expression);
 		//System.out.println("processRequest: " + param);
 		try {
+			if (sv == null) {
+				sv = ServiceFactory.getDirectService();
+			}
 			if ("suchen".equalsIgnoreCase(param)) {
 				if (res != null) { // Neu suchen: Ggf. bestehende Session zuvor beenden (die kann aber durch ein Timeout bereits beendet worden sein!)
 					boolean terminated = sv.endSession(res.sessionId);
