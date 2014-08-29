@@ -913,7 +913,9 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 	// WebListener
 	@Override
    public void contextDestroyed(ServletContextEvent arg0) {
-      remover.setWorking(false);
+		if (remover != null) {
+			remover.setWorking(false);
+		}
       BfPL.getInstance().finalize();
    }
 	@Override
