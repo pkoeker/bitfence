@@ -1,5 +1,6 @@
 package de.pk86.bf;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
@@ -12,14 +13,16 @@ import de.pk86.bf.pl.Item;
 /**
  * Hält den Zustand einer Session
  */
-public class Selection {
+public class Selection implements Serializable {
+   private static final long serialVersionUID = 1L;
+   
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Selection.class);
 
 	public static enum Oper {NONE, AND, OR, XOR, NOT}; 
 	private int sessionId; // Eindeutige ID
 	private Date created = new Date(); // Erzeugt
 	private Date timestamp = new Date(); // Zeitstempel
-	private BfPL pl = BfPL.getInstance();
+	private transient BfPL pl = BfPL.getInstance();
 	private Item item;
 	private int bitCount;
 	private int calls;
@@ -34,6 +37,8 @@ public class Selection {
    public List<TraceElement> trace = new ArrayList<TraceElement>();
 
 	// Constructor
+   Selection() {} // Serializable
+   
 	Selection (int id) {
 		this.sessionId = id;
 	}
@@ -369,8 +374,10 @@ public class Selection {
    	return sb.toString();
    }
    
-   private static class TraceElement {
-   	public String expression;
+   private static class TraceElement implements Serializable {
+      private static final long serialVersionUID = 1L;
+
+      public String expression;
    	public int elements;
    	
    	TraceElement(String expression, int cnt) {
