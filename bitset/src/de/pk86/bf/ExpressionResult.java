@@ -14,6 +14,7 @@ public class ExpressionResult implements Serializable {
    private static final long serialVersionUID = 1L;
    
    public int sessionId;
+   public Selection sel; // Tomcat Session
    
    public String expression;
    public String missingItems;
@@ -33,6 +34,10 @@ public class ExpressionResult implements Serializable {
     */
    public ExpressionResult() { }
    
+   public ExpressionResult(Selection sel) {
+   	this.sel = sel;
+   	this.sessionId = sel.getSessionId();
+   }
    public ExpressionResult(int sessionId) {
    	this.sessionId = sessionId;
    }
