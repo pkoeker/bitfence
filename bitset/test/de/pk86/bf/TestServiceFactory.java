@@ -25,7 +25,7 @@ public class TestServiceFactory {
 		}
 	}
 	@Test public void testAPI() {
-		ObjectItemServiceIF srv = ServiceFactory.getDirectService();
+		ObjectItemServiceIF srv = ServiceFactory.getLocalService();
 		srv.echo("äöüÄÖÜß");		
 	}
 }
