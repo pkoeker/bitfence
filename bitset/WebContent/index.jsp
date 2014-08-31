@@ -14,12 +14,12 @@
   <form method="post">
   Suchbegriffe: <sup>[1]</sup><br/> 
   <textarea cols="100" rows="5" name="searchPattern" maxlength="4000"><%= bitdemo.getSearchPattern() %></textarea> <p/>
-  <input type="submit" name="action" value="Suchen"/> Anzahl Treffer: <%= bitdemo.getResultSetSize() %> Dauer: <%= bitdemo.getDuration() %><p/>    
+  <input type="submit" name="action" value="Suchen"/> Anzahl Treffer: <%= bitdemo.getResultSetSize(request) %> Dauer: <%= bitdemo.getDuration(request) %><p/>    
   Suchergebnis: <br/> 
   <textarea cols="100" rows="20" name="searchResult" readonly="readonly"><%= bitdemo.getSearchResult() %></textarea> <p/>
   </form>
   
-  <form method="post" style="display:inline"><input type="submit" name="action" value="zur&uuml;ck"/> <%=bitdemo.getPointer() %></form> 
+  <form method="post" style="display:inline"><input type="submit" name="action" value="zur&uuml;ck"/> <%=bitdemo.getPointer(request) %></form> 
   <form method="post" style="display:inline"><input type="submit" name="action" value="weiter"/></form>
   <form method="post" style="display:inline"><input type="submit" name="action" value="statistic"/></form>
   <form method="post" style="display:inline"><input type="submit" name="action" value="select"/></form>
