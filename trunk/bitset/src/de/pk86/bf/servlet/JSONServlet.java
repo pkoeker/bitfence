@@ -24,7 +24,7 @@ public class JSONServlet extends HttpServlet {
    private ObjectItemServiceIF sv;
    
    public JSONServlet() {
-   	sv = ServiceFactory.getDirectService();   	
+   	sv = ServiceFactory.getLocalService();   	
    }
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
