@@ -36,7 +36,7 @@ public class AllTest2 {
 		return pl;
 	}
 	public static ObjectItemServiceIF getService() {
-		ObjectItemServiceIF srv = ServiceFactory.getDirectService();
+		ObjectItemServiceIF srv = ServiceFactory.getLocalService();
 		return srv;
 	}
 
