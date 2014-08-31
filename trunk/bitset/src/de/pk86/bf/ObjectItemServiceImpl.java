@@ -1,5 +1,11 @@
 package de.pk86.bf;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
@@ -23,6 +29,7 @@ import de.jdataset.JDataColumn;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
 import de.jdataset.JDataTable;
+import de.pk86.bf.client.ServiceFactory;
 import de.pk86.bf.pl.BfPL;
 import electric.xml.Element;
 
@@ -131,23 +138,33 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
 @WebListener
 public final class ObjectItemServiceImpl implements ObjectItemServiceIF, ServletContextListener {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemServiceImpl.class);
-	private BfPL pl = BfPL.getInstance();
-	private Spider spider;
-	private SessionRemover remover;
+	private transient BfPL pl = BfPL.getInstance();
+	private transient Spider spider;
+	private transient SessionRemover remover;
 	private static ObjectItemServiceImpl me;
 	/**
 	 * Session werden nach 15 Minuten timeout gelöscht
 	 */
 	private ConcurrentHashMap<Integer, Selection> sessions = new ConcurrentHashMap<Integer, Selection>();
 	
-	private int sessionCounter; // TODO: Beim runterfahren persistent machen
+	private int sessionCounter; // Beim runterfahren persistent machen
 	// Constructor
 	/**
 	 * Erzeugt einen neuen Dienst.
 	 */
 	public ObjectItemServiceImpl() { // TODO: wird doppelt aufgerufen :-( [JAX-WS-SOAP (sun-jaxws.xml) + Spring (BfServerConfig) ]
+		this(true);
+	}
+	public ObjectItemServiceImpl(boolean remover) {
+		if (ServiceFactory.getService() == null) {
+			ServiceFactory.setService(this);
+		}
 		this.initSpider();
-		this.initRemover();
+		if (remover) {
+			this.initRemover();
+		} else {
+			// Tomcat
+		}
 	}
 	public static ObjectItemServiceIF getInstance() {
 		if (me == null) {
@@ -344,11 +361,10 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 	
 	public ExpressionResult performOper(ArrayList<OperToken> al) {
 		long start = System.currentTimeMillis();
-		int sessionId = this.startSession().getSessionId(); // Hier wird die neue Session erzeugt
-		Selection sel = sessions.get(sessionId);
+		Selection sel = this.startSession(); // Hier wird die neue Session erzeugt
 		int cnt = sel.performOper(al);
 		long end1 = System.currentTimeMillis();
-		ExpressionResult ret = new ExpressionResult(sessionId);
+		ExpressionResult ret = new ExpressionResult(sel);
 		//int anz = pl.getResultSetPage();
 		JDataSet ds = sel.getFirstPage();
 		ret.firstPage = ds;
@@ -627,11 +643,10 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 	public ExpressionResult select(String expression) throws RemoteException {
 		try {
 			long start = System.currentTimeMillis();
-			int sessionId = this.startSession().getSessionId(); // Hier wird die neue Session erzeugt
+			Selection sel = this.startSession(); // Hier wird die neue Session erzeugt
 			JDataSet ds = pl.getObjekts(expression);
-			Selection sel = sessions.get(sessionId);
 			long end1 = System.currentTimeMillis();
-			ExpressionResult ret = new ExpressionResult(sessionId);
+			ExpressionResult ret = new ExpressionResult(sel);
 			//int anz = pl.getResultSetPage();
 			ret.firstPage = ds;
 			ret.resultsetSize = sel.getResultSetSize();
@@ -910,17 +925,60 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 	public String echo(String s) {
 		return s;
 	}
-	// WebListener
+	// ContextListener
+	@Override
+	public void contextInitialized(ServletContextEvent arg0) {
+		//initRemover();   
+		
+		// sessions laden falls vorhanden
+		// Read from disk using FileInputStream
+		FileInputStream f_in;
+      try {
+	      f_in = new FileInputStream("sessions.ser");
+	      // Read object using ObjectInputStream
+	      ObjectInputStream obj_in = new ObjectInputStream (f_in);
+	      
+	      // Read an object
+	      Object obj = obj_in.readObject();
+	      obj_in.close();
+	      if (obj instanceof ConcurrentHashMap) {
+	      	// Cast object 
+	      	sessions = (ConcurrentHashMap<Integer, Selection>) obj;
+	      	for (Selection sel:sessions.values()) {
+	      		if (sel.getSessionId() > sessionCounter) {
+	      			sessionCounter = sel.getSessionId() +1;
+	      		}
+	      	}
+	      }
+      } catch (FileNotFoundException e) {
+	      e.printStackTrace();
+      } catch (IOException e) {
+	      e.printStackTrace();
+      } catch (ClassNotFoundException e) {
+	      e.printStackTrace();
+      }
+
+	}
 	@Override
    public void contextDestroyed(ServletContextEvent arg0) {
 		if (remover != null) {
-			remover.setWorking(false);
+			remover.setWorking(false); // Führt auch interrupt() beim Thread aus
 		}
       BfPL.getInstance().finalize();
-   }
-	@Override
-   public void contextInitialized(ServletContextEvent arg0) {
-      //initRemover();      
+		// sessions serialisieren (wenn vorhanden)
+      if (sessions.size() > 0) {
+	      try {
+	      	// Write to disk with FileOutputStream    
+	      	FileOutputStream f_out = new FileOutputStream("sessions.ser");
+		      // Write object with ObjectOutputStream
+		      ObjectOutputStream obj_out = new ObjectOutputStream (f_out);		      
+		      // Write object out to disk
+		      obj_out.writeObject ( sessions );
+		      obj_out.close();
+	      } catch (Exception e) {
+		      e.printStackTrace();
+	      }
+      }
    }
 
 	
@@ -945,7 +1003,7 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 			try {
 				sleep(sleep);
 			} catch (InterruptedException e) {
-				// nix
+				logger.info("Thread interrupted#1: " + e.getMessage());
 			}
 			while (brun) {
 				if (cnt % 120 == 0) { // Einmal pro Stunde ein Lebenszeichen
@@ -956,7 +1014,7 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 				try {
 					sleep(sleep);
 				} catch (InterruptedException e) {
-					logger.info("Thread interrupted: " + e.getMessage());
+					logger.info("Thread interrupted#2: " + e.getMessage());
 				}
 			}
 		}

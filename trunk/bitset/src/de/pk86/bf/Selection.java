@@ -22,7 +22,15 @@ public class Selection implements Serializable {
 	private int sessionId; // Eindeutige ID
 	private Date created = new Date(); // Erzeugt
 	private Date timestamp = new Date(); // Zeitstempel
+	
 	private transient BfPL pl = BfPL.getInstance();
+	private BfPL getPL() {
+		if (pl == null) {
+			pl = BfPL.getInstance();
+		}
+		return pl;
+	}
+	
 	private Item item;
 	private int bitCount;
 	private int calls;
@@ -37,7 +45,9 @@ public class Selection implements Serializable {
    public List<TraceElement> trace = new ArrayList<TraceElement>();
 
 	// Constructor
-   Selection() {} // Serializable
+   Selection() {
+   	pl = BfPL.getInstance();
+   } 
    
 	Selection (int id) {
 		this.sessionId = id;
@@ -192,7 +202,7 @@ public class Selection implements Serializable {
 		return bitCount;
 	}
 	int[] getResultSet() {
-		if (this.bitCount > pl.getMaxResultSet()) {
+		if (this.bitCount > getPL().getMaxResultSet()) {
 			throw new IllegalStateException("Maximum ResultSet Size exceeded: " + Integer.toString(bitCount));
 		}
 		return getResult(0, bitCount, true);
@@ -244,10 +254,10 @@ public class Selection implements Serializable {
 	JDataSet getFirstPage() {
 		timestamp = new Date(); // Zeitstempel
 		posi = 0; index = 0;
-		int anz = pl.getResultSetPage(); // 20
+		int anz = getPL().getResultSetPage(); // 20
 		int[] oids = getResult(posi, anz, true);
       try {
-	      JDataSet ds = pl.getObjectPage(oids);
+	      JDataSet ds = getPL().getObjectPage(oids);
 	      return ds;
       } catch (Exception e) {
 	      e.printStackTrace();
@@ -260,7 +270,7 @@ public class Selection implements Serializable {
 		if (posi >= bitCount -1) {
 			throw new IllegalStateException("End of ResultSet reached");
 		}
-		int anz = pl.getResultSetPage(); // 20
+		int anz = getPL().getResultSetPage(); // 20
 		if (posi + anz > bitCount) {
 			anz = bitCount - posi;
 		}
@@ -274,7 +284,7 @@ public class Selection implements Serializable {
 		if (this.hasNext()) {
 			int[] oids = this.getNext();
 	      try {
-		      JDataSet ds = pl.getObjectPage(oids);
+		      JDataSet ds = getPL().getObjectPage(oids);
 		      if (ds == null) {
 					throw new IllegalStateException("End of ResultSet reached");
 		      }
@@ -293,12 +303,12 @@ public class Selection implements Serializable {
 		if (posi == 0) {
 			throw new IllegalStateException("Begin of ResultSet reached");
 		}
-		int anz = pl.getResultSetPage(); // 20
+		int anz = getPL().getResultSetPage(); // 20
 		posi = posi - anz;
 		int[] oids = getResult(posi, anz, false);
 		if (posi < 0) posi = 0;
       try {
-	      JDataSet ds = pl.getObjectPage(oids);
+	      JDataSet ds = getPL().getObjectPage(oids);
 	      ds.setOid(posi);
 	      return ds;
       } catch (Exception e) {
@@ -325,7 +335,7 @@ public class Selection implements Serializable {
 	long getDuration() {
 		return this.duration;
 	}
-	void reset() {
+	public void reset() {
 		this.calls = 0;
 		this.bitCount = 0;
 		this.posi = 0;
