@@ -57,7 +57,7 @@ public class ObjectItemGui {
 	}
 	
 	private ObjectItemGui() {
-		sv = ServiceFactory.getDirectService();
+		sv = ServiceFactory.getLocalService();
 		//sv = ServiceFactory.getSOAP_Service("http://pk86.de:8004/bitdemo.wsdl");		
 		//sv = ServiceFactory.getSpringService();
 		//sv = ServiceFactory.getSOAP_Service("http://localhost:8004/bf.wsdl");
@@ -81,7 +81,7 @@ public class ObjectItemGui {
 	public void getService(GuiUserEvent event) {
 		GuiChangeEvent ce = (GuiChangeEvent)event;
 		if (ce.value.equals("native")) {
-			sv = ServiceFactory.getDirectService();					
+			sv = ServiceFactory.getLocalService();					
 		} else if (ce.value.equals("rmi")) {
 			sv = ServiceFactory.getSpringService();		
 //		} else if (ce.value.equals("soap")) {

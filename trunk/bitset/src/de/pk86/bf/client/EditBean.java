@@ -19,7 +19,7 @@ public class EditBean implements Serializable {
 	private int anzahl;
 
 	public EditBean() {
-		sv = ServiceFactory.getDirectService();		
+		sv = ServiceFactory.getLocalService();		
 	}
 	
 	public void processRequest(HttpServletRequest request) {
@@ -46,7 +46,7 @@ public class EditBean implements Serializable {
 			if (page.hasChanges()) {
 				JDataSet dsChanges = page.getChanges();
 				if (sv == null) {
-					sv = ServiceFactory.getDirectService();
+					sv = ServiceFactory.getLocalService();
 				}
 				anzahl = sv.updateObjects(dsChanges);
 				page.commitChanges();

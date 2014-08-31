@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import de.jdataset.JDataSet;
 import de.pk86.bf.ExpressionResult;
@@ -16,12 +17,11 @@ public class BitdemoBean implements Serializable {
 	
 	private transient ObjectItemServiceIF sv;
 	private String expression = "";
-	private ExpressionResult res;
 	private String page = "";
 	private JDataSet currentPage;
 	
 	public BitdemoBean() {
-		sv = ServiceFactory.getDirectService();
+		sv = ServiceFactory.getLocalService();
 		logger.debug("new BitDemoBean created");
 	}
 	
@@ -46,33 +46,48 @@ public class BitdemoBean implements Serializable {
 		//System.out.println("processRequest: " + param);
 		try {
 			if (sv == null) {
-				sv = ServiceFactory.getDirectService();
+				sv = ServiceFactory.getLocalService();
 			}
+			HttpSession ses = request.getSession(true);
+			ExpressionResult res = (ExpressionResult)ses.getAttribute("ExpressionResult");
 			if ("suchen".equalsIgnoreCase(param)) {
 				if (res != null) { // Neu suchen: Ggf. bestehende Session zuvor beenden (die kann aber durch ein Timeout bereits beendet worden sein!)
-					boolean terminated = sv.endSession(res.sessionId);
+					if (res.sel != null) {
+						res.sel.reset();
+					} else {
+						boolean terminated = sv.endSession(res.sessionId);
+					}
 					res = null;
 				}
-				res = sv.execute(expression);	// throws RemoteException		
+				res = sv.execute(expression);	// throws RemoteException
+				ses.setAttribute("ExpressionResult", res);
 				if (res != null) {
 					currentPage = res.firstPage;
 					request.getSession().setAttribute("currentPage", currentPage);
-					this.dispResult(currentPage, res.trace);
+					this.dispResult(request, currentPage, res.trace);
 				} else {
 					currentPage = null;
 					request.getSession().setAttribute("currentPage", currentPage);
 				}
 			} else if (res != null) { 
 				if ("weiter".equalsIgnoreCase(param)) {
-					currentPage = sv.getNextPage(res.sessionId);
+					if (res.sel != null) {
+						currentPage = res.sel.getNextPage();
+					} else {
+						currentPage = sv.getNextPage(res.sessionId);
+					}
 					request.getSession().setAttribute("currentPage", currentPage);
-					this.res.pointer = (int)currentPage.getOid();
-					this.dispResult(currentPage, null);
+					res.pointer = (int)currentPage.getOid();
+					this.dispResult(request, currentPage, null);
 				} else if ("zurück".equalsIgnoreCase(param)) {
-					currentPage = sv.getPrevPage(res.sessionId);
+					if (res.sel != null) {
+						currentPage = res.sel.getPrevPage();
+					} else {
+						currentPage = sv.getPrevPage(res.sessionId);
+					}
 					request.getSession().setAttribute("currentPage", currentPage);
-					this.res.pointer = (int)currentPage.getOid();
-					this.dispResult(currentPage, null);
+					res.pointer = (int)currentPage.getOid();
+					this.dispResult(request, currentPage, null);
 				} else if ("statistic".equalsIgnoreCase(param)) {
 					String cs = sv.getItemCacheStatistics();
 					page = cs;
@@ -81,7 +96,7 @@ public class BitdemoBean implements Serializable {
 					if (res != null) {
 						currentPage = res.firstPage;
 						request.getSession().setAttribute("currentPage", currentPage);
-						this.dispResult(currentPage, res.trace);
+						this.dispResult(request, currentPage, res.trace);
 					} else {
 						currentPage = null;
 						request.getSession().setAttribute("currentPage", currentPage);
@@ -89,6 +104,7 @@ public class BitdemoBean implements Serializable {
 				}
 			}
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			page = ex.getMessage();
 		}
 	}
@@ -107,7 +123,9 @@ public class BitdemoBean implements Serializable {
 		return page;
 	}
 	
-	public String getDuration() {
+	public String getDuration(HttpServletRequest request) {
+		HttpSession ses = request.getSession();
+		ExpressionResult res = (ExpressionResult)ses.getAttribute("ExpressionResult");
 		if (res != null) {
 			return res.getDuration();
 		} else {
@@ -115,7 +133,9 @@ public class BitdemoBean implements Serializable {
 		}
 	}
 	
-	public String getResultSetSize() {
+	public String getResultSetSize(HttpServletRequest request) {
+		HttpSession ses = request.getSession();
+		ExpressionResult res = (ExpressionResult)ses.getAttribute("ExpressionResult");
 		if (res != null) {
 			return Integer.toString(res.resultsetSize);
 		} else {
@@ -123,7 +143,9 @@ public class BitdemoBean implements Serializable {
 		}
 	}
 	
-	private void dispResult(JDataSet ds, String trace) {
+	private void dispResult(HttpServletRequest request, JDataSet ds, String trace) {
+		HttpSession ses = request.getSession();
+		ExpressionResult res = (ExpressionResult)ses.getAttribute("ExpressionResult");
 		String s = ExpressionResult.pageToString(ds);
 		if (trace != null && trace.length() > 0) {
 			s += "\nEntwicklung der Ergebnismenge:\n" + trace;
@@ -134,7 +156,9 @@ public class BitdemoBean implements Serializable {
 		page = s;
 	}
 	
-	public String getPointer() {
+	public String getPointer(HttpServletRequest request) {
+		HttpSession ses = request.getSession();
+		ExpressionResult res = (ExpressionResult)ses.getAttribute("ExpressionResult");
 		if (res != null) {
 			return Integer.toString(res.pointer);
 		} else {
