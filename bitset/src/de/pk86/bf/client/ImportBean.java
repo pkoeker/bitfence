@@ -15,10 +15,9 @@ public class ImportBean implements Serializable {
 	private String data = "";
 	private long dura;
 	private int anzahl;
-	//private HttpServletRequest request;
 	
 	public ImportBean() {
-		sv = ServiceFactory.getDirectService();
+		sv = ServiceFactory.getLocalService();
 	}
 	
 	public void processRequest(HttpServletRequest request) {
@@ -30,7 +29,7 @@ public class ImportBean implements Serializable {
 		if ("importieren".equalsIgnoreCase(param) && data.length() > 0) {
 			long start = System.currentTimeMillis();
 			if (sv == null) {
-				sv = ServiceFactory.getDirectService();
+				sv = ServiceFactory.getLocalService();
 			}
 			anzahl = sv.importDatabaseCSV(data);
 			long end = System.currentTimeMillis();

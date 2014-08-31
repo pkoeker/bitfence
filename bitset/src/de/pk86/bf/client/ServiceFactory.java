@@ -15,14 +15,20 @@ import de.pk86.bf.ObjectItemSOAPService;
  * @author peter
  */
 public class ServiceFactory {	
-	private static ObjectItemServiceImpl srv;
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServiceFactory.class);
+	private static ObjectItemServiceImpl srv;
+	public static void setService(ObjectItemServiceImpl s) {
+		srv = s;
+	}
+	public static ObjectItemServiceIF getService() {
+		return srv;
+	}
 
-	public static ObjectItemServiceIF getDirectService() {
+	public static ObjectItemServiceIF getLocalService() {
 		if (srv == null) {
 			synchronized (ServiceFactory.class) {
 				if (srv == null) {
-					srv = new ObjectItemServiceImpl();
+					srv = new ObjectItemServiceImpl(false);
 				}
 			}
 		}
