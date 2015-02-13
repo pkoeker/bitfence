@@ -17,7 +17,7 @@ import de.jdataset.JDataSet;
  */
 public class TestBitset {
 	public static void main(String[] args) {
-		ObjectItemServiceImpl sv = new ObjectItemServiceImpl();
+		ObjectItemServiceIF sv = new ObjectItemServiceWrapper("test");
 		
 		long start = System.currentTimeMillis();
 		//System.out.println(start);
