@@ -3,7 +3,7 @@
 	<Database name='bitfence' enabled='true'>
     <!-- POSTGRES -->
     <JDBC-Driver>org.postgresql.Driver</JDBC-Driver>
-    <URL>jdbc:postgresql://localhost/bitset?prepareThreshold=3</URL>
+    <URL>jdbc:postgresql://localhost:5433/bitset?prepareThreshold=3</URL>
     <!--URL>jdbc:postgresql://10.8.0.1/bitset?prepareThreshold=3</URL-->
 	<Schema>public</Schema>
     <Username>bitset</Username>
@@ -15,9 +15,9 @@
     <Username>bitfence</Username>
     <Password>bitfence</Password-->
     
-	<MaxActiveConnections value="400"/>
-	<MaxIdleConnections value="400"/>
-	<MinIdleConnections value="5"/>
+	<MaxActiveConnections value="40"/>
+	<MaxIdleConnections value="40"/>
+	<MinIdleConnections value="3"/>
 	<!-- MaxWait 5 Minuten -->
 	<ConnectionTimeOut value="300000"/>
 	<ValidationQuery>SELECT 1</ValidationQuery>
