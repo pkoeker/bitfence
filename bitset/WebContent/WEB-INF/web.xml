@@ -6,25 +6,24 @@
 	<distributable />
 	<listener>
 	    <!-- ServletContextListener (Thread stoppen, Session serialisieren) -->
-	    <listener-class>de.pk86.bf.ObjectItemServiceImpl</listener-class>
-		<!-- listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class-->
+		<listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
 	</listener>
 	<!-- SOAP -->
-	<!--servlet>
+	<servlet>
 		<servlet-name>bitset</servlet-name>
 		<servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
-	</servlet-->
+	</servlet>
 	<!-- JSON -->
 	<!--servlet>
   		<servlet-name>JSONServlet</servlet-name>
   		<servlet-class>de.pk86.bf.servlet.JSONServlet</servlet-class>
   	</servlet-->
   	<!-- Mapping -->
-	<!--servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>bitset</servlet-name>
 		<url-pattern>/soap</url-pattern>
-	</servlet-mapping-->
+	</servlet-mapping>
   	<!--servlet-mapping>
   		<servlet-name>JSONServlet</servlet-name>
   		<url-pattern>/request</url-pattern>
