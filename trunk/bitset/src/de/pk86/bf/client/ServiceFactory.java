@@ -5,10 +5,10 @@ import java.net.URL;
 
 import org.springframework.context.ApplicationContext;
 
-import de.pk86.bf.ObjectItemServiceImpl;
-import de.pk86.bf.ObjectItemServiceIF;
-import de.pk86.bf.soap.Bitset;
 import de.pk86.bf.ObjectItemSOAPService;
+import de.pk86.bf.ObjectItemServiceIF;
+import de.pk86.bf.ObjectItemServiceWrapper;
+import de.pk86.bf.soap.Bitset;
 
 /**
  * Erzeugt einen ObjectItemService auf Basis von SOAP oder Spring-RMI
@@ -16,8 +16,8 @@ import de.pk86.bf.ObjectItemSOAPService;
  */
 public class ServiceFactory {	
 	private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ServiceFactory.class);
-	private static ObjectItemServiceImpl srv;
-	public static void setService(ObjectItemServiceImpl s) {
+	private static ObjectItemServiceIF srv;
+	public static void setService(ObjectItemServiceIF s) {
 		srv = s;
 	}
 	public static ObjectItemServiceIF getService() {
@@ -28,7 +28,7 @@ public class ServiceFactory {
 		if (srv == null) {
 			synchronized (ServiceFactory.class) {
 				if (srv == null) {
-					srv = new ObjectItemServiceImpl(false);
+					srv = new ObjectItemServiceWrapper("local");
 				}
 			}
 		}

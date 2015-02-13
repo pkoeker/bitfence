@@ -88,9 +88,6 @@ public class BitdemoBean implements Serializable {
 					request.getSession().setAttribute("currentPage", currentPage);
 					res.pointer = (int)currentPage.getOid();
 					this.dispResult(request, currentPage, null);
-				} else if ("statistic".equalsIgnoreCase(param)) {
-					String cs = sv.getItemCacheStatistics();
-					page = cs;
 				} else if ("select".equalsIgnoreCase(param)) {
 					res = sv.select(expression);
 					if (res != null) {
@@ -102,6 +99,9 @@ public class BitdemoBean implements Serializable {
 						request.getSession().setAttribute("currentPage", currentPage);
 					}
 				}
+			} else if ("statistic".equalsIgnoreCase(param)) {
+				String cs = sv.getItemCacheStatistics();
+				page = cs;
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
