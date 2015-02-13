@@ -127,6 +127,7 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
 </ul>
  * @author Peter Köker
  */
+/*
 @WebService
 (    
   serviceName = "bitset",
@@ -136,6 +137,7 @@ die Größe des Intervalls der Objekt-IDs definiert; es macht also Sinn,
 )
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
 @WebListener
+*/
 public final class ObjectItemServiceImpl implements ObjectItemServiceIF, ServletContextListener {
 	private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ObjectItemServiceImpl.class);
 	private transient BfPL pl = BfPL.getInstance();
@@ -319,11 +321,12 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 		}
 		int sessionId = this.getNewSessionId();
 		Selection sel = new Selection(sessionId);
-		if (sessions.put(sessionId, sel) != null) {
-			String msg = "Transaction already exists: " + sessionId;
+		while (sessions.get(sessionId) != null) {
+			String msg = "SessionId already exists: " + sessionId;
 			logger.error(msg);
-			throw new IllegalArgumentException(msg);
+			sessionId = this.getNewSessionId();
 		}
+		sessions.put(sessionId, sel);
 		return sel;
 	}
 	/**
@@ -926,15 +929,13 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 		return s;
 	}
 	// ContextListener
+	@SuppressWarnings("unchecked")
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		//initRemover();   
-		
+		//initRemover();   		
 		// sessions laden falls vorhanden
-		// Read from disk using FileInputStream
-		FileInputStream f_in;
       try {
-	      f_in = new FileInputStream("sessions.ser");
+    	  FileInputStream f_in = new FileInputStream("sessions.ser");
 	      // Read object using ObjectInputStream
 	      ObjectInputStream obj_in = new ObjectInputStream (f_in);
 	      
@@ -944,6 +945,7 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 	      if (obj instanceof ConcurrentHashMap) {
 	      	// Cast object 
 	      	sessions = (ConcurrentHashMap<Integer, Selection>) obj;
+	      	logger.debug("Persistent Sessions: " + sessions.size());
 	      	for (Selection sel:sessions.values()) {
 	      		if (sel.getSessionId() > sessionCounter) {
 	      			sessionCounter = sel.getSessionId() +1;
@@ -951,10 +953,13 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 	      	}
 	      }
       } catch (FileNotFoundException e) {
+    	  logger.error(e.getMessage(), e);
 	      e.printStackTrace();
       } catch (IOException e) {
+    	  logger.error(e.getMessage(), e);
 	      e.printStackTrace();
       } catch (ClassNotFoundException e) {
+    	  logger.error(e.getMessage(), e);
 	      e.printStackTrace();
       }
 
@@ -975,7 +980,9 @@ public final class ObjectItemServiceImpl implements ObjectItemServiceIF, Servlet
 		      // Write object out to disk
 		      obj_out.writeObject ( sessions );
 		      obj_out.close();
+		      logger.debug("Persistent Sessions: " + sessions.size());
 	      } catch (Exception e) {
+	    	  logger.error(e.getMessage(), e);
 		      e.printStackTrace();
 	      }
       }
