@@ -4,20 +4,38 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Map;
 
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+import javax.servlet.annotation.WebListener;
+
 import de.jdataset.JDataSet;
 import de.pk86.bf.Selection.Oper;
 
 /**
- * Wrapper für SpringService 
+ * Wrapper für Spring- und SOAP-Service 
  * @author peter
  */
-public class ObjectItemSpringService implements ObjectItemServiceIF {
+@WebService
+(    
+  serviceName = "bitset",
+  portName = "bitset", 
+  targetNamespace = "http://pk86.de/bitset", // Wie beim Client-Interface!
+  endpointInterface = "de.pk86.bf.ObjectItemSOAPService"
+)
+@SOAPBinding(style = SOAPBinding.Style.DOCUMENT)
+@WebListener
+public class ObjectItemServiceWrapper implements ObjectItemServiceIF {
 	private ObjectItemServiceIF me;
+	private String type;
 	
-	
-	public ObjectItemSpringService() {
+	public ObjectItemServiceWrapper() {
 		me = ObjectItemServiceImpl.getInstance();
+		this.type = "soap";
 	}
+    public ObjectItemServiceWrapper(String type) {
+       me = ObjectItemServiceImpl.getInstance();
+       this.type = type;
+   }
 
 	@Override
    public int createObject(String content) {

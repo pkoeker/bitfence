@@ -68,7 +68,7 @@ public class BfServerConfig {
 	// RMI
 	@Bean
 	private ObjectItemServiceIF srv_bf() {
-		ObjectItemServiceIF srv = new ObjectItemSpringService();
+		ObjectItemServiceIF srv = new ObjectItemServiceWrapper("Spring-RMI");
 		// srv.setSessionManager(getSessionManager());
 		RmiServiceExporter exp = new RmiServiceExporter();
 		exp.setService(srv);
