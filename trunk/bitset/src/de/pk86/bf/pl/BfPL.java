@@ -15,6 +15,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.management.CacheStatistics;
 import de.jdataset.JDataRow;
 import de.jdataset.JDataSet;
+import de.jdataset.JDataSet.ProfileEntry;
 import de.jdataset.ParameterList;
 import de.pk86.bf.ObjectItemServiceIF;
 import de.pk86.bf.OperToken;
@@ -37,7 +38,7 @@ public class BfPL {
 	// Statements
 	// Object
 	private final String insertObject = "INSERT INTO OBJEKT Values(?,?)";
-	private final String findObject 	= "SELECT Content FROM Objekt WHERE obid = ?";
+	private final String findObject   = "SELECT Content FROM Objekt WHERE obid = ?";
 	private final String deleteObject = "DELETE FROM OBJEKT WHERE obid = ?";
 	//private String getMaxOid = "SELECT MAX(oid)+1 FROM OBJEKT";	
 	// Item
@@ -725,7 +726,11 @@ public class BfPL {
 			loids[i] = oids[i];
 		}
 		JDataSet ds = pl.getDataset("objekt", loids);		
-		
+//		List<ProfileEntry> list = ds.getProfiler();
+//		for(int i = 0; i < list.size(); i++) {
+//		   ProfileEntry pe = list.get(i);
+//		   logger.debug(pe);
+//		}
 		return ds;
 	}
 	/**
@@ -836,7 +841,7 @@ public class BfPL {
 				resultSetPage = Integer.parseInt(sRsPage);
 			}
 			// Caches
-			Element scEle = optEle.getElement("SlotCache");
+			Element scEle = optEle.getElement("ItemCache");
 			if (scEle != null) {
 				iCache = new ItemCache(scEle);
 			}
